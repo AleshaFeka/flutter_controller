@@ -118,12 +118,15 @@ class _TabsPage extends State<TabsPage> {
     while (buf.length >= pos + 34) {
       // enough bytes?
       if (buf[pos] == 0x23 && buf[pos + 33] == 0x2A) {
-        Uint8List packet = buf.sublist(pos + 1, pos + 33);
-        buf = buf.sublist(pos + 34);
-        print("Packet received: ");
-        print(packet);
-        pos = 0;
-        continue;
+        Uint8List packetData = buf.sublist(pos + 1, pos + 33);
+        Packet packet = Packet.fromBytes(packetData);
+        if (packet.crcValid) {
+          buf = buf.sublist(pos + 34);
+          print("Packet received: ");
+          print(packetData);
+          pos = 0;
+          continue;
+        }
       }
 
       pos++;
@@ -157,8 +160,7 @@ class _TabsPage extends State<TabsPage> {
   @override
   Widget build(BuildContext context) {
     final handleSettingsTap = () async {
-      await Navigator.of(context).push(MaterialPageRoute(
-          builder: (BuildContext context) => SettingsPage()));
+      await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => SettingsPage()));
       setState(() {
         settings = AppSettings.load();
       });
@@ -202,15 +204,18 @@ class _TabsPage extends State<TabsPage> {
       body: Container(
         child: (int num) {
           switch (num) {
-            case 1: return MonitorTab(settings);
-            case 2: return MotorTab();
+            case 1:
+              return MonitorTab(settings);
+            case 2:
+              return MotorTab();
 //            case 3: return DriveTab();
 //            case 4: return AnalogTab();
 //            case 5: return RegsTab();
 //            case 6: return SensorLessTab();
 //            case 7: return IdentTab();
 //            case 8: return LogsTab();
-            default: return Container();
+            default:
+              return Container();
           }
         }(_selectedChoice),
       ),

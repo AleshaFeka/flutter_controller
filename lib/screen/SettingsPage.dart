@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 
-import 'core/LiveData.dart';
+import '../core/LiveData.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage();

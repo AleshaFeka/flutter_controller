@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_controller/TabsPage.dart';
+import 'package:flutter_controller/screen/TabsPage.dart';
 
 class MainPage extends StatefulWidget {
   @override

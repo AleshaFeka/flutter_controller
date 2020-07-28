@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
-import 'package:flutter_controller/TabsPage.dart';
+import 'package:flutter_controller/screen/TabsPage.dart';
 
-import 'BluetoothDeviceListEntry.dart';
+import '../widget/BluetoothDeviceListEntry.dart';
 
 class ConnectPage extends StatefulWidget {
   /// If true, on page start there is performed discovery upon the bonded devices.

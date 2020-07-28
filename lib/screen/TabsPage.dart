@@ -1,12 +1,15 @@
 import 'dart:typed_data';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
+import 'package:flutter_controller/widget/tab/MonitorTab.dart';
+import 'package:flutter_controller/widget/tab/MotorTab.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'SettingsPage.dart';
-import 'core/Packet.dart';
-import 'tabs/MonitorTab.dart';
-import 'tabs/MotorTab.dart';
+import '../common.dart';
+import '../core/Packet.dart';
 
 final tabNames = <int, String>{
   1: 'Monitor',
@@ -86,10 +89,10 @@ class _TabsPage extends State<TabsPage> {
         }
       });
 
-      final packet = Packet(0, 0, Uint8List(28));
-      print(Uint8List(28));
-      _sendMessage(packet);
-      _sendMessage(packet);
+//      final packet = Packet(0, 0, Uint8List(28));
+//      print(Uint8List(28));
+//      _sendMessage(packet);
+//      _sendMessage(packet);
     }).catchError((error) {
       print('Cannot connect, exception occured');
       print(error);
@@ -166,6 +169,11 @@ class _TabsPage extends State<TabsPage> {
       });
     };
 
+    const TextStyle linkStyle = const TextStyle(
+      color: Colors.blue,
+      decoration: TextDecoration.underline,
+    );
+
     return Scaffold(
       appBar: AppBar(
         leading: PopupMenuButton<int>(
@@ -192,7 +200,41 @@ class _TabsPage extends State<TabsPage> {
           // action button
           IconButton(
             icon: Icon(Icons.info_outline),
-            onPressed: () {},
+            onPressed: () {
+              showAboutDialog(
+                  context: context,
+                  applicationIcon: Icon(
+                    Icons.memory,
+                    size: 64,
+                  ),
+//                              applicationName: appName,
+                  applicationVersion: appVersion,
+                  applicationLegalese: "Sergey Averin <s@averin.ru>",
+                  children: <Widget>[
+                    Container(height: 12),
+                    const Text(
+                        "Программа для настройки и мониторинга параметров контроллера имени Булычева и Ермакова"),
+                    Container(height: 12),
+                    RichText(
+                        text: TextSpan(
+                      text: 'abc.com',
+                      style: linkStyle,
+                      recognizer: new TapGestureRecognizer()
+                        ..onTap = () async {
+                          final url = 'https://github.com/flutter/gallery/';
+                          if (await canLaunch(url)) {
+                            await launch(
+                              url,
+                              forceSafariVC: false,
+                            );
+                          }
+                        },
+                    )),
+                    Container(height: 12),
+                    const Text("Прошивка контроллера: 0.1"),
+                    const Text("Макс. фазный ток: 350А"),
+                  ]);
+            },
           ),
           // action button
           IconButton(

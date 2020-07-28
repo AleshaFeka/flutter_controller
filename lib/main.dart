@@ -1,10 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
+import 'package:package_info/package_info.dart';
 
-import 'MainPage.dart';
+import 'screen/MainPage.dart';
+import 'common.dart';
+
+init() async {
+  await Settings.init(cacheProvider: SharePreferenceCache());
+  PackageInfo packageInfo = await PackageInfo.fromPlatform();
+
+  appName = packageInfo.appName;
+  packageName = packageInfo.packageName;
+  appVersion = packageInfo.version;
+  buildNumber = packageInfo.buildNumber;
+}
 
 Future<void> main() async {
-  await Settings.init(cacheProvider: SharePreferenceCache());
+  await init();
   runApp(MyApp());
 }
 

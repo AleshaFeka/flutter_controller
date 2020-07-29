@@ -1,13 +1,14 @@
 import 'dart:async';
-import 'dart:io';
 
+import 'package:flutter_controller/interactor/BluetoothInteractor.dart';
 import 'package:flutter_controller/model/MotorSettings.dart';
 import 'package:rxdart/rxdart.dart';
 
-enum MotorSettingsCommand { READ, WRITE }
+enum MotorSettingsCommand { READ, WRITE, SAVE }
 
 class MotorTabBloc {
-  var motorSettingsInitial = MotorSettings();
+  var motorSettingsInitial = MotorSettings.zero();
+  BluetoothInteractor _bluetoothInteractor;
 
   var _motorInstantSettingsStreamController = StreamController<MotorSettings>();
   get motorInstantSettingsStream => _motorInstantSettingsStreamController.stream;
@@ -15,11 +16,11 @@ class MotorTabBloc {
   var _motorSettingsCommandStreamController = StreamController<MotorSettingsCommand>();
   StreamSink<MotorSettingsCommand> get motorSettingsCommandStream => _motorSettingsCommandStreamController.sink;
   
-  MotorTabBloc() {
-    _motorSettingsCommandStreamController.stream.listen(_commandListener);
+  MotorTabBloc(this._bluetoothInteractor) {
+    _motorSettingsCommandStreamController.stream.listen(_handleCommand);
   }
 
-  void _commandListener(MotorSettingsCommand event) {
+  void _handleCommand(MotorSettingsCommand event) {
     switch (event) {
       case MotorSettingsCommand.READ:
         _motorSettingsRead();
@@ -27,17 +28,24 @@ class MotorTabBloc {
       case MotorSettingsCommand.WRITE:
         _motorSettingsWrite();
         break;
+      case MotorSettingsCommand.SAVE:
+        _motorSettingsSave();
+        break;
     }
   }
 
   void _motorSettingsRead() {
-    print("motorSettingsRead");
-    sleep(Duration(seconds: 2));
-    _motorInstantSettingsStreamController.sink.add(motorSettingsInitial);
+    MotorSettings data = _bluetoothInteractor.read();
+    print("Readed from bluetooht - $data");
+    _motorInstantSettingsStreamController.sink.add(data);
   }
-  
+
   void _motorSettingsWrite() {
-    print("motorSettingsWrite");
+    _bluetoothInteractor.write();
+  }
+
+  void _motorSettingsSave() {
+    _bluetoothInteractor.save();
   }
 
   void dispose() {

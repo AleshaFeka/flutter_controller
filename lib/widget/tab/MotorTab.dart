@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_controller/bloc/MotorTabBloc.dart';
@@ -20,6 +21,7 @@ class _MotorTabState extends State<MotorTab> {
   MotorTabBloc _motorTabBloc;
   Map _parameterNames;
   Map _localizedStrings;
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void didChangeDependencies() {
@@ -31,11 +33,9 @@ class _MotorTabState extends State<MotorTab> {
 
   @override
   Widget build(BuildContext context) {
-    final _formKey = GlobalKey<FormState>();
-
     return StreamBuilder<MotorSettings>(
       stream: _motorTabBloc.motorInstantSettingsStream,
-      initialData: _motorTabBloc.motorSettingsInitial,
+//      initialData: _motorTabBloc.motorSettings,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return _buildError(snapshot.error.toString());
@@ -49,7 +49,8 @@ class _MotorTabState extends State<MotorTab> {
     );
   }
 
-  Widget _buildForm(Map parameterNames, Key key, AsyncSnapshot<MotorSettings> snapshot) {
+  Widget _buildForm(
+      Map parameterNames, Key key, AsyncSnapshot<MotorSettings> snapshot) {
     var parameterValues = Map<String, dynamic>();
     if (snapshot.hasData) {
       parameterValues = snapshot.data.toJson();
@@ -57,10 +58,11 @@ class _MotorTabState extends State<MotorTab> {
 
     List<Widget> children = List();
     parameterNames.entries.forEach((nameEntry) {
-      String parameterValue = _extractParameterValueFromNum((parameterValues[nameEntry.key] as num));
+      String parameterValue = _extractParameterValueFromNum(
+          (parameterValues[nameEntry.key] as num));
       String parameterName = nameEntry.value;
 
-      children.add(_buildRow(parameterName, parameterValue));
+      children.add(_buildRow(parameterName, parameterValue, nameEntry.key));
       children.add(Divider(
         height: 1,
         color: Colors.grey,
@@ -72,15 +74,10 @@ class _MotorTabState extends State<MotorTab> {
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.center, children: children));
   }
-  String _extractParameterValueFromNum(num raw) {
-    String parameterValue = raw.toStringAsFixed(_parameterValueAccuracy);
-    if (raw.roundToDouble() == raw) {
-      parameterValue = raw.toInt().toString();
-    } 
-    return parameterValue;
-  }
 
-  Widget _buildRow(String name, String value) {
+  Widget _buildRow(String name, String value, String variableName) {
+    var textController = TextEditingController()..text = value;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -101,13 +98,14 @@ class _MotorTabState extends State<MotorTab> {
           child: Container(
             height: 40,
             child: Align(
-              alignment: Alignment(0.5, 0),
-              child: TextFormField(controller: TextEditingController()..text = value,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder())
-              )
-            ),
+                alignment: Alignment(0.5, 0),
+                child: TextFormField(
+                  onSaved: (value) {
+                    _motorTabBloc.motorSettingsDataStream.add(MotorParameter(variableName, value));
+                  },
+                    controller: textController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(border: OutlineInputBorder()))),
           ),
         ),
         Container(
@@ -128,7 +126,9 @@ class _MotorTabState extends State<MotorTab> {
             color: Colors.red,
           ),
         ),
-        Container(height: 16,),
+        Container(
+          height: 16,
+        ),
         Text(message)
       ],
     );
@@ -151,8 +151,9 @@ class _MotorTabState extends State<MotorTab> {
           ),
           RaisedButton(
             onPressed: () {
-              _motorTabBloc.motorSettingsCommandStream
-                  .add(MotorSettingsCommand.WRITE);
+              _formKey.currentState.validate(); //todo add validation
+              _formKey.currentState.save();
+              _motorTabBloc.motorSettingsCommandStream.add(MotorSettingsCommand.WRITE);
             },
             child: Text(_localizedStrings[_write]),
           ),
@@ -167,6 +168,15 @@ class _MotorTabState extends State<MotorTab> {
         ],
       ),
     );
+  }
+
+  String _extractParameterValueFromNum(num raw) {
+    if (raw == null) return "";
+    String parameterValue = raw.toStringAsFixed(_parameterValueAccuracy);
+    if (raw.roundToDouble() == raw) {
+      parameterValue = raw.toInt().toString();
+    }
+    return parameterValue;
   }
 
   @override

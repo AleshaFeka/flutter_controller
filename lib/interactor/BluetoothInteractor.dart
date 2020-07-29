@@ -6,8 +6,8 @@ class BluetoothInteractor {
     return result;
   }
 
-  void write() {
-    print("BluetoothInteractor - WRITE");
+  void write(MotorSettings motorSettings) {
+    print("BluetoothInteractor - WRITE - ${motorSettings.toJson()}");
   }
   void save() {
     print("BluetoothInteractor - SAVE");

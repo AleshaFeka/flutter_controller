@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_controller/model/MotorSettings.dart';
-import 'package:flutter_controller/screen/MainPage.dart';
 import 'package:rxdart/rxdart.dart';
 
 enum MotorSettingsCommand { READ, WRITE }

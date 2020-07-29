@@ -1,5 +1,14 @@
-{"motorDirection" : "Направление вращения",
+{
   "motorPolePairs" : "Количество пар полюсов мотора",
+  "motorDirection" : "Направление вращения",
   "motorSpeedMax" : "Максимальная скорость мотора",
   "motorVoltageMax" : "Максимальное напряжение мотора",
-  "motorTemperatureMax" : "Максимальная температура мотора"}
+  "fieldWakingCurrent" : "Ток ослабления поля (уточнить)",
+  "motorTemperatureMax" : "Максимальная температура мотора",
+  "motorTemperatureLimit" : "Температура уменьшения тока",
+  "motorCurrentMax" : "Максимальный фазный ток",
+  "motorStatorResistance" : "Сопротивление статора",
+  "motorInductance" : "Индуктивность (мотора?  статора?)",
+  "motorKv" : "Kv мотора",
+  "phaseCorrection" : "Коррекция фаз (уточнить)"
+}

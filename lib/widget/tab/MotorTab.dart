@@ -1,91 +1,94 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_controller/bloc/MotorTabBloc.dart';
+import 'package:flutter_controller/di/Provider.dart';
+import 'package:flutter_controller/model/MotorSettings.dart';
 
 class MotorTab extends StatefulWidget {
   @override
-  _MotorTab createState() => new _MotorTab();
+  _MotorTabState createState() => _MotorTabState();
 }
 
-class _MotorTab extends State<MotorTab> {
-  @override
-  void initState() {
-    super.initState();
-  }
+class _MotorTabState extends State<MotorTab> {
+  MotorTabBloc _motorTabBloc = MotorTabBloc();
+  Map _parameterNames;
 
   @override
-  void dispose() {
-    super.dispose();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _parameterNames = Provider.of(context).localizedStrings;
   }
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraint) {
-        return SingleChildScrollView(
-            child: ConstrainedBox(
-          constraints: BoxConstraints(minHeight: constraint.maxHeight),
-          child: IntrinsicHeight(
-            child: Container(
-              padding: EdgeInsets.all(12),
-              child: Column(
-                children: <Widget>[
-                  Row(children: <Widget>[
-                    Expanded(child: const Text("Param 1", style: TextStyle(fontSize: 20),)),
-                    Expanded(child: TextField(enabled: false, decoration: new InputDecoration(hintText: "I am the TextField"))),
-                  ]),
-                  Row(children: <Widget>[
-                    Expanded(child: const Text("Param 2")),
-//                    Expanded(child: TextField(decoration: new InputDecoration(hintText: "I am the TextField"))),
-                  ]),
-                  Row(children: <Widget>[
-                    Expanded(child: const Text("Param 3")),
-//                    Expanded(child: TextField(decoration: new InputDecoration(hintText: "I am the TextField"))),
-                  ]),
-                  Row(children: <Widget>[
-                    Expanded(child: const Text("Param 4")),
-//                    Expanded(child: TextField(decoration: new InputDecoration(hintText: "I am the TextField"))),
-                  ]),
-                  Row(children: <Widget>[
-                    Expanded(child: const Text("Param 5")),
-//                    Expanded(child: TextField(decoration: new InputDecoration(hintText: "I am the TextField"))),
-                  ]),
-                  Row(children: <Widget>[
-                    Expanded(child: const Text("Param 6")),
-//                    Expanded(child: TextField(decoration: new InputDecoration(hintText: "I am the TextField"))),
-                  ]),
-                  Container(
-                    height: 700,
-                    color: Colors.blue,
-                  ),
-//                  Container(
-//                    height: 700,
-//                    color: Colors.blue,
-//                  ),
-//                  Flexible(
-//                    fit: FlexFit.loose,
-//                    child: Container(),
-//                  ),
-                  Spacer(),
-//                  Expanded(child: Container()),
-                  Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: <Widget>[
-                    RaisedButton(
-                      child: const Text("Read"),
-                      onPressed: null,
-                    ),
-                    RaisedButton(
-                      child: const Text("Write"),
-                      onPressed: null,
-                    ),
-                    RaisedButton(
-                      child: const Text("Save"),
-                      onPressed: null,
-                    ),
-                  ]),
-                ],
-              ),
-            ),
-          ),
-        ));
+    final _formKey = GlobalKey<FormState>();
+
+    return StreamBuilder<MotorSettings>(
+      stream: _motorTabBloc.motorInstantSettingsStream,
+      initialData: _motorTabBloc.motorSettingsInitial,
+      builder: (context, snapshot) {
+        return buildForm(_parameterNames, _formKey);
       },
     );
+  }
+
+  Widget buildForm(Map parameterNames, Key key) {
+    List<Widget> children = List();
+    parameterNames.entries.forEach((element) {
+      children.add(buildRow(element.value));
+      children.add(Divider(
+        height: 1,
+        color: Colors.grey,
+      ));
+    });
+
+    return Form(
+        key: key,
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+          children: children
+        )
+    );
+  }
+
+  Widget buildRow(String name) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          width: 4,
+        ),
+        Expanded(
+          flex: 3,
+          child: Container(
+            height: 40,
+            child: Align(
+              alignment: Alignment(-1, 0),
+              child: Text(name),
+            ),
+          ),
+        ),
+        Expanded(
+          child: Container(
+            height: 40,
+            child: Align(
+                alignment: Alignment(0.5, 0),
+                child: TextFormField(keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                        border: OutlineInputBorder(), labelText: ""))),
+          ),
+        ),
+        Container(
+          width: 4,
+        )
+      ],
+    );
+  }
+
+  @override
+  void dispose() {
+    _motorTabBloc.dispose();
+    super.dispose();
   }
 }

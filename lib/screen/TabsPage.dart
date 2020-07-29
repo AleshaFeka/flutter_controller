@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:flutter_controller/widget/tab/MonitorTab.dart';
 import 'package:flutter_controller/widget/tab/MotorTab.dart';
-import 'package:flutter_controller/widget/tab/MotorTabM.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -250,7 +249,7 @@ class _TabsPage extends State<TabsPage> {
             case 1:
               return MonitorTab(settings);
             case 2:
-              return MotorTabM();
+              return MotorTab();
 //            case 3: return DriveTab();
 //            case 4: return AnalogTab();
 //            case 5: return RegsTab();

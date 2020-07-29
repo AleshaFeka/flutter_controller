@@ -4,7 +4,6 @@ class MotorSettings {
   int motorSpeedMax = 0;
   int motorVoltageMax = 0; //Unused((
   int fieldWakingCurrent = 0;
-
   double motorTemperatureMax = 0;
   double motorTemperatureLimit = 0;
   double motorCurrentMax = 0;

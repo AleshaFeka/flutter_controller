@@ -13,6 +13,7 @@
     "motorKv" : "Kv мотора",
     "phaseCorrection" : "Коррекция фаз (уточнить)"
   },
+  "onlyNumbersAllowed": "Допустимы только числа",
   "read": "Прочитать",
   "write": "Записать",
   "save": "Сохранить"

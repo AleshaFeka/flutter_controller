@@ -15,7 +15,7 @@ class MotorTabBloc {
   MotorSettings _motorSettings;
   BluetoothInteractor _bluetoothInteractor;
 
-  StreamController _motorInstantSettingsStreamController = StreamController<MotorSettings>();
+  StreamController _motorInstantSettingsStreamController = StreamController<MotorSettings>.broadcast();
   Stream get motorInstantSettingsStream => _motorInstantSettingsStreamController.stream;
 
   StreamController<MotorSettingsCommand> _motorSettingsCommandStreamController = StreamController<MotorSettingsCommand>();

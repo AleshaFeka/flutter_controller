@@ -16,6 +16,7 @@ class _MotorTabState extends State<MotorTab> {
   static const _read = "read";
   static const _write = "write";
   static const _save = "save";
+  static const _onlyNumbersAllowed = "onlyNumbersAllowed";
   static const _parameterValueAccuracy = 2;
 
   MotorTabBloc _motorTabBloc;
@@ -76,7 +77,21 @@ class _MotorTabState extends State<MotorTab> {
   }
 
   Widget _buildRow(String name, String value, String variableName) {
-    var textController = TextEditingController()..text = value;
+    String Function(String) validator = (String value) {
+      var message = ""; //_localizedStrings[_mustBeNumberNotLessNull];
+
+      if (value == null) {
+        return message;
+      }
+      if (value.isEmpty) {
+        return message;
+      }
+      if (double.parse(value, (e) => null) == null) {
+        return message;
+      }
+
+      return null;
+    };
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -100,12 +115,18 @@ class _MotorTabState extends State<MotorTab> {
             child: Align(
                 alignment: Alignment(0.5, 0),
                 child: TextFormField(
-                  onSaved: (value) {
-                    _motorTabBloc.motorSettingsDataStream.add(MotorParameter(variableName, value));
-                  },
-                    controller: textController,
+//                    autovalidate: true,
+                    validator: validator,
+                    onSaved: (value) {
+                      _motorTabBloc.motorSettingsDataStream
+                          .add(MotorParameter(variableName, value));
+                    },
+                    controller: TextEditingController()..text = value,
                     keyboardType: TextInputType.number,
-                    decoration: InputDecoration(border: OutlineInputBorder()))),
+                    decoration: InputDecoration(
+                        errorStyle: TextStyle(height: 0),
+                        // Use just red border without text
+                        border: OutlineInputBorder()))),
           ),
         ),
         Container(
@@ -151,9 +172,16 @@ class _MotorTabState extends State<MotorTab> {
           ),
           RaisedButton(
             onPressed: () {
-              _formKey.currentState.validate(); //todo add validation
-              _formKey.currentState.save();
-              _motorTabBloc.motorSettingsCommandStream.add(MotorSettingsCommand.WRITE);
+              if (!_formKey.currentState.validate()) {
+                Scaffold.of(context).showSnackBar(SnackBar(
+                    content:
+                        Text(_localizedStrings[_onlyNumbersAllowed])));
+                return;
+              } else {
+                _formKey.currentState.save();
+                _motorTabBloc.motorSettingsCommandStream
+                    .add(MotorSettingsCommand.WRITE);
+              }
             },
             child: Text(_localizedStrings[_write]),
           ),

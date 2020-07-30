@@ -18,11 +18,11 @@ class MotorTabBloc {
   StreamController _motorInstantSettingsStreamController = StreamController<MotorSettings>.broadcast();
   Stream get motorInstantSettingsStream => _motorInstantSettingsStreamController.stream;
 
-  StreamController<MotorSettingsCommand> _motorSettingsCommandStreamController = StreamController<MotorSettingsCommand>();
+  StreamController<MotorSettingsCommand> _motorSettingsCommandStreamController = StreamController<MotorSettingsCommand>.broadcast();
   StreamSink<MotorSettingsCommand> get motorSettingsCommandStream => _motorSettingsCommandStreamController.sink;
 
   StreamController<MotorParameter> _motorSettingsDataStreamController
-    = StreamController<MotorParameter>(sync: true); //Sync to avoid race between changing parameters and writing to controller
+    = StreamController<MotorParameter>.broadcast(sync: true); //Sync to avoid async between changing parameters and writing to controller
   StreamSink<MotorParameter> get motorSettingsDataStream => _motorSettingsDataStreamController.sink;
 
   MotorTabBloc(this._bluetoothInteractor) {
@@ -70,7 +70,6 @@ class MotorTabBloc {
         _motorSettings.phaseCorrection = double.parse(motorParameter.value);
         break;
     }
-//    _motorInstantSettingsStreamController.sink.add(_motorSettings);
   }
 
   void _handleCommand(MotorSettingsCommand event) {

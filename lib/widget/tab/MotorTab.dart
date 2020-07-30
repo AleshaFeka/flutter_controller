@@ -16,8 +16,12 @@ class _MotorTabState extends State<MotorTab> {
   static const _read = "read";
   static const _write = "write";
   static const _save = "save";
-  static const _onlyNumbersAllowed = "onlyNumbersAllowed";
+  static const _invalidValue = "invalidValue";
+  static const _notIntegerNumber = "notIntegerNumber";
+  static const _notANumber = "notANumber";
+  static const _writingNotAllowed = "writingNotAllowed";
   static const _parameterValueAccuracy = 2;
+  static const _olyIntegerValues = ["motorPolePairs", "motorDirection", "motorSpeedMax", "motorVoltageMax", "fieldWakingCurrent"];
 
   MotorTabBloc _motorTabBloc;
   Map _parameterNames;
@@ -36,7 +40,6 @@ class _MotorTabState extends State<MotorTab> {
   Widget build(BuildContext context) {
     return StreamBuilder<MotorSettings>(
       stream: _motorTabBloc.motorInstantSettingsStream,
-//      initialData: _motorTabBloc.motorSettings,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return _buildError(snapshot.error.toString());
@@ -58,9 +61,9 @@ class _MotorTabState extends State<MotorTab> {
     }
 
     List<Widget> children = List();
+    children.add(Container(height: 8,));
     parameterNames.entries.forEach((nameEntry) {
-      String parameterValue = _extractParameterValueFromNum(
-          (parameterValues[nameEntry.key] as num));
+      String parameterValue = _extractParameterValueFromNum((parameterValues[nameEntry.key] as num));
       String parameterName = nameEntry.value;
 
       children.add(_buildRow(parameterName, parameterValue, nameEntry.key));
@@ -78,16 +81,20 @@ class _MotorTabState extends State<MotorTab> {
 
   Widget _buildRow(String name, String value, String variableName) {
     String Function(String) validator = (String value) {
-      var message = ""; //_localizedStrings[_mustBeNumberNotLessNull];
-
       if (value == null) {
-        return message;
+        return _localizedStrings[_invalidValue];
       }
       if (value.isEmpty) {
-        return message;
+        return _localizedStrings[_invalidValue];
       }
-      if (double.parse(value, (e) => null) == null) {
-        return message;
+
+      double number = double.parse(value, (e) => null);
+      if (number== null) {
+        return _localizedStrings[_notANumber];
+      }
+      if (_olyIntegerValues.contains(variableName) &&
+        number.round() != number) {
+        return _localizedStrings[_notIntegerNumber];
       }
 
       return null;
@@ -100,7 +107,7 @@ class _MotorTabState extends State<MotorTab> {
           width: 4,
         ),
         Expanded(
-          flex: 3,
+          flex: 4,
           child: Container(
             height: 40,
             child: Align(
@@ -110,12 +117,12 @@ class _MotorTabState extends State<MotorTab> {
           ),
         ),
         Expanded(
+          flex: 2,
           child: Container(
             height: 40,
             child: Align(
                 alignment: Alignment(0.5, 0),
                 child: TextFormField(
-//                    autovalidate: true,
                     validator: validator,
                     onSaved: (value) {
                       _motorTabBloc.motorSettingsDataStream
@@ -124,8 +131,7 @@ class _MotorTabState extends State<MotorTab> {
                     controller: TextEditingController()..text = value,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
-                        errorStyle: TextStyle(height: 0),
-                        // Use just red border without text
+                        errorStyle: TextStyle(height: 0),// Use just red border without text
                         border: OutlineInputBorder()))),
           ),
         ),
@@ -175,7 +181,7 @@ class _MotorTabState extends State<MotorTab> {
               if (!_formKey.currentState.validate()) {
                 Scaffold.of(context).showSnackBar(SnackBar(
                     content:
-                        Text(_localizedStrings[_onlyNumbersAllowed])));
+                        Text(_localizedStrings[_writingNotAllowed])));
                 return;
               } else {
                 _formKey.currentState.save();
@@ -207,9 +213,11 @@ class _MotorTabState extends State<MotorTab> {
     return parameterValue;
   }
 
+/*
   @override
   void dispose() {
     _motorTabBloc.dispose();
     super.dispose();
   }
+*/
 }

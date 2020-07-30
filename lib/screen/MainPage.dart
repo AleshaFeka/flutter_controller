@@ -15,5 +15,10 @@ class _MainPage extends State<MainPage> {
     return Provider(context, child: TabsPage());
 //    return ConnectPage(checkAvailability: false,);
   }
+
+  @override
+  void dispose() {
+    Provider.of(context).motorTabBloc.dispose();
+  }
 }
 

@@ -18,10 +18,12 @@ class _MotorTabState extends State<MotorTab> {
   static const _save = "save";
   static const _invalidValue = "invalidValue";
   static const _notIntegerNumber = "notIntegerNumber";
+  static const _lessThanZero = "lessThanZero";
   static const _notANumber = "notANumber";
   static const _writingNotAllowed = "writingNotAllowed";
   static const _parameterValueAccuracy = 2;
-  static const _olyIntegerValues = ["motorPolePairs", "motorDirection", "motorSpeedMax", "motorVoltageMax", "fieldWakingCurrent"];
+  static const _onlyIntegerValues = ["motorPolePairs", "motorDirection", "motorSpeedMax", "motorVoltageMax", "fieldWakingCurrent"];
+  static const _possibleNegativeValues = ["phaseCorrection"];
 
   MotorTabBloc _motorTabBloc;
   Map _parameterNames;
@@ -92,9 +94,13 @@ class _MotorTabState extends State<MotorTab> {
       if (number== null) {
         return _localizedStrings[_notANumber];
       }
-      if (_olyIntegerValues.contains(variableName) &&
+      if (_onlyIntegerValues.contains(variableName) &&
         number.round() != number) {
         return _localizedStrings[_notIntegerNumber];
+      }
+      if (!_possibleNegativeValues.contains(variableName) &&
+        number < 0) {
+        return _localizedStrings[_lessThanZero];
       }
 
       return null;

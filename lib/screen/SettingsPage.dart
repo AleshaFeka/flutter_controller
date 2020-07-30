@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_controller/di/Provider.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 
 import '../core/LiveData.dart';
@@ -11,13 +12,26 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPage extends State<SettingsPage> {
+  static const _settings = "settings";
+  static const _centerParameter = "centerParameter";
+  static const _leftTopParameter = "leftTopParameter";
+  static const _leftBottomParameter = "leftBottomParameter";
+  static const _rightTopParameter = "rightTopParameter";
+  static const _rightBottomParameter = "rightBottomParameter";
 
+  Map _localizedStrings;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _localizedStrings = Provider.of(context).localizedStrings;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Settings"),
+          title: Text(_localizedStrings[_settings]),
           actions: <Widget>[
             // action button
             IconButton(
@@ -31,25 +45,25 @@ class _SettingsPage extends State<SettingsPage> {
           children: <Widget>[
             SettingsGroup(title: "Экран «Мониторинг»", children: <Widget>[
               DropDownSettingsTile<int>(
-                title: 'Главный параметр',
+                title: _localizedStrings[_centerParameter],
                 settingKey: 'setting-monitor-param1',
                 values: ParamNames,
-                selected: 2,
+                selected: 4,
                 onChange: (value) {
                   debugPrint('setting-monitor-param1: $value');
                 },
               ),
               DropDownSettingsTile<int>(
-                title: 'Параметр слева 1',
+                title: _localizedStrings[_leftTopParameter],
                 settingKey: 'setting-monitor-param2',
                 values: ParamNames,
-                selected: 2,
+                selected: 1,
                 onChange: (value) {
                   debugPrint('setting-monitor-param2: $value');
                 },
               ),
               DropDownSettingsTile<int>(
-                title: 'Параметр слева 2',
+                title: _localizedStrings[_leftBottomParameter],
                 settingKey: 'setting-monitor-param3',
                 values: ParamNames,
                 selected: 2,
@@ -58,19 +72,19 @@ class _SettingsPage extends State<SettingsPage> {
                 },
                 ),
               DropDownSettingsTile<int>(
-                title: 'Параметр справа 1',
+                title: _localizedStrings[_rightTopParameter],
                 settingKey: 'setting-monitor-param4',
                 values: ParamNames,
-                selected: 2,
+                selected: 3,
                 onChange: (value) {
                   debugPrint('setting-monitor-param4: $value');
                 },
                 ),
               DropDownSettingsTile<int>(
-                title: 'Параметр справа 2',
+                title: _localizedStrings[_rightBottomParameter],
                 settingKey: 'setting-monitor-param5',
                 values: ParamNames,
-                selected: 2,
+                selected: 5,
                 onChange: (value) {
                   debugPrint('setting-monitor-param5: $value');
                 },

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_controller/bloc/MotorTabBloc.dart';
 import 'package:flutter_controller/interactor/BluetoothInteractor.dart';
+import 'package:flutter_controller/interactor/ResourceInteractor.dart';
 
 class Provider extends InheritedWidget {
   static Provider of(BuildContext context) {
@@ -10,21 +11,14 @@ class Provider extends InheritedWidget {
   }
 
   BluetoothInteractor bluetoothInteractor;
+  ResourceInteractor resourceInteractor;
   MotorTabBloc motorTabBloc;
-  Map localizedStrings;
 
-  Provider(BuildContext context, {Key key, Widget child})
-    : super(key: key, child: child) {
-    init(context);
-  }
+  Map get localizedStrings => resourceInteractor.localizedStrings;
 
-  void init(BuildContext context) async {
-    bluetoothInteractor = BluetoothInteractor();
+  Provider(this.resourceInteractor, this.bluetoothInteractor, {Key key, Widget child})
+      : super(key: key, child: child) {
     motorTabBloc = MotorTabBloc(bluetoothInteractor);
-
-    var rawStrings = await DefaultAssetBundle.of(context)
-      .loadString('assets/strings/ru.json');
-    localizedStrings = json.decode(rawStrings) as Map;
   }
 
   @override

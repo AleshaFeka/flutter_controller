@@ -2,6 +2,7 @@ import 'dart:typed_data';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
+import 'package:flutter_controller/di/Provider.dart';
 import 'package:flutter_controller/widget/tab/MonitorTab.dart';
 import 'package:flutter_controller/widget/tab/MotorTab.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
@@ -10,17 +11,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'SettingsPage.dart';
 import '../common.dart';
 import '../core/Packet.dart';
-
-final tabNames = <int, String>{
-  1: 'Monitor',
-  2: 'Motor',
-  3: 'Drive',
-  4: 'Analog',
-  5: 'Regs',
-  6: 'SensorLess',
-  7: 'Ident',
-  8: 'Logs',
-};
 
 final tabIcons = <int, IconData>{
   1: Icons.computer,
@@ -43,6 +33,9 @@ class TabsPage extends StatefulWidget {
 }
 
 class _TabsPage extends State<TabsPage> {
+  Map<int, String> tabNames;
+  Map _localizedStrings;
+
   BluetoothConnection connection;
   bool isConnecting = true;
 
@@ -57,6 +50,14 @@ class _TabsPage extends State<TabsPage> {
   Uint8List inBuffer = Uint8List(0);
 
   AppSettings settings = AppSettings.load();
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _localizedStrings = Provider.of(context).localizedStrings;
+    tabNames = (_localizedStrings['tabNames'] as Map).map((key, value) => MapEntry(int.parse(key), value.toString()));
+    print(tabNames);
+  }
 
   @override
   void initState() {
@@ -116,7 +117,8 @@ class _TabsPage extends State<TabsPage> {
     print(data);
 
     // skip till 0x23, search for (0x23, 32 bytes, 0x2A)
-    Uint8List buf = Uint8List.fromList(inBuffer.toList() + data.toList()); // old data + new data
+    Uint8List buf = Uint8List.fromList(
+        inBuffer.toList() + data.toList()); // old data + new data
     int pos = 0;
     while (buf.length >= pos + 34) {
       // enough bytes?
@@ -140,7 +142,8 @@ class _TabsPage extends State<TabsPage> {
 
   void _sendMessage(Packet packet) async {
     try {
-      final msg = Uint8List.fromList(<int>[0x23] + packet.toBytes + <int>[0x2A]);
+      final msg =
+          Uint8List.fromList(<int>[0x23] + packet.toBytes + <int>[0x2A]);
       connection.output.add(msg);
       print("Sent");
       print(msg);
@@ -163,7 +166,8 @@ class _TabsPage extends State<TabsPage> {
   @override
   Widget build(BuildContext context) {
     final handleSettingsTap = () async {
-      await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => SettingsPage()));
+      await Navigator.of(context).push(
+          MaterialPageRoute(builder: (BuildContext context) => SettingsPage()));
       setState(() {
         settings = AppSettings.load();
       });

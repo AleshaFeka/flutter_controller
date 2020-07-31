@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_controller/di/Provider.dart';
+import 'package:flutter_controller/model/MonitorSettings.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
-
-import '../core/LiveData.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage();
@@ -18,13 +17,18 @@ class _SettingsPage extends State<SettingsPage> {
   static const _leftBottomParameter = "leftBottomParameter";
   static const _rightTopParameter = "rightTopParameter";
   static const _rightBottomParameter = "rightBottomParameter";
+  static const _monitorScreenView = "monitorScreenView";
+  static const _monitorSettingsParameters = "monitorSettingsParameters";
 
   Map _localizedStrings;
+  Map<int, String> _paramNames;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _localizedStrings = Provider.of(context).localizedStrings;
+    _paramNames = (_localizedStrings[_monitorSettingsParameters] as Map)
+        .map((key, value) => MapEntry(int.parse(key), value));
   }
 
   @override
@@ -43,53 +47,40 @@ class _SettingsPage extends State<SettingsPage> {
         ),
         body: ListView(
           children: <Widget>[
-            SettingsGroup(title: "Экран «Мониторинг»", children: <Widget>[
-              DropDownSettingsTile<int>(
-                title: _localizedStrings[_centerParameter],
-                settingKey: 'setting-monitor-param1',
-                values: ParamNames,
-                selected: 4,
-                onChange: (value) {
-                  debugPrint('setting-monitor-param1: $value');
-                },
-              ),
-              DropDownSettingsTile<int>(
-                title: _localizedStrings[_leftTopParameter],
-                settingKey: 'setting-monitor-param2',
-                values: ParamNames,
-                selected: 1,
-                onChange: (value) {
-                  debugPrint('setting-monitor-param2: $value');
-                },
-              ),
-              DropDownSettingsTile<int>(
-                title: _localizedStrings[_leftBottomParameter],
-                settingKey: 'setting-monitor-param3',
-                values: ParamNames,
-                selected: 2,
-                onChange: (value) {
-                  debugPrint('setting-monitor-param3: $value');
-                },
-                ),
-              DropDownSettingsTile<int>(
-                title: _localizedStrings[_rightTopParameter],
-                settingKey: 'setting-monitor-param4',
-                values: ParamNames,
-                selected: 3,
-                onChange: (value) {
-                  debugPrint('setting-monitor-param4: $value');
-                },
-                ),
-              DropDownSettingsTile<int>(
-                title: _localizedStrings[_rightBottomParameter],
-                settingKey: 'setting-monitor-param5',
-                values: ParamNames,
-                selected: 5,
-                onChange: (value) {
-                  debugPrint('setting-monitor-param5: $value');
-                },
-                ),
-            ]),
+            SettingsGroup(
+                title: _localizedStrings[_monitorScreenView],
+                children: <Widget>[
+                  DropDownSettingsTile<int>(
+                    title: _localizedStrings[_centerParameter],
+                    settingKey: MonitorTabSettings.centerTopParameter,
+                    values: _paramNames,
+                    selected: 4,
+                  ),
+                  DropDownSettingsTile<int>(
+                    title: _localizedStrings[_leftTopParameter],
+                    settingKey: MonitorTabSettings.leftTopParameter,
+                    values: _paramNames,
+                    selected: 1,
+                  ),
+                  DropDownSettingsTile<int>(
+                    title: _localizedStrings[_leftBottomParameter],
+                    settingKey: MonitorTabSettings.leftBottomParameter,
+                    values: _paramNames,
+                    selected: 2,
+                  ),
+                  DropDownSettingsTile<int>(
+                    title: _localizedStrings[_rightTopParameter],
+                    settingKey: MonitorTabSettings.rightTopParameter,
+                    values: _paramNames,
+                    selected: 3,
+                  ),
+                  DropDownSettingsTile<int>(
+                    title: _localizedStrings[_rightBottomParameter],
+                    settingKey: MonitorTabSettings.rightBottomParameter,
+                    values: _paramNames,
+                    selected: 5,
+                  ),
+                ]),
           ],
         ));
   }

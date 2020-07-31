@@ -17,6 +17,7 @@ import 'dart:typed_data';
 //  float Trottle_Act;// RAW voltage of Gas Lever
 //} Live_st;
 
+/*
 final ParamNames = <int, String>{
   1: 'Battery voltage',
   2: 'Motor voltage',
@@ -33,6 +34,7 @@ final ParamNames = <int, String>{
   13: 'Halls position',
   14: 'Throttle voltage',
 };
+*/
 
 class LiveData {
   final double udc; // Actual DC voltage (V)

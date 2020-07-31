@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_controller/di/Provider.dart';
+import 'package:flutter_controller/screen/ConnectPage.dart';
 import 'package:flutter_controller/screen/TabsPage.dart';
 
 class MainPage extends StatefulWidget {
@@ -19,6 +20,7 @@ class _MainPage extends State<MainPage> {
   @override
   void dispose() {
     Provider.of(context).motorTabBloc.dispose();
+    Provider.of(context).monitorTabBloc.dispose();
   }
 }
 

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_controller/bloc/MotorTabBloc.dart';
 import 'package:flutter_controller/di/Provider.dart';
 import 'package:flutter_controller/model/MotorSettings.dart';
+import 'package:flutter_controller/model/Parameter.dart';
 
 class MotorTab extends StatefulWidget {
   @override
@@ -132,7 +133,7 @@ class _MotorTabState extends State<MotorTab> {
                     validator: validator,
                     onSaved: (value) {
                       _motorTabBloc.motorSettingsDataStream
-                          .add(MotorParameter(variableName, value));
+                          .add(Parameter(variableName, value));
                     },
                     controller: TextEditingController()..text = value,
                     keyboardType: TextInputType.number,

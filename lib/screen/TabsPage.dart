@@ -3,25 +3,14 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:flutter_controller/di/Provider.dart';
+import 'package:flutter_controller/model/MonitorSettings.dart';
 import 'package:flutter_controller/widget/tab/MonitorTab.dart';
 import 'package:flutter_controller/widget/tab/MotorTab.dart';
-import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'SettingsPage.dart';
 import '../common.dart';
 import '../core/Packet.dart';
-
-final tabIcons = <int, IconData>{
-  1: Icons.computer,
-  2: Icons.adjust,
-  3: Icons.motorcycle,
-  4: Icons.surround_sound,
-  5: Icons.build,
-  6: Icons.leak_remove,
-  7: Icons.leak_add,
-  8: Icons.short_text,
-};
 
 class TabsPage extends StatefulWidget {
   final BluetoothDevice server;
@@ -33,8 +22,19 @@ class TabsPage extends StatefulWidget {
 }
 
 class _TabsPage extends State<TabsPage> {
+  final tabIcons = <int, IconData>{
+    1: Icons.computer,
+    2: Icons.adjust,
+    3: Icons.motorcycle,
+    4: Icons.surround_sound,
+    5: Icons.build,
+    6: Icons.leak_remove,
+    7: Icons.leak_add,
+    8: Icons.short_text,
+  };
+
   Map<int, String> tabNames;
-  Map _localizedStrings;
+  Map<String, dynamic> _localizedStrings;
 
   BluetoothConnection connection;
   bool isConnecting = true;
@@ -49,13 +49,14 @@ class _TabsPage extends State<TabsPage> {
   int byteCnt = 0; // received bytes counter
   Uint8List inBuffer = Uint8List(0);
 
-  AppSettings settings = AppSettings.load();
+//  MonitorSettings settings = MonitorSettings.load();
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _localizedStrings = Provider.of(context).localizedStrings;
-    tabNames = (_localizedStrings['tabNames'] as Map).map((key, value) => MapEntry(int.parse(key), value.toString()));
+    tabNames = (_localizedStrings['tabNames'] as Map)
+        .map((key, value) => MapEntry(int.parse(key), value.toString()));
     print(tabNames);
   }
 
@@ -98,18 +99,6 @@ class _TabsPage extends State<TabsPage> {
       print('Cannot connect, exception occured');
       print(error);
     });
-  }
-
-  @override
-  void dispose() {
-    // Avoid memory leak (`setState` after dispose) and disconnect
-    if (isConnected) {
-      isDisconnecting = true;
-      connection.dispose();
-      connection = null;
-    }
-
-    super.dispose();
   }
 
   void _onDataReceived(Uint8List data) {
@@ -165,38 +154,12 @@ class _TabsPage extends State<TabsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final handleSettingsTap = () async {
-      await Navigator.of(context).push(
-          MaterialPageRoute(builder: (BuildContext context) => SettingsPage()));
-      setState(() {
-        settings = AppSettings.load();
-      });
-    };
-
-    const TextStyle linkStyle = const TextStyle(
-      color: Colors.blue,
-      decoration: TextDecoration.underline,
-    );
-
     return Scaffold(
       appBar: AppBar(
         leading: PopupMenuButton<int>(
-          onSelected: _select,
+          onSelected: _handleTabSelectClick,
           itemBuilder: (BuildContext context) {
-            return tabNames.keys.map((int num) {
-              return PopupMenuItem<int>(
-                value: num,
-                child: Row(
-                  children: <Widget>[
-                    Container(
-                      margin: new EdgeInsets.only(right: 10),
-                      child: Icon(tabIcons[num], size: 24, color: Colors.grey),
-                    ),
-                    Text(tabNames[num]),
-                  ],
-                ),
-              );
-            }).toList();
+            return _buildMenuItems();
           },
         ),
         title: Text(tabNames[_selectedChoice]),
@@ -205,45 +168,13 @@ class _TabsPage extends State<TabsPage> {
           IconButton(
             icon: Icon(Icons.info_outline),
             onPressed: () {
-              showAboutDialog(
-                  context: context,
-                  applicationIcon: Icon(
-                    Icons.memory,
-                    size: 64,
-                  ),
-//                              applicationName: appName,
-                  applicationVersion: appVersion,
-                  applicationLegalese: "Sergey Averin <s@averin.ru>",
-                  children: <Widget>[
-                    Container(height: 12),
-                    const Text(
-                        "Программа для настройки и мониторинга параметров контроллера имени Булычева и Ермакова"),
-                    Container(height: 12),
-                    RichText(
-                        text: TextSpan(
-                      text: 'abc.com',
-                      style: linkStyle,
-                      recognizer: new TapGestureRecognizer()
-                        ..onTap = () async {
-                          final url = 'https://github.com/flutter/gallery/';
-                          if (await canLaunch(url)) {
-                            await launch(
-                              url,
-                              forceSafariVC: false,
-                            );
-                          }
-                        },
-                    )),
-                    Container(height: 12),
-                    const Text("Прошивка контроллера: 0.1"),
-                    const Text("Макс. фазный ток: 350А"),
-                  ]);
+              _handleInfoClick(context);
             },
           ),
           // action button
           IconButton(
             icon: Icon(Icons.settings),
-            onPressed: handleSettingsTap,
+            onPressed: _handleSettingsClick,
           ),
         ],
       ),
@@ -251,7 +182,7 @@ class _TabsPage extends State<TabsPage> {
         child: (int num) {
           switch (num) {
             case 1:
-              return MonitorTab(settings);
+              return MonitorTab();
             case 2:
               return MotorTab();
 //            case 3: return DriveTab();
@@ -263,27 +194,94 @@ class _TabsPage extends State<TabsPage> {
             default:
               return Container();
           }
-        }(_selectedChoice),
+        }
+        (_selectedChoice),
       ),
     );
   }
 
-  void _select(int choice) {
+  List<PopupMenuItem<int>> _buildMenuItems() {
+    return tabNames.keys.map((int num) {
+      return PopupMenuItem<int>(
+        value: num,
+        child: Row(
+          children: <Widget>[
+            Container(
+              margin: new EdgeInsets.only(right: 10),
+              child: Icon(tabIcons[num], size: 24, color: Colors.grey),
+            ),
+            Text(tabNames[num]),
+          ],
+        ),
+      );
+    }).toList();
+  }
+
+  void _handleInfoClick(BuildContext context) {
+    const TextStyle linkStyle = const TextStyle(
+      color: Colors.blue,
+      decoration: TextDecoration.underline,
+    );
+
+    showAboutDialog(
+        context: context,
+        applicationIcon: Icon(
+          Icons.memory,
+          size: 64,
+        ),
+        //                              applicationName: appName,
+        applicationVersion: appVersion,
+        applicationLegalese: "Sergey Averin <s@averin.ru>",
+        children: <Widget>[
+          Container(height: 12),
+          const Text(
+              "Программа для настройки и мониторинга параметров контроллера имени Булычева и Ермакова"),
+          Container(height: 12),
+          RichText(
+              text: TextSpan(
+            text: 'abc.com',
+            style: linkStyle,
+            recognizer: new TapGestureRecognizer()
+              ..onTap = () async {
+                final url = 'https://github.com/flutter/gallery/';
+                if (await canLaunch(url)) {
+                  await launch(
+                    url,
+                    forceSafariVC: false,
+                  );
+                }
+              },
+          )),
+          Container(height: 12),
+          const Text("Прошивка контроллера: 0.1"),
+          const Text("Макс. фазный ток: 350А"),
+        ]);
+  }
+
+  void _handleSettingsClick() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (BuildContext context) => SettingsPage()));
+    setState(() {
+//      settings = MonitorSettings.load();
+    });
+  }
+
+  void _handleTabSelectClick(int choice) {
     // Causes the app to rebuild with the new _selectedChoice.
     setState(() {
       _selectedChoice = choice;
     });
   }
-}
 
-class AppSettings {
-  int param1, param2, param3, param4, param5;
+  @override
+  void dispose() {
+    // Avoid memory leak (`setState` after dispose) and disconnect
+    if (isConnected) {
+      isDisconnecting = true;
+      connection.dispose();
+      connection = null;
+    }
 
-  AppSettings.load() {
-    this.param1 = Settings.getValue<int>('setting-monitor-param1', 1);
-    this.param2 = Settings.getValue<int>('setting-monitor-param2', 2);
-    this.param3 = Settings.getValue<int>('setting-monitor-param3', 3);
-    this.param4 = Settings.getValue<int>('setting-monitor-param4', 4);
-    this.param5 = Settings.getValue<int>('setting-monitor-param5', 5);
+    super.dispose();
   }
 }

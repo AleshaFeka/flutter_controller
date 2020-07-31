@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_controller/di/Provider.dart';
 import 'package:flutter_controller/model/MonitorSettings.dart';
+import 'package:flutter_controller/util/Util.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -40,7 +41,7 @@ class _SettingsPage extends State<SettingsPage> {
             // action button
             IconButton(
               icon: Icon(Icons.info_outline),
-              onPressed: () {},
+              onPressed: () {showAbout(context);},
             ),
             // action button
           ],

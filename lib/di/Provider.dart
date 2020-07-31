@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_controller/bloc/MonitorTabBloc.dart';
 import 'package:flutter_controller/bloc/MotorTabBloc.dart';
+import 'package:flutter_controller/bloc/TabsPageBloc.dart';
 import 'package:flutter_controller/interactor/BluetoothInteractor.dart';
 import 'package:flutter_controller/interactor/ResourceInteractor.dart';
 
@@ -13,6 +14,7 @@ class Provider extends InheritedWidget {
 
   BluetoothInteractor bluetoothInteractor;
   ResourceInteractor resourceInteractor;
+  TabsPageBloc tabsPageBloc;
   MotorTabBloc motorTabBloc;
   MonitorTabBloc monitorTabBloc;
 
@@ -20,6 +22,7 @@ class Provider extends InheritedWidget {
 
   Provider(this.resourceInteractor, this.bluetoothInteractor, {Key key, Widget child})
       : super(key: key, child: child) {
+    tabsPageBloc = TabsPageBloc();
     monitorTabBloc = MonitorTabBloc();
     motorTabBloc = MotorTabBloc(bluetoothInteractor);
   }

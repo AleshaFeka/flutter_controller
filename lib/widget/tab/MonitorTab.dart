@@ -1,11 +1,7 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_controller/bloc/MonitorTabBloc.dart';
 import 'package:flutter_controller/di/Provider.dart';
 import 'package:flutter_controller/model/MonitorSettings.dart';
-import 'package:flutter_controller/core/LiveData.dart';
-import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class MonitorTab extends StatefulWidget {

@@ -11,8 +11,8 @@ class TabsPageBloc {
     _tabsCommandStreamController.stream.listen(_handleCommand);
   }
 
-  void _handleCommand(int choise) {
-    _tabsStreamController.sink.add(choise);
+  void _handleCommand(int tabIndex) {
+    _tabsStreamController.sink.add(tabIndex);
   }
 
   void dispose() {

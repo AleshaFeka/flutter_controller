@@ -13,8 +13,8 @@ class MainPage extends StatefulWidget {
 class _MainPage extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
-    return TabsPage();
-//    return ConnectPage(checkAvailability: false,);
+//    return TabsPage();
+    return ConnectPage(checkAvailability: false,);
   }
 
   @override

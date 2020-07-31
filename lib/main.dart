@@ -24,6 +24,7 @@ Future<void> main() async {
 }
 
 class MyApp extends StatelessWidget {
+  static const _logoFilePath = "assets/images/logo.png";
   BluetoothInteractor _bluetoothInteractor = BluetoothInteractor();
   ResourceInteractor _resourceInteractor = ResourceInteractor();
 
@@ -78,7 +79,6 @@ class MyApp extends StatelessWidget {
     );
   }
 
-
   Widget _buildDoneScreen() {
     return MaterialApp(
       title: 'B&E controller app',
@@ -103,10 +103,7 @@ class MyApp extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(
-                Icons.memory,
-                size: 128,
-              ),
+              Image.asset(_logoFilePath,height: 256, width: 256,),
               Container(height: 24,),
               CircularProgressIndicator(),
             ],

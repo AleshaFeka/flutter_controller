@@ -9,6 +9,6 @@ class ResourceInteractor {
     var rawStrings = await DefaultAssetBundle.of(context)
       .loadString(_localizedStringsFileName);
     localizedStrings = await json.decode(rawStrings) as Map;
-    return Future<bool>.delayed(Duration(milliseconds: 100),() => true,); //Just for debug )))
+    return Future<bool>.delayed(Duration(milliseconds: 500),() => true,); //Just for debug )))
   }
 }

@@ -26,36 +26,55 @@ class _ConnectPageM extends State<ConnectPageM> {
 
     return StreamBuilder<List<BluetoothDiscoveryResult>>(
         stream: _bloc.discoveryResultStream,
+        initialData: [],
         builder: (context, snapshot) {
-          Widget child;
-          if (snapshot.hasError) {
-            child = _buildError(snapshot.error.toString());
-          } else {
-            if (!snapshot.hasData) {
-              child = _buildWaiting();
-            } else {
-              child = _buildContent(snapshot.data);
-            }
-          }
+          return StreamBuilder<ConnectPageState>(
+              stream: _bloc.connectPageStateStream,
+              initialData: ConnectPageState.IDLE,
+              builder: (context, stateSnapshot) {
+                String title;
+                if (stateSnapshot.data == ConnectPageState.IDLE) {
+                  title = "Доступные устройства";
+                } else {
+                  title = stateSnapshot.data == ConnectPageState.DISCOVERING ? "Поиск..." : "Соединение...";
+                }
 
-          return Scaffold(
-              appBar: AppBar(
-                title: Text("Устройства"),
-                actions: [
-                  IconButton(
-                      icon: Icon(Icons.replay),
-                      onPressed: () {
-                        _bloc.commandStream.add(ConnectPageDiscoveryCommand.START_DISCOVERY);
-                      })
-                ],
-              ),
-              body: Container(
-                  decoration: BoxDecoration(
-                      image: DecorationImage(
-                          image: AssetImage(_logoAssetPath),
-                          fit: BoxFit.fitWidth,
-                          colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.2), BlendMode.dstATop))),
-                  child: child));
+                Widget child;
+                if (snapshot.hasError) {
+                  child = _buildError(snapshot.error.toString());
+                } else {
+                  if (!snapshot.hasData) {
+                    child = _buildWaiting();
+                  } else {
+                    child = _buildContent(snapshot.data);
+                  }
+                }
+
+                return Scaffold(
+                    appBar: AppBar(
+                      title: Text(title),
+                      actions: [
+                        /*stateSnapshot.data != ConnectPageState.IDLE
+                            ? FittedBox(
+                                child: Container(
+                                    margin: new EdgeInsets.all(16.0),
+                                    child: CircularProgressIndicator(
+                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white))))
+                            :*/ IconButton(
+                                icon: Icon(Icons.replay),
+                                onPressed: () {
+                                  _bloc.commandStream.add(ConnectPageDiscoveryCommand.START_DISCOVERY);
+                                }),
+                      ],
+                    ),
+                    body: Container(
+                        decoration: BoxDecoration(
+                            image: DecorationImage(
+                                image: AssetImage(_logoAssetPath),
+                                fit: BoxFit.fitWidth,
+                                colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.2), BlendMode.dstATop))),
+                        child: child));
+              });
         });
   }
 

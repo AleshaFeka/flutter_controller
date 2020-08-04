@@ -5,6 +5,7 @@ import 'package:flutter_controller/interactor/BluetoothInteractor.dart';
 import 'package:flutter_controller/model/Pair.dart';
 
 enum ConnectPageDiscoveryCommand { START_DISCOVERY, STOP_DISCOVERY, GET_BONDED_DEVICES, CONNECT, DISCONNECT }
+enum ConnectPageState { IDLE, DISCOVERING, CONNECTING }
 
 class ConnectPageBloc {
   final BluetoothInteractor _interactor;
@@ -15,6 +16,10 @@ class ConnectPageBloc {
   StreamController<List<BluetoothDiscoveryResult>> _discoveryResultStreamController =
       StreamController<List<BluetoothDiscoveryResult>>.broadcast();
   Stream<List<BluetoothDiscoveryResult>> get discoveryResultStream => _discoveryResultStreamController.stream;
+
+  StreamController<ConnectPageState> _connectStateStreamController =
+      StreamController<ConnectPageState>.broadcast();
+  Stream<ConnectPageState> get connectPageStateStream => _connectStateStreamController.stream;
 
   StreamController<ConnectPageDiscoveryCommand> _commandStreamController =
       StreamController<ConnectPageDiscoveryCommand>.broadcast();
@@ -74,6 +79,7 @@ class ConnectPageBloc {
   }
 
   void _startDiscovery() {
+    _connectStateStreamController.sink.add(ConnectPageState.DISCOVERING);
     _availableDevices.clear();
     _discoveryResultStreamController.sink.add(_availableDevices);
 
@@ -88,6 +94,8 @@ class ConnectPageBloc {
         _availableDevices.add(device);
       }
       _discoveryResultStreamController.sink.add(_availableDevices);
+    }).onDone(() {
+      _connectStateStreamController.sink.add(ConnectPageState.IDLE);
     });
   }
 
@@ -97,6 +105,7 @@ class ConnectPageBloc {
   }
 
   void dispose() {
+    _connectStateStreamController.close();
     _userActionsStreamController.close();
     _discoveryResultStreamController.close();
     _commandStreamController.close();

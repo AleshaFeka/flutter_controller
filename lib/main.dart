@@ -24,7 +24,7 @@ Future<void> main() async {
 }
 
 class MyApp extends StatelessWidget {
-  static const _logoFilePath = "assets/images/logo.png";
+  static const _logoAssetPath = "assets/images/logo.png";
   BluetoothInteractor _bluetoothInteractor = BluetoothInteractor();
   ResourceInteractor _resourceInteractor = ResourceInteractor();
 
@@ -103,7 +103,7 @@ class MyApp extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.asset(_logoFilePath,height: 256, width: 256,),
+              Image.asset(_logoAssetPath,height: 256, width: 256,),
               Container(height: 24,),
               CircularProgressIndicator(),
             ],

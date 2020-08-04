@@ -6,14 +6,6 @@ import 'package:flutter_controller/model/Parameter.dart';
 
 enum MotorSettingsCommand { READ, WRITE, SAVE }
 
-/*
-class MotorParameter {
-  String name;
-  String value;
-  MotorParameter(this.name, this. value);
-}
-*/
-
 class MotorTabBloc {
   MotorSettings _motorSettings;
   BluetoothInteractor _bluetoothInteractor;
@@ -91,7 +83,6 @@ class MotorTabBloc {
 
   void _motorSettingsRead() {
     _motorSettings = _bluetoothInteractor.read();
-    print("Readed from bluetooth - $_motorSettings");
     _motorInstantSettingsStreamController.sink.add(_motorSettings);
   }
 

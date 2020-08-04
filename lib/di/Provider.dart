@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_controller/bloc/ConnectPageBloc.dart';
 import 'package:flutter_controller/bloc/MonitorTabBloc.dart';
 import 'package:flutter_controller/bloc/MotorTabBloc.dart';
 import 'package:flutter_controller/bloc/TabsPageBloc.dart';
@@ -12,19 +13,22 @@ class Provider extends InheritedWidget {
     return context.dependOnInheritedWidgetOfExactType<Provider>();
   }
 
-  BluetoothInteractor bluetoothInteractor;
-  ResourceInteractor resourceInteractor;
+  BluetoothInteractor _bluetoothInteractor;
+  ResourceInteractor _resourceInteractor;
+
+  ConnectPageBloc connectPageBloc;
   TabsPageBloc tabsPageBloc;
   MotorTabBloc motorTabBloc;
   MonitorTabBloc monitorTabBloc;
+  
+  Map get localizedStrings => _resourceInteractor.localizedStrings;
 
-  Map get localizedStrings => resourceInteractor.localizedStrings;
-
-  Provider(this.resourceInteractor, this.bluetoothInteractor, {Key key, Widget child})
+  Provider(this._resourceInteractor, this._bluetoothInteractor, {Key key, Widget child})
       : super(key: key, child: child) {
+    connectPageBloc = ConnectPageBloc(_bluetoothInteractor);
     tabsPageBloc = TabsPageBloc();
     monitorTabBloc = MonitorTabBloc();
-    motorTabBloc = MotorTabBloc(bluetoothInteractor);
+    motorTabBloc = MotorTabBloc(_bluetoothInteractor);
   }
 
   @override

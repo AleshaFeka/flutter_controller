@@ -1,7 +1,11 @@
+import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:flutter_controller/model/MotorSettings.dart';
 
 class BluetoothInteractor {
-
+  FlutterBluetoothSerial instance = FlutterBluetoothSerial.instance;
+  bool isConnected = false;
+  BluetoothConnection connection;
+  
   MotorSettings read() {
     MotorSettings result = MotorSettings.random(50);
     return result;
@@ -12,6 +16,28 @@ class BluetoothInteractor {
   }
   void save() {
     print("BluetoothInteractor - SAVE");
+  }
+
+  Future<bool> connect(String address) async {
+    print('Connected to the device...');
+    await BluetoothConnection.toAddress(address).then((value) {
+      connection = value;
+      isConnected = true;
+    }).catchError((error) {
+      isConnected = false;
+      _onError(error.toString());
+    });
+    print('isConnected - $isConnected');
+
+    return isConnected;
+  }
+
+  Future<void> disconnect() async {
+    connection.close();
+  }
+
+  void _onError(String error) {
+    print("Error - $error");
   }
 
 /*

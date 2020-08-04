@@ -39,6 +39,11 @@ class _ConnectPageM extends State<ConnectPageM> {
                   title = stateSnapshot.data == ConnectPageState.DISCOVERING ? "Поиск..." : "Соединение...";
                 }
 
+                IconData actionIcon = stateSnapshot.data == ConnectPageState.IDLE ? Icons.replay : Icons.cancel;
+                void Function() actionOnPressed = stateSnapshot.data == ConnectPageState.IDLE ?
+                  () { _bloc.commandStream.add(ConnectPageDiscoveryCommand.START_DISCOVERY); } :
+                  () { _bloc.commandStream.add(ConnectPageDiscoveryCommand.STOP_DISCOVERY); };
+
                 Widget child;
                 if (snapshot.hasError) {
                   child = _buildError(snapshot.error.toString());
@@ -46,7 +51,7 @@ class _ConnectPageM extends State<ConnectPageM> {
                   if (!snapshot.hasData) {
                     child = _buildWaiting();
                   } else {
-                    child = _buildContent(snapshot.data);
+                    child = _buildContent(snapshot.data, stateSnapshot.data);
                   }
                 }
 
@@ -54,17 +59,10 @@ class _ConnectPageM extends State<ConnectPageM> {
                     appBar: AppBar(
                       title: Text(title),
                       actions: [
-                        /*stateSnapshot.data != ConnectPageState.IDLE
-                            ? FittedBox(
-                                child: Container(
-                                    margin: new EdgeInsets.all(16.0),
-                                    child: CircularProgressIndicator(
-                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white))))
-                            :*/ IconButton(
-                                icon: Icon(Icons.replay),
-                                onPressed: () {
-                                  _bloc.commandStream.add(ConnectPageDiscoveryCommand.START_DISCOVERY);
-                                }),
+                        IconButton(
+                            icon: Icon(actionIcon),
+                            onPressed: actionOnPressed
+                        ),
                       ],
                     ),
                     body: Container(
@@ -84,14 +82,13 @@ class _ConnectPageM extends State<ConnectPageM> {
 
     return ListTile(
       onTap: () {
-        _onItemClick(device);
+        _onItemClick(discoveryResult);
       },
       onLongPress: () {
-        _onItemLongClick(device);
+        _onItemLongClick(discoveryResult);
       },
       enabled: true,
       leading: Icon(Icons.devices),
-      // @TODO . !BluetoothClass! class aware icon
       title: Text(device.name ?? "Unknown device"),
       subtitle: Text(device.address.toString()),
       trailing: Row(
@@ -109,31 +106,40 @@ class _ConnectPageM extends State<ConnectPageM> {
                   ),
                 )
               : Container(width: 0, height: 0),
-          device.isConnected ? Icon(Icons.import_export) : Container(width: 0, height: 0),
+          device.isConnected ? Icon(Icons.import_export, color: Colors.green,) : Container(width: 0, height: 0),
           device.isBonded ? Icon(Icons.link) : Container(width: 0, height: 0),
         ],
       ),
     );
   }
 
-  void _onItemClick(BluetoothDevice device) {
+  void _onItemClick(BluetoothDiscoveryResult device) {
     _bloc.userActionsStream.add(Pair(device, ConnectPageDiscoveryCommand.CONNECT));
   }
 
-  void _onItemLongClick(BluetoothDevice device) {
+  void _onItemLongClick(BluetoothDiscoveryResult device) {
     _bloc.userActionsStream.add(Pair(device, ConnectPageDiscoveryCommand.DISCONNECT));
   }
 
-  Widget _buildContent(List<BluetoothDiscoveryResult> discoveryResults) {
+  Widget _buildContent(List<BluetoothDiscoveryResult> discoveryResults, ConnectPageState state) {
     var items = List<Widget>();
     for (BluetoothDiscoveryResult discoveryResult in discoveryResults) {
       items.add(_buildItem(discoveryResult));
     }
+    if (state == ConnectPageState.DISCOVERING) {
+      items.add(ListTile(
+        enabled: true,
+        title: Center(child: CircularProgressIndicator()),
+      ));
+    }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: items,
-    );
+    return Stack(children: [
+      state == ConnectPageState.CONNECTING ? Center(child: CircularProgressIndicator()) : Container(),
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: items,
+      ),
+    ]);
   }
 
   Widget _buildWaiting() {

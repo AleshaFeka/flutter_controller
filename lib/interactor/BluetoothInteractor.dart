@@ -27,7 +27,7 @@ class BluetoothInteractor {
       isConnected = false;
       _onError(error.toString());
     });
-    print('isConnected - $isConnected');
+    print('BluetoothInteractor. isConnected - $isConnected');
 
     return isConnected;
   }

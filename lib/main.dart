@@ -25,6 +25,7 @@ Future<void> main() async {
 
 class MyApp extends StatelessWidget {
   static const _logoAssetPath = "assets/images/logo.png";
+  static const _appName = "SinTech Controller";
   BluetoothInteractor _bluetoothInteractor = BluetoothInteractor();
   ResourceInteractor _resourceInteractor = ResourceInteractor();
 
@@ -53,7 +54,7 @@ class MyApp extends StatelessWidget {
 
   Widget _buildErrorScreen(String message) {
     return MaterialApp(
-      title: 'B&E controller app',
+      title: 'SinTech Controller',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
@@ -81,7 +82,7 @@ class MyApp extends StatelessWidget {
 
   Widget _buildDoneScreen() {
     return MaterialApp(
-      title: 'B&E controller app',
+      title: _appName,
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,

@@ -83,7 +83,7 @@ class _ConnectPageM extends State<ConnectPageM> {
     int rssi = discoveryResult.rssi;
 
     var fontSize = device.isConnected ? 18.0 : 16.0;
-    var color = device.isConnected ? Colors.green : Colors.grey;
+    var color = device.isConnected ? Colors.green : device.name.startsWith(_controllerNameStarts) ? Colors.black : Colors.grey;
 
     return ListTile(
       onTap: () {

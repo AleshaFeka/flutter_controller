@@ -33,7 +33,7 @@ class BluetoothInteractor {
   }
 
   Future<void> disconnect() async {
-    connection.close();
+    connection?.close();
   }
 
   void _onError(String error) {

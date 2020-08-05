@@ -11,6 +11,7 @@ class ConnectPageM extends StatefulWidget {
 
 class _ConnectPageM extends State<ConnectPageM> {
   static const _logoAssetPath = "assets/images/logo.png";
+  static const _controllerNameStarts = "ws-";
 
   ConnectPageBloc _bloc;
 
@@ -40,9 +41,13 @@ class _ConnectPageM extends State<ConnectPageM> {
                 }
 
                 IconData actionIcon = stateSnapshot.data == ConnectPageState.IDLE ? Icons.replay : Icons.cancel;
-                void Function() actionOnPressed = stateSnapshot.data == ConnectPageState.IDLE ?
-                  () { _bloc.commandStream.add(ConnectPageDiscoveryCommand.START_DISCOVERY); } :
-                  () { _bloc.commandStream.add(ConnectPageDiscoveryCommand.STOP_DISCOVERY); };
+                void Function() actionOnPressed = stateSnapshot.data == ConnectPageState.IDLE
+                    ? () {
+                        _bloc.commandStream.add(ConnectPageDiscoveryCommand.START_DISCOVERY);
+                      }
+                    : () {
+                        _bloc.commandStream.add(ConnectPageDiscoveryCommand.STOP_DISCOVERY);
+                      };
 
                 Widget child;
                 if (snapshot.hasError) {
@@ -59,10 +64,7 @@ class _ConnectPageM extends State<ConnectPageM> {
                     appBar: AppBar(
                       title: Text(title),
                       actions: [
-                        IconButton(
-                            icon: Icon(actionIcon),
-                            onPressed: actionOnPressed
-                        ),
+                        IconButton(icon: Icon(actionIcon), onPressed: actionOnPressed),
                       ],
                     ),
                     body: Container(
@@ -80,6 +82,9 @@ class _ConnectPageM extends State<ConnectPageM> {
     var device = discoveryResult.device;
     int rssi = discoveryResult.rssi;
 
+    var fontSize = device.isConnected ? 18.0 : 16.0;
+    var color = device.isConnected ? Colors.green : Colors.grey;
+
     return ListTile(
       onTap: () {
         _onItemClick(discoveryResult);
@@ -88,8 +93,14 @@ class _ConnectPageM extends State<ConnectPageM> {
         _onItemLongClick(discoveryResult);
       },
       enabled: true,
-      leading: Icon(Icons.devices),
-      title: Text(device.name ?? "Unknown device"),
+      leading: Icon(
+        device.name.startsWith(_controllerNameStarts) ? Icons.memory : Icons.devices,
+        color: device.isConnected ? Colors.green : device.name.startsWith(_controllerNameStarts) ? Colors.blueAccent : IconTheme.of(context).color,
+      ),
+      title: Text(
+        device.name ?? "Unknown device",
+        style: TextStyle(fontSize: fontSize, color: color),
+      ),
       subtitle: Text(device.address.toString()),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
@@ -106,7 +117,12 @@ class _ConnectPageM extends State<ConnectPageM> {
                   ),
                 )
               : Container(width: 0, height: 0),
-          device.isConnected ? Icon(Icons.import_export, color: Colors.green,) : Container(width: 0, height: 0),
+          device.isConnected
+              ? Icon(
+                  Icons.import_export,
+                  color: Colors.green,
+                )
+              : Container(width: 0, height: 0),
           device.isBonded ? Icon(Icons.link) : Container(width: 0, height: 0),
         ],
       ),

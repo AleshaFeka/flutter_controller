@@ -54,7 +54,7 @@ class MyApp extends StatelessWidget {
 
   Widget _buildErrorScreen(String message) {
     return MaterialApp(
-      title: 'SinTech Controller',
+      title: _appName,
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
@@ -93,7 +93,7 @@ class MyApp extends StatelessWidget {
 
   Widget _buildWaitingScreen() {
     return MaterialApp(
-      title: 'B&E controller app',
+      title: _appName,
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,

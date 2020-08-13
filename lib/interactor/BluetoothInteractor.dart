@@ -8,11 +8,17 @@ class BluetoothInteractor {
   BluetoothState bluetoothState = BluetoothState.UNKNOWN;
 
   BluetoothInteractor() {
+    _initState();
+
     instance
       .onStateChanged()
       .listen((BluetoothState state) {
       bluetoothState = state;
     });
+  }
+
+  void _initState() async {
+    bluetoothState = await instance.state;
   }
 
   MotorSettings read() {

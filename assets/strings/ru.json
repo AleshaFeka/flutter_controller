@@ -39,6 +39,18 @@
     "motorKv": "Kv мотора",
     "phaseCorrection": "Коррекция фаз (уточнить)"
   },
+  "bluetoothUnavailable": "Блютуз недоступен.",
+  "workImpossible": "Продолжение работы невозможно.",
+  "understand": "Понятно",
+  "bluetoothDisabled": "Блютуз отключен.",
+  "turnOnBluetooth": "Для корректной работы включите блютуз на вашем телефоне",
+  "notTurnOn": "Не включать",
+  "turnOn": "Включить",
+  "availableDevices": "Доступные устройства",
+  "search": "Поиск...",
+  "connection": "Соединение...",
+  "unknownDevice": "Неизвестное устройство",
+
   "writingNotAllowed": "Запись недопустима",
   "invalidValue": "Значение пусто",
   "notIntegerNumber": "Не целое число",
@@ -48,7 +60,6 @@
   "write": "Записать",
   "save": "Сохранить",
   "settings": "Настройки",
-
   "monitorScreenView": "Вид экрана Мониторинг",
   "centerParameter": "Центральный параметр",
   "leftTopParameter": "Параметр слева сверху",

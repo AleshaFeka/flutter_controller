@@ -14,12 +14,28 @@ class _ConnectPageM extends State<ConnectPageM> {
   static const _logoAssetPath = "assets/images/logo.png";
   static const _controllerNameStarts = "ws-";
 
+  static const _bluetoothUnavailable = "bluetoothUnavailable";
+  static const _workImpossible = "workImpossible";
+  static const _understand = "understand";
+  static const _bluetoothDisabled = "bluetoothDisabled";
+  static const _turnOnBluetooth = "turnOnBluetooth";
+  static const _notTurnOn = "notTurnOn";
+  static const _turnOn = "turnOn";
+  static const _availableDevices = "availableDevices";
+  static const _search = "search";
+  static const _connection = "connection";
+  static const _unknownDevice = "unknownDevice";
+
+
+
+  Map<String, dynamic> _localizedStrings;
   ConnectPageBloc _bloc;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _bloc = Provider.of(context).connectPageBloc;
+    _localizedStrings = Provider.of(context).localizedStrings;
   }
 
   @override
@@ -36,17 +52,17 @@ class _ConnectPageM extends State<ConnectPageM> {
               builder: (context, stateSnapshot) {
                 if (stateSnapshot.data == ConnectPageState.BLUETOOTH_UNAVAILABLE) {
                   return AlertDialog(
-                    title: Text('Блютуз недоступен.'),
+                    title: Text(_localizedStrings[_bluetoothUnavailable]),
                     content: SingleChildScrollView(
                       child: ListBody(
                         children: <Widget>[
-                          Text('Продолжение работы невозможно.'),
+                          Text(_localizedStrings[_workImpossible]),
                         ],
                       ),
                     ),
                     actions: <Widget>[
                       FlatButton(
-                        child: Text('Ок'),
+                        child: Text(_localizedStrings[_understand]),
                         onPressed: () {
                           SystemNavigator.pop(); //Finish app.
                         },
@@ -57,23 +73,23 @@ class _ConnectPageM extends State<ConnectPageM> {
 
                 if (stateSnapshot.data == ConnectPageState.BLUETOOTH_DISABLED) {
                   return AlertDialog(
-                    title: Text('Блютуз отключен.'),
+                    title: Text(_localizedStrings[_bluetoothDisabled]),
                     content: SingleChildScrollView(
                       child: ListBody(
                         children: <Widget>[
-                          Text('Для корректной работы включите блютуз на вашем телефоне'),
+                          Text(_localizedStrings[_turnOnBluetooth]),
                         ],
                       ),
                     ),
                     actions: <Widget>[
                       FlatButton(
-                        child: Text('Не включать'),
+                        child: Text(_localizedStrings[_notTurnOn]),
                         onPressed: () {
                           SystemNavigator.pop(); //Finish app.
                         },
                       ),
                       FlatButton(
-                        child: Text('Включить'),
+                        child: Text(_localizedStrings[_turnOn]),
                         onPressed: () {
                           _bloc.commandStream.add(ConnectPageCommand.ENABLE_BLUETOOTH);
                         },
@@ -84,9 +100,9 @@ class _ConnectPageM extends State<ConnectPageM> {
 
                 String title;
                 if (stateSnapshot.data == ConnectPageState.IDLE) {
-                  title = "Доступные устройства";
+                  title = _localizedStrings[_availableDevices];
                 } else {
-                  title = stateSnapshot.data == ConnectPageState.DISCOVERING ? "Поиск..." : "Соединение...";
+                  title = stateSnapshot.data == ConnectPageState.DISCOVERING ? _localizedStrings[_search] : _localizedStrings[_connection];
                 }
 
                 IconData actionIcon = stateSnapshot.data == ConnectPageState.IDLE ? Icons.replay : Icons.cancel;
@@ -150,7 +166,7 @@ class _ConnectPageM extends State<ConnectPageM> {
             : device.name.startsWith(_controllerNameStarts) ? Colors.blueAccent : IconTheme.of(context).color,
       ),
       title: Text(
-        device.name ?? "Unknown device",
+        device.name ?? _localizedStrings[_unknownDevice],
         style: TextStyle(fontSize: fontSize, color: color),
       ),
       subtitle: Text(device.address.toString()),

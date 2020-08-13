@@ -5,7 +5,16 @@ class BluetoothInteractor {
   FlutterBluetoothSerial instance = FlutterBluetoothSerial.instance;
   bool isConnected = false;
   BluetoothConnection connection;
-  
+  BluetoothState bluetoothState = BluetoothState.UNKNOWN;
+
+  BluetoothInteractor() {
+    instance
+      .onStateChanged()
+      .listen((BluetoothState state) {
+      bluetoothState = state;
+    });
+  }
+
   MotorSettings read() {
     MotorSettings result = MotorSettings.random(50);
     return result;

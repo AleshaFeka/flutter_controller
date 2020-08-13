@@ -4,8 +4,8 @@ import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:flutter_controller/interactor/BluetoothInteractor.dart';
 import 'package:flutter_controller/model/Pair.dart';
 
-enum ConnectPageDiscoveryCommand { START_DISCOVERY, STOP_DISCOVERY, GET_BONDED_DEVICES, CONNECT, DISCONNECT }
-enum ConnectPageState { IDLE, DISCOVERING, CONNECTING }
+enum ConnectPageCommand { START_DISCOVERY, STOP_DISCOVERY, GET_BONDED_DEVICES, CONNECT, DISCONNECT, ENABLE_BLUETOOTH }
+enum ConnectPageState { IDLE, DISCOVERING, CONNECTING, BLUETOOTH_DISABLED, BLUETOOTH_UNAVAILABLE }
 
 class ConnectPageBloc {
   final BluetoothInteractor _interactor;
@@ -15,7 +15,7 @@ class ConnectPageBloc {
   final List<BluetoothDiscoveryResult> _availableDevices = List<BluetoothDiscoveryResult>();
 
   StreamController<List<BluetoothDiscoveryResult>> _discoveryResultStreamController =
-      StreamController<List<BluetoothDiscoveryResult>>.broadcast();
+  StreamController<List<BluetoothDiscoveryResult>>.broadcast();
 
   Stream<List<BluetoothDiscoveryResult>> get discoveryResultStream => _discoveryResultStreamController.stream;
 
@@ -23,16 +23,16 @@ class ConnectPageBloc {
 
   Stream<ConnectPageState> get connectPageStateStream => _connectStateStreamController.stream;
 
-  StreamController<ConnectPageDiscoveryCommand> _commandStreamController =
-      StreamController<ConnectPageDiscoveryCommand>.broadcast();
+  StreamController<ConnectPageCommand> _commandStreamController =
+  StreamController<ConnectPageCommand>.broadcast();
 
-  StreamSink<ConnectPageDiscoveryCommand> get commandStream => _commandStreamController.sink;
+  StreamSink<ConnectPageCommand> get commandStream => _commandStreamController.sink;
 
-  StreamController<Pair<BluetoothDiscoveryResult, ConnectPageDiscoveryCommand>> _userActionsStreamController =
-      StreamController<Pair<BluetoothDiscoveryResult, ConnectPageDiscoveryCommand>>.broadcast();
+  StreamController<Pair<BluetoothDiscoveryResult, ConnectPageCommand>> _userActionsStreamController =
+  StreamController<Pair<BluetoothDiscoveryResult, ConnectPageCommand>>.broadcast();
 
-  StreamSink<Pair<BluetoothDiscoveryResult, ConnectPageDiscoveryCommand>> get userActionsStream =>
-      _userActionsStreamController.sink;
+  StreamSink<Pair<BluetoothDiscoveryResult, ConnectPageCommand>> get userActionsStream =>
+    _userActionsStreamController.sink;
 
   ConnectPageBloc(this._interactor) {
     _bluetooth = _interactor.instance;
@@ -40,14 +40,14 @@ class ConnectPageBloc {
     _userActionsStreamController.stream.listen(_handleUserAction);
   }
 
-  void _handleUserAction(Pair<BluetoothDiscoveryResult, ConnectPageDiscoveryCommand> action) async {
+  void _handleUserAction(Pair<BluetoothDiscoveryResult, ConnectPageCommand> action) async {
     _stopDiscovery();
     _connectStateStreamController.sink.add(ConnectPageState.CONNECTING);
     switch (action.second) {
-      case ConnectPageDiscoveryCommand.CONNECT:
+      case ConnectPageCommand.CONNECT:
         await _connect(action);
         break;
-      case ConnectPageDiscoveryCommand.DISCONNECT:
+      case ConnectPageCommand.DISCONNECT:
         await _disconnect(action);
         break;
       default:
@@ -56,13 +56,13 @@ class ConnectPageBloc {
     _connectStateStreamController.sink.add(ConnectPageState.IDLE);
   }
 
-  Future _connect(Pair<BluetoothDiscoveryResult, ConnectPageDiscoveryCommand> action) async {
+  Future _connect(Pair<BluetoothDiscoveryResult, ConnectPageCommand> action) async {
     return _interactor.connect(action.first.device.address).then((value) {
       _setConnectionStateAndReplaceItem(action.first, value);
     });
   }
 
-  Future _disconnect(Pair<BluetoothDiscoveryResult, ConnectPageDiscoveryCommand> action) async {
+  Future _disconnect(Pair<BluetoothDiscoveryResult, ConnectPageCommand> action) async {
     return _interactor.disconnect().then((value) {
       _setConnectionStateAndReplaceItem(action.first, false);
     });
@@ -71,34 +71,60 @@ class ConnectPageBloc {
   void _setConnectionStateAndReplaceItem(BluetoothDiscoveryResult oldItem, bool isConnected) {
     var oldItemMap = oldItem.device.toMap();
     oldItemMap['isConnected'] = isConnected;
-    BluetoothDiscoveryResult newItem = BluetoothDiscoveryResult(device: BluetoothDevice.fromMap(oldItemMap), rssi: oldItem.rssi);
+    BluetoothDiscoveryResult newItem = BluetoothDiscoveryResult(
+      device: BluetoothDevice.fromMap(oldItemMap), rssi: oldItem.rssi);
 
     _addToAvailableDevices(newItem, replace: true);
   }
 
-  void _handleCommand(ConnectPageDiscoveryCommand command) {
+  void _handleCommand(ConnectPageCommand command) {
+    if (!_interactor.bluetoothState.isEnabled) {
+      if (command ==  ConnectPageCommand.ENABLE_BLUETOOTH) {
+        _enableBluetooth();
+      } else {
+        _connectStateStreamController.sink.add(ConnectPageState.BLUETOOTH_DISABLED);
+      }
+      return;
+    }
+
     switch (command) {
-      case ConnectPageDiscoveryCommand.START_DISCOVERY:
+      case ConnectPageCommand.START_DISCOVERY:
         _startDiscovery();
         break;
-      case ConnectPageDiscoveryCommand.STOP_DISCOVERY:
+      case ConnectPageCommand.STOP_DISCOVERY:
         _stopDiscovery();
         break;
-      case ConnectPageDiscoveryCommand.GET_BONDED_DEVICES:
+      case ConnectPageCommand.GET_BONDED_DEVICES:
         _getBondedDevices();
         break;
       default:
         break;
     }
   }
+  
+  void _enableBluetooth() async {
+    bool isEnabled = false;
+    try {
+      isEnabled = await _bluetooth.requestEnable();
+    } catch (exc) {
+      print(exc);
+      _connectStateStreamController.sink.add(ConnectPageState.BLUETOOTH_UNAVAILABLE);
+    }
+    if (!isEnabled) {
+      _connectStateStreamController.sink.add(ConnectPageState.BLUETOOTH_UNAVAILABLE);
+    } else {
+      _connectStateStreamController.sink.add(ConnectPageState.IDLE);
+    }
+  }
 
   void _getBondedDevices() {
-    _bluetooth.getBondedDevices().then((bondedDevice) => {
-          bondedDevice.forEach((bondedDevice) {
-            BluetoothDiscoveryResult result = BluetoothDiscoveryResult(device: bondedDevice);
-            _availableDevices.add(result);
-          })
-        });
+    _bluetooth.getBondedDevices().then((bondedDevice) =>
+    {
+      bondedDevice.forEach((bondedDevice) {
+        BluetoothDiscoveryResult result = BluetoothDiscoveryResult(device: bondedDevice);
+        _availableDevices.add(result);
+      })
+    });
   }
 
   void _startDiscovery() {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:flutter_controller/bloc/ConnectPageBloc.dart';
 import 'package:flutter_controller/di/Provider.dart';
@@ -23,7 +24,7 @@ class _ConnectPageM extends State<ConnectPageM> {
 
   @override
   Widget build(BuildContext context) {
-    _bloc.commandStream.add(ConnectPageDiscoveryCommand.START_DISCOVERY);
+    _bloc.commandStream.add(ConnectPageCommand.START_DISCOVERY);
 
     return StreamBuilder<List<BluetoothDiscoveryResult>>(
         stream: _bloc.discoveryResultStream,
@@ -33,6 +34,54 @@ class _ConnectPageM extends State<ConnectPageM> {
               stream: _bloc.connectPageStateStream,
               initialData: ConnectPageState.IDLE,
               builder: (context, stateSnapshot) {
+                if (stateSnapshot.data == ConnectPageState.BLUETOOTH_UNAVAILABLE) {
+                  return AlertDialog(
+                    title: Text('Блютуз недоступен.'),
+                    content: SingleChildScrollView(
+                      child: ListBody(
+                        children: <Widget>[
+                          Text('Продолжение работы невозможно.'),
+                        ],
+                      ),
+                    ),
+                    actions: <Widget>[
+                      FlatButton(
+                        child: Text('Ок'),
+                        onPressed: () {
+                          SystemNavigator.pop(); //Finish app.
+                        },
+                      ),
+                    ],
+                  );
+                }
+
+                if (stateSnapshot.data == ConnectPageState.BLUETOOTH_DISABLED) {
+                  return AlertDialog(
+                    title: Text('Блютуз отключен.'),
+                    content: SingleChildScrollView(
+                      child: ListBody(
+                        children: <Widget>[
+                          Text('Для корректной работы включите блютуз на вашем телефоне'),
+                        ],
+                      ),
+                    ),
+                    actions: <Widget>[
+                      FlatButton(
+                        child: Text('Не включать'),
+                        onPressed: () {
+                          SystemNavigator.pop(); //Finish app.
+                        },
+                      ),
+                      FlatButton(
+                        child: Text('Включить'),
+                        onPressed: () {
+                          _bloc.commandStream.add(ConnectPageCommand.ENABLE_BLUETOOTH);
+                        },
+                      ),
+                    ],
+                  );
+                }
+
                 String title;
                 if (stateSnapshot.data == ConnectPageState.IDLE) {
                   title = "Доступные устройства";
@@ -43,10 +92,10 @@ class _ConnectPageM extends State<ConnectPageM> {
                 IconData actionIcon = stateSnapshot.data == ConnectPageState.IDLE ? Icons.replay : Icons.cancel;
                 void Function() actionOnPressed = stateSnapshot.data == ConnectPageState.IDLE
                     ? () {
-                        _bloc.commandStream.add(ConnectPageDiscoveryCommand.START_DISCOVERY);
+                        _bloc.commandStream.add(ConnectPageCommand.START_DISCOVERY);
                       }
                     : () {
-                        _bloc.commandStream.add(ConnectPageDiscoveryCommand.STOP_DISCOVERY);
+                        _bloc.commandStream.add(ConnectPageCommand.STOP_DISCOVERY);
                       };
 
                 Widget child;
@@ -83,7 +132,8 @@ class _ConnectPageM extends State<ConnectPageM> {
     int rssi = discoveryResult.rssi;
 
     var fontSize = device.isConnected ? 18.0 : 16.0;
-    var color = device.isConnected ? Colors.green : device.name.startsWith(_controllerNameStarts) ? Colors.black : Colors.grey;
+    var color =
+        device.isConnected ? Colors.green : device.name.startsWith(_controllerNameStarts) ? Colors.black : Colors.grey;
 
     return ListTile(
       onTap: () {
@@ -95,7 +145,9 @@ class _ConnectPageM extends State<ConnectPageM> {
       enabled: true,
       leading: Icon(
         device.name.startsWith(_controllerNameStarts) ? Icons.memory : Icons.devices,
-        color: device.isConnected ? Colors.green : device.name.startsWith(_controllerNameStarts) ? Colors.blueAccent : IconTheme.of(context).color,
+        color: device.isConnected
+            ? Colors.green
+            : device.name.startsWith(_controllerNameStarts) ? Colors.blueAccent : IconTheme.of(context).color,
       ),
       title: Text(
         device.name ?? "Unknown device",
@@ -130,11 +182,11 @@ class _ConnectPageM extends State<ConnectPageM> {
   }
 
   void _onItemClick(BluetoothDiscoveryResult device) {
-    _bloc.userActionsStream.add(Pair(device, ConnectPageDiscoveryCommand.CONNECT));
+    _bloc.userActionsStream.add(Pair(device, ConnectPageCommand.CONNECT));
   }
 
   void _onItemLongClick(BluetoothDiscoveryResult device) {
-    _bloc.userActionsStream.add(Pair(device, ConnectPageDiscoveryCommand.DISCONNECT));
+    _bloc.userActionsStream.add(Pair(device, ConnectPageCommand.DISCONNECT));
   }
 
   Widget _buildContent(List<BluetoothDiscoveryResult> discoveryResults, ConnectPageState state) {

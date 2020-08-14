@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
@@ -11,6 +12,10 @@ class BluetoothInteractor {
   bool isConnected = false;
   BluetoothConnection connection;
   BluetoothState bluetoothState = BluetoothState.UNKNOWN;
+
+  Stream<Uint8List> connectionStream;
+  StreamSubscription<Uint8List> _subscription;
+  StreamController<Uint8List> _controller;
 
   Uint8List _inBuffer = Uint8List(0);
 
@@ -44,6 +49,13 @@ class BluetoothInteractor {
     await BluetoothConnection.toAddress(address).then((value) {
       connection = value;
       isConnected = true;
+
+      _controller = StreamController<Uint8List>.broadcast();
+
+      connectionStream = connection.input.asBroadcastStream();
+      _subscription = connectionStream.listen((event) {
+        _controller.sink.add(event);
+      });
     }).catchError((error) {
       isConnected = false;
       _onError(error.toString());
@@ -103,10 +115,19 @@ class BluetoothInteractor {
     }
   }
 
+  void stopMonitoring() {
+    _subscription.cancel();
+  }
+
   void startMonitoring(Function(Packet) packetHandler) {
-    print('listen. connection - $connection');
-    connection.input.listen((data) { _onDataReceived(data, packetHandler); })
-      ..onDone(() { print('Disconnected'); })
-      ..onError((e) { print('Error! - $e'); });
+    _subscription = _controller.stream.listen((event) {
+      _onDataReceived(event, packetHandler);
+    })
+      ..onDone(() {
+        print('Disconnected');
+      })
+      ..onError((e) {
+        print('Error! - $e');
+      }); //todo add handling
   }
 }

@@ -6,14 +6,16 @@ import 'package:flutter_controller/core/Packet.dart';
 import 'package:flutter_controller/interactor/BluetoothInteractor.dart';
 import 'package:flutter_controller/model/MonitorSettings.dart';
 
-enum MonitorTabCommand { READ, START_MONITORING }
+enum MonitorTabCommand { READ, START_MONITORING, STOP_MONITORING }
 
 class MonitorTabBloc {
-
+  static const _monitoringInterval = 500;
   LiveData liveDataStub = LiveData.fromBytes(Uint8List(28));
+  StreamSubscription _monitoringSubscription;
 
   MonitorTabSettingsData _settings;
   BluetoothInteractor _interactor;
+  bool _isMonitoring = false;
 
   StreamController<MonitorTabSettingsData> _monitorSettingsStreamController =
       StreamController<MonitorTabSettingsData>.broadcast();
@@ -30,17 +32,28 @@ class MonitorTabBloc {
   }
 
   void _packetHandler(Packet packet) {
-    print("Packet Handler. ");
-    print(packet.toBytes);
-
     _settings = MonitorTabSettingsData.build(LiveData.fromBytes(packet.toBytes), MonitorTabSettings.load());
     _monitorSettingsStreamController.sink.add(_settings);
-
   }
 
-  void _startMonitoring() {
-    _interactor.sendMessage(Packet(0, 0, Uint8List(28)));
+  void _stopMonitoring() {
+    _interactor.stopMonitoring();
+    _monitoringSubscription.cancel();
+  }
+
+  void _startMonitoring() async {
+    
     _interactor.startMonitoring(_packetHandler);
+    _isMonitoring = true;
+
+    dynamic Function(int) computation = (count) {
+      _interactor.sendMessage(Packet(0, 0, Uint8List(28)));
+    };
+
+    _monitoringSubscription = Stream.periodic(Duration(milliseconds: _monitoringInterval), computation).listen((event) {
+      print(event);
+    });
+
   }
 
   void _handleCommand(MonitorTabCommand command) {
@@ -52,7 +65,9 @@ class MonitorTabBloc {
       case MonitorTabCommand.START_MONITORING:
         _startMonitoring();
         break;
-
+      case MonitorTabCommand.STOP_MONITORING:
+        _stopMonitoring();
+        break;
     }
   }
 

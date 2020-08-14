@@ -17,6 +17,13 @@ class _MonitorTab extends State<MonitorTab> {
   MonitorTabBloc _monitorTabBloc;
   Map _localizedStrings;
 
+
+  @override
+  void dispose() {
+    _monitorTabBloc.monitorSettingsCommandStream.add(MonitorTabCommand.STOP_MONITORING);
+    super.dispose();
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();

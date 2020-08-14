@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_controller/di/Provider.dart';
 import 'package:flutter_controller/screen/ConnectPage.dart';
+import 'package:flutter_controller/screen/TabsPage.dart';
 
 class MainPage extends StatefulWidget {
   @override

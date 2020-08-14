@@ -22,11 +22,12 @@ class _MonitorTab extends State<MonitorTab> {
     super.didChangeDependencies();
     _localizedStrings = Provider.of(context).localizedStrings;
     _monitorTabBloc = Provider.of(context).monitorTabBloc;
+    _monitorTabBloc.monitorSettingsCommandStream.add(MonitorTabCommand.READ);
   }
 
   @override
   Widget build(BuildContext context) {
-    _monitorTabBloc.monitorSettingsCommandStream.add(MonitorTabCommand.READ);
+    _monitorTabBloc.monitorSettingsCommandStream.add(MonitorTabCommand.START_MONITORING);
 
     final large = GoogleFonts.oswald(textStyle: TextStyle(fontSize: 80));
     final small = GoogleFonts.oswald(textStyle: TextStyle(fontSize: 28));

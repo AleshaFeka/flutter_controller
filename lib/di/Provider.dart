@@ -27,7 +27,7 @@ class Provider extends InheritedWidget {
       : super(key: key, child: child) {
     connectPageBloc = ConnectPageBloc(_bluetoothInteractor);
     tabsPageBloc = TabsPageBloc();
-    monitorTabBloc = MonitorTabBloc();
+    monitorTabBloc = MonitorTabBloc(_bluetoothInteractor);
     motorTabBloc = MotorTabBloc(_bluetoothInteractor);
   }
 

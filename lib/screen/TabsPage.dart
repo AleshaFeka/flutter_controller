@@ -31,7 +31,7 @@ class _TabsPage extends State<TabsPage> {
     7: Icons.short_text,
   };
 
-  List<Widget> _tabs = [ MonitorTab(), MotorTab()/*, DriveTab(), AnalogTab(), RegsTab(), SensorLessTab(), IdentTab(), LogsTab()*/ ];
+//  List<Widget> _tabs = [ MonitorTab(), MotorTab()/*, DriveTab(), AnalogTab(), RegsTab(), SensorLessTab(), IdentTab(), LogsTab()*/ ];
 
   TabsPageBloc _tabsPageBloc;
   Map<int, String> tabNames;
@@ -109,6 +109,9 @@ class _TabsPage extends State<TabsPage> {
   }
 
   Widget _buildTab(int tabIndex) {
+    //todo replace later...
+    List<Widget> _tabs = [ MonitorTab(), MotorTab()/*, DriveTab(), AnalogTab(), RegsTab(), SensorLessTab(), IdentTab(), LogsTab()*/ ];
+
     if (tabIndex > 1) return _tabs[0];//todo change when new tabs will added, remove at the end))
     return _tabs[tabIndex];
   }
@@ -133,7 +136,9 @@ class _TabsPage extends State<TabsPage> {
   void _handleSettingsClick() async {
     await Navigator.of(context).push(
         MaterialPageRoute(builder: (BuildContext context) => SettingsPage()));
-    setState(() {}); // Applying new settings
+    setState(() {
+      print("setState");
+    }); // Applying new settings
   }
 
   void _handleTabSelectClick(int choice) {

@@ -4,6 +4,7 @@ import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:flutter_controller/bloc/ConnectPageBloc.dart';
 import 'package:flutter_controller/di/Provider.dart';
 import 'package:flutter_controller/model/Pair.dart';
+import 'package:flutter_controller/screen/TabsPage.dart';
 
 class ConnectPage extends StatefulWidget {
   @override
@@ -12,7 +13,7 @@ class ConnectPage extends StatefulWidget {
 
 class _ConnectPage extends State<ConnectPage> {
   static const _logoAssetPath = "assets/images/logo.png";
-  static const _controllerNameStarts = "ws-";
+  static const _controllerNameStarts = "spv3";
 
   static const _bluetoothUnavailable = "bluetoothUnavailable";
   static const _workImpossible = "workImpossible";
@@ -25,8 +26,6 @@ class _ConnectPage extends State<ConnectPage> {
   static const _search = "search";
   static const _connection = "connection";
   static const _unknownDevice = "unknownDevice";
-
-
 
   Map<String, dynamic> _localizedStrings;
   ConnectPageBloc _bloc;
@@ -51,58 +50,20 @@ class _ConnectPage extends State<ConnectPage> {
               initialData: ConnectPageState.IDLE,
               builder: (context, stateSnapshot) {
                 if (stateSnapshot.data == ConnectPageState.BLUETOOTH_UNAVAILABLE) {
-                  return AlertDialog(
-                    title: Text(_localizedStrings[_bluetoothUnavailable]),
-                    content: SingleChildScrollView(
-                      child: ListBody(
-                        children: <Widget>[
-                          Text(_localizedStrings[_workImpossible]),
-                        ],
-                      ),
-                    ),
-                    actions: <Widget>[
-                      FlatButton(
-                        child: Text(_localizedStrings[_understand]),
-                        onPressed: () {
-                          SystemNavigator.pop(); //Finish app.
-                        },
-                      ),
-                    ],
-                  );
+                  return _buildBtUnavailableDialog();
                 }
 
                 if (stateSnapshot.data == ConnectPageState.BLUETOOTH_DISABLED) {
-                  return AlertDialog(
-                    title: Text(_localizedStrings[_bluetoothDisabled]),
-                    content: SingleChildScrollView(
-                      child: ListBody(
-                        children: <Widget>[
-                          Text(_localizedStrings[_turnOnBluetooth]),
-                        ],
-                      ),
-                    ),
-                    actions: <Widget>[
-                      FlatButton(
-                        child: Text(_localizedStrings[_notTurnOn]),
-                        onPressed: () {
-                          SystemNavigator.pop(); //Finish app.
-                        },
-                      ),
-                      FlatButton(
-                        child: Text(_localizedStrings[_turnOn]),
-                        onPressed: () {
-                          _bloc.commandStream.add(ConnectPageCommand.ENABLE_BLUETOOTH);
-                        },
-                      ),
-                    ],
-                  );
+                  return _buildBtDisabledDialog();
                 }
 
                 String title;
                 if (stateSnapshot.data == ConnectPageState.IDLE) {
                   title = _localizedStrings[_availableDevices];
                 } else {
-                  title = stateSnapshot.data == ConnectPageState.DISCOVERING ? _localizedStrings[_search] : _localizedStrings[_connection];
+                  title = stateSnapshot.data == ConnectPageState.DISCOVERING
+                      ? _localizedStrings[_search]
+                      : _localizedStrings[_connection];
                 }
 
                 IconData actionIcon = stateSnapshot.data == ConnectPageState.IDLE ? Icons.replay : Icons.cancel;
@@ -143,6 +104,54 @@ class _ConnectPage extends State<ConnectPage> {
         });
   }
 
+  AlertDialog _buildBtDisabledDialog() {
+    return AlertDialog(
+      title: Text(_localizedStrings[_bluetoothDisabled]),
+      content: SingleChildScrollView(
+        child: ListBody(
+          children: <Widget>[
+            Text(_localizedStrings[_turnOnBluetooth]),
+          ],
+        ),
+      ),
+      actions: <Widget>[
+        FlatButton(
+          child: Text(_localizedStrings[_notTurnOn]),
+          onPressed: () {
+            SystemNavigator.pop(); //Finish app.
+          },
+        ),
+        FlatButton(
+          child: Text(_localizedStrings[_turnOn]),
+          onPressed: () {
+            _bloc.commandStream.add(ConnectPageCommand.ENABLE_BLUETOOTH);
+          },
+        ),
+      ],
+    );
+  }
+
+  AlertDialog _buildBtUnavailableDialog() {
+    return AlertDialog(
+      title: Text(_localizedStrings[_bluetoothUnavailable]),
+      content: SingleChildScrollView(
+        child: ListBody(
+          children: <Widget>[
+            Text(_localizedStrings[_workImpossible]),
+          ],
+        ),
+      ),
+      actions: <Widget>[
+        FlatButton(
+          child: Text(_localizedStrings[_understand]),
+          onPressed: () {
+            SystemNavigator.pop(); //Finish app.
+          },
+        ),
+      ],
+    );
+  }
+
   Widget _buildItem(BluetoothDiscoveryResult discoveryResult) {
     var device = discoveryResult.device;
     int rssi = discoveryResult.rssi;
@@ -173,28 +182,39 @@ class _ConnectPage extends State<ConnectPage> {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          rssi != null
-              ? Container(
-                  margin: new EdgeInsets.all(8.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Text(rssi.toString()),
-                      Text('dBm'),
-                    ],
+          rssi == null
+              ? Container(width: 0, height: 0)
+              : !device.isConnected
+                  ? Container(
+                      margin: new EdgeInsets.all(8.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Text(rssi.toString()),
+                          Text('dBm'),
+                        ],
+                      ),
+                    )
+                  : Container(width: 0, height: 0),
+          device.isConnected
+              ? RaisedButton(
+                  onPressed: _navigateToSettingsTabs,
+                  elevation: 8,
+                  child: Icon(
+                    Icons.settings,
+                    color: Colors.black,
                   ),
                 )
               : Container(width: 0, height: 0),
-          device.isConnected
-              ? Icon(
-                  Icons.import_export,
-                  color: Colors.green,
-                )
-              : Container(width: 0, height: 0),
-          device.isBonded ? Icon(Icons.link) : Container(width: 0, height: 0),
+          device.isConnected ? Container() : device.isBonded ? Icon(Icons.link) : Container(width: 0, height: 0),
         ],
       ),
     );
+  }
+
+  void _navigateToSettingsTabs() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (BuildContext context) => TabsPage()));
   }
 
   void _onItemClick(BluetoothDiscoveryResult device) {

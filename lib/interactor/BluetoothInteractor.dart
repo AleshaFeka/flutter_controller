@@ -13,9 +13,11 @@ class BluetoothInteractor {
   BluetoothConnection connection;
   BluetoothState bluetoothState = BluetoothState.UNKNOWN;
 
-  Stream<Uint8List> connectionStream;
+  Stream<Uint8List> _connectionStream;
   StreamSubscription<Uint8List> _subscription;
-  StreamController<Uint8List> _controller;
+  StreamController<Uint8List> _streamController = StreamController<Uint8List>.broadcast();
+
+  Stream<Uint8List> get fromBtConnectionStream => _streamController.stream;
 
   Uint8List _inBuffer = Uint8List(0);
 
@@ -50,12 +52,20 @@ class BluetoothInteractor {
       connection = value;
       isConnected = true;
 
-      _controller = StreamController<Uint8List>.broadcast();
+//      _streamController = StreamController<Uint8List>.broadcast();
 
-      connectionStream = connection.input.asBroadcastStream();
-      _subscription = connectionStream.listen((event) {
-        _controller.sink.add(event);
-      });
+      _connectionStream = connection.input.asBroadcastStream();
+      _subscription = _connectionStream.listen((event) {
+        _streamController.sink.add(event);
+      })
+        ..onDone(() { 
+          print("onDone");
+          _streamController.sink.addError(Exception("Connection closed."));
+        })
+        ..onError((e) { 
+          print("Error - $e");
+          _streamController.sink.addError(e);
+        });
     }).catchError((error) {
       isConnected = false;
       _onError(error.toString());
@@ -120,7 +130,7 @@ class BluetoothInteractor {
   }
 
   void startMonitoring(Function(Packet) packetHandler) {
-    _subscription = _controller.stream.listen((event) {
+    _subscription = _streamController.stream.listen((event) {
       _onDataReceived(event, packetHandler);
     })
       ..onDone(() {

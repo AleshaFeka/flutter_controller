@@ -57,7 +57,7 @@ class _TabsPage extends State<TabsPage> {
         builder: (context, snapshot) {
           Widget child;
           if (snapshot.hasError) {
-            _buildError(snapshot.error.toString());
+            child = _buildError(snapshot.error.toString());
           } else if (!snapshot.hasData) {
             child = Center(child: CircularProgressIndicator());
           } else {

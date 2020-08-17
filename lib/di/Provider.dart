@@ -26,7 +26,7 @@ class Provider extends InheritedWidget {
   Provider(this._resourceInteractor, this._bluetoothInteractor, {Key key, Widget child})
       : super(key: key, child: child) {
     connectPageBloc = ConnectPageBloc(_bluetoothInteractor);
-    tabsPageBloc = TabsPageBloc();
+    tabsPageBloc = TabsPageBloc(_bluetoothInteractor);
     monitorTabBloc = MonitorTabBloc(_bluetoothInteractor);
     motorTabBloc = MotorTabBloc(_bluetoothInteractor);
   }

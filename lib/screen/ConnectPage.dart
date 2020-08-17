@@ -15,6 +15,8 @@ class _ConnectPage extends State<ConnectPage> {
   static const _logoAssetPath = "assets/images/logo.png";
   static const _controllerNameStarts = "spv3";
 
+//  static const _controllerNameStarts = "ws-";
+
   static const _bluetoothUnavailable = "bluetoothUnavailable";
   static const _workImpossible = "workImpossible";
   static const _understand = "understand";
@@ -152,13 +154,17 @@ class _ConnectPage extends State<ConnectPage> {
     );
   }
 
+  bool _isDeviceController(BluetoothDevice device) {
+    String name = device.name;
+    return name != null && device.name.startsWith(_controllerNameStarts);
+  }
+
   Widget _buildItem(BluetoothDiscoveryResult discoveryResult) {
     var device = discoveryResult.device;
     int rssi = discoveryResult.rssi;
 
     var fontSize = device.isConnected ? 18.0 : 16.0;
-    var color =
-        device.isConnected ? Colors.green : device.name.startsWith(_controllerNameStarts) ? Colors.black : Colors.grey;
+    var color = device.isConnected ? Colors.green : _isDeviceController(device) ? Colors.black : Colors.grey;
 
     return ListTile(
       onTap: () {
@@ -169,10 +175,10 @@ class _ConnectPage extends State<ConnectPage> {
       },
       enabled: true,
       leading: Icon(
-        device.name.startsWith(_controllerNameStarts) ? Icons.memory : Icons.devices,
+        _isDeviceController(device) ? Icons.memory : Icons.devices,
         color: device.isConnected
             ? Colors.green
-            : device.name.startsWith(_controllerNameStarts) ? Colors.blueAccent : IconTheme.of(context).color,
+            : _isDeviceController(device) ? Colors.blueAccent : IconTheme.of(context).color,
       ),
       title: Text(
         device.name ?? _localizedStrings[_unknownDevice],
@@ -212,9 +218,9 @@ class _ConnectPage extends State<ConnectPage> {
     );
   }
 
-  void _navigateToSettingsTabs() {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (BuildContext context) => TabsPage()));
+  void _navigateToSettingsTabs() async {
+    await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => TabsPage()));
+    _bloc.commandStream.add(ConnectPageCommand.START_DISCOVERY);
   }
 
   void _onItemClick(BluetoothDiscoveryResult device) {

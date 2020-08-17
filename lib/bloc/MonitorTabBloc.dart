@@ -15,7 +15,6 @@ class MonitorTabBloc {
 
   MonitorTabSettingsData _settings;
   BluetoothInteractor _interactor;
-  bool _isMonitoring = false;
 
   StreamController<MonitorTabSettingsData> _monitorSettingsStreamController =
       StreamController<MonitorTabSettingsData>.broadcast();
@@ -42,9 +41,7 @@ class MonitorTabBloc {
   }
 
   void _startMonitoring() async {
-    
     _interactor.startMonitoring(_packetHandler);
-    _isMonitoring = true;
 
     dynamic Function(int) computation = (count) {
       _interactor.sendMessage(Packet(0, 0, Uint8List(28)));

@@ -77,10 +77,11 @@ class ConnectPageBloc {
     _addToAvailableDevices(newItem, replace: true);
   }
 
-  void _handleCommand(ConnectPageCommand command) {
+  void _handleCommand(ConnectPageCommand command) async {
     if (!_interactor.bluetoothState.isEnabled) {
       if (command ==  ConnectPageCommand.ENABLE_BLUETOOTH) {
-        _enableBluetooth();
+        await _enableBluetooth();
+        _startDiscovery();
       } else {
         _connectStateStreamController.sink.add(ConnectPageState.BLUETOOTH_DISABLED);
       }

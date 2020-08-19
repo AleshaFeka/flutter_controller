@@ -25,6 +25,13 @@ class BluetoothInteractor {
     _initState();
 
     instance.onStateChanged().listen((BluetoothState state) {
+      print("BluetoothInteractor.onStateChanged  - $state");
+/*
+      if (isConnected && (bluetoothState == BluetoothState.STATE_OFF || bluetoothState == BluetoothState.STATE_BLE_TURNING_OFF)) {
+        _streamController.sink.addError(Exception("Bluetooth disabled."));
+        isConnected = false;
+      }
+*/
       bluetoothState = state;
     });
   }
@@ -51,8 +58,6 @@ class BluetoothInteractor {
     await BluetoothConnection.toAddress(address).then((value) {
       connection = value;
       isConnected = true;
-
-//      _streamController = StreamController<Uint8List>.broadcast();
 
       _connectionStream = connection.input.asBroadcastStream();
       _subscription = _connectionStream.listen((event) {
@@ -122,6 +127,8 @@ class BluetoothInteractor {
       await connection.output.allSent;
     } catch (e) {
       print("_sendMessage error - ${e.toString()}");
+      _streamController.sink.addError(Exception("Bluetooth disabled."));
+      isConnected = false;
     }
   }
 

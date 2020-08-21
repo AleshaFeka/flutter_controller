@@ -19,7 +19,7 @@ class TabsPage extends StatefulWidget {
 
 class _TabsPage extends State<TabsPage> {
   static const _firstTab = 0;
-  static const _tabNames = "tabNames";
+  static const _tabNamesConst = "tabNames";
   static const tabIcons = <int, IconData>{
     0: Icons.computer,
     1: Icons.adjust,
@@ -31,20 +31,18 @@ class _TabsPage extends State<TabsPage> {
     7: Icons.short_text,
   };
 
-//  List<Widget> _tabs = [ MonitorTab(), MotorTab()/*, DriveTab(), AnalogTab(), RegsTab(), SensorLessTab(), IdentTab(), LogsTab()*/ ];
-
   TabsPageBloc _tabsPageBloc;
   Map<int, String> tabNames;
   Map<String, dynamic> _localizedStrings;
 
-  int _selectedChoice = 1; // Selected tab
+  int _selectedChoice = 0; // Selected tab
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _tabsPageBloc = Provider.of(context).tabsPageBloc;
     _localizedStrings = Provider.of(context).localizedStrings;
-    tabNames = (_localizedStrings[_tabNames] as Map)
+    tabNames = (_localizedStrings[_tabNamesConst] as Map)
         .map((key, value) => MapEntry(int.parse(key), value.toString()));
   }
 
@@ -53,14 +51,16 @@ class _TabsPage extends State<TabsPage> {
     _tabsPageBloc.tabsCommandStream.add(_firstTab);
 
     return StreamBuilder<int>(
-        stream: _tabsPageBloc.monitorSettingsStream,
+        stream: _tabsPageBloc.tabsSettingsStream,
         builder: (context, snapshot) {
           Widget child;
+          String tabName = "";
           if (snapshot.hasError) {
             child = _buildError(snapshot.error.toString());
           } else if (!snapshot.hasData) {
             child = Center(child: CircularProgressIndicator());
           } else {
+            tabName = tabNames[snapshot.data];
             child = _buildTab(snapshot.data);
           }
 
@@ -72,7 +72,7 @@ class _TabsPage extends State<TabsPage> {
                   return _buildMenuItems();
                 },
               ),
-              title: Text(tabNames[_selectedChoice]),
+              title: Text(tabName),
               actions: <Widget>[
                 IconButton(
                   icon: Icon(Icons.info_outline),

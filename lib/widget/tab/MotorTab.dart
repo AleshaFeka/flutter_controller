@@ -23,7 +23,8 @@ class _MotorTabState extends State<MotorTab> {
   static const _notANumber = "notANumber";
   static const _writingNotAllowed = "writingNotAllowed";
   static const _parameterValueAccuracy = 2;
-  static const _onlyIntegerValues = ["motorPolePairs", "motorDirection", "motorSpeedMax", "motorVoltageMax", "fieldWakingCurrent"];
+  static const _onlyIntegerValues = ["motorPolePairs", "motorDirection", "motorSpeedMax", "motorVoltageMax",
+    "motorPositionSensorType", "motorTemperatureSensorType", "fieldWakingCurrent"];
   static const _possibleNegativeValues = ["phaseCorrection"];
 
   MotorTabBloc _motorTabBloc;

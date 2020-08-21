@@ -5,6 +5,7 @@ import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:flutter_controller/core/LiveData.dart';
 import 'package:flutter_controller/core/Packet.dart';
 import 'package:flutter_controller/model/MotorSettings.dart';
+import 'package:flutter_controller/util/Mapper.dart';
 
 class BluetoothInteractor {
   FlutterBluetoothSerial instance = FlutterBluetoothSerial.instance;
@@ -26,12 +27,6 @@ class BluetoothInteractor {
 
     instance.onStateChanged().listen((BluetoothState state) {
       print("BluetoothInteractor.onStateChanged  - $state");
-/*
-      if (isConnected && (bluetoothState == BluetoothState.STATE_OFF || bluetoothState == BluetoothState.STATE_BLE_TURNING_OFF)) {
-        _streamController.sink.addError(Exception("Bluetooth disabled."));
-        isConnected = false;
-      }
-*/
       bluetoothState = state;
     });
   }
@@ -40,13 +35,16 @@ class BluetoothInteractor {
     bluetoothState = await instance.state;
   }
 
-  MotorSettings read() {
+  MotorSettings readMotorSettings() {
     MotorSettings result = MotorSettings.random(50);
     return result;
   }
 
-  void write(MotorSettings motorSettings) {
+  void writeMotorSettings(MotorSettings motorSettings) {
+    Packet packet = Mapper.motorSettingsToPacket(motorSettings);
+
     print("BluetoothInteractor - WRITE - ${motorSettings.toJson()}");
+    sendMessage(packet);
   }
 
   void save() {

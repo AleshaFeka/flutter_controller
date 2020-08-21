@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'dart:typed_data';
 
+import 'package:flutter_controller/core/Packet.dart';
 import 'package:flutter_controller/interactor/BluetoothInteractor.dart';
 import 'package:flutter_controller/model/MotorSettings.dart';
 import 'package:flutter_controller/model/Parameter.dart';
+import 'package:flutter_controller/util/Mapper.dart';
 
 enum MotorSettingsCommand { READ, WRITE, SAVE }
 
@@ -42,7 +45,19 @@ class MotorTabBloc {
       case "fieldWakingCurrent" :
         _motorSettings.fieldWakingCurrent = int.parse(motorParameter.value);
         break;
+      case "motorPositionSensorType" :
+        _motorSettings.motorPositionSensorType = int.parse(motorParameter.value);
+        break;
+      case "motorTemperatureSensorType" :
+        _motorSettings.motorTemperatureSensorType = int.parse(motorParameter.value);
+        break;
+      case "wheelDiameter" :
+        _motorSettings.wheelDiameter = int.parse(motorParameter.value);
+        break;
 
+      case "motorFlux" :
+        _motorSettings.motorFlux = double.parse(motorParameter.value);
+        break;
       case "motorTemperatureMax" :
         _motorSettings.motorTemperatureMax = double.parse(motorParameter.value);
         break;
@@ -81,13 +96,24 @@ class MotorTabBloc {
     }
   }
 
-  void _motorSettingsRead() {
-    _motorSettings = _bluetoothInteractor.read();
+  void _packetHandler(Packet packet) {
+    print(packet.toBytes);
+    _motorSettings = Mapper.packetToMotorSettings(packet);
     _motorInstantSettingsStreamController.sink.add(_motorSettings);
   }
 
+  void _motorSettingsRead() {
+    _bluetoothInteractor.sendMessage(Packet(1, 0, Uint8List(28)));
+    _bluetoothInteractor.startMonitoring(_packetHandler);
+
+/*
+    _motorSettings = _bluetoothInteractor.readMotorSettings();
+    _motorInstantSettingsStreamController.sink.add(_motorSettings);
+*/
+  }
+
   void _motorSettingsWrite() {
-    _bluetoothInteractor.write(_motorSettings);
+    _bluetoothInteractor.writeMotorSettings(_motorSettings);
   }
 
   void _motorSettingsSave() {
@@ -95,6 +121,7 @@ class MotorTabBloc {
   }
 
   void dispose() {
+    _bluetoothInteractor.stopMonitoring();
     _motorInstantSettingsStreamController.close();
     _motorSettingsCommandStreamController.close();
     _motorSettingsDataStreamController.close();

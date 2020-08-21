@@ -37,6 +37,10 @@
     "motorStatorResistance": "Сопротивление статора",
     "motorInductance": "Индуктивность (мотора?  статора?)",
     "motorKv": "Kv мотора",
+    "motorPositionSensorType": "Тип датчика положения",
+    "motorTemperatureSensorType": "Тип датчика температуры",
+    "motorFlux": "Магнитный поток",
+    "wheelDiameter": "Диаметр колеса, мм",
     "phaseCorrection": "Коррекция фаз (уточнить)"
   },
   "bluetoothUnavailable": "Блютуз недоступен.",

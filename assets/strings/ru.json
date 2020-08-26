@@ -72,5 +72,12 @@
   "rightBottomParameter": "Параметр справа снизу",
   "error": "Ошибка",
   "online": "Работа",
-  "mode": "Режим"
+  "mode": "Режим",
+  "sensorType": "Тип датчика",
+  "hallSensors": "Холлы",
+  "encoder": "Энкодер",
+  "KTY84": "KTY84",
+  "KTY81": "KTY81",
+  "NTC10": "NTC10",
+  "unknownTemperatureSensor": "Неверный тип"
 }

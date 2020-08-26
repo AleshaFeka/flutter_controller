@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_controller/bloc/MotorTabBloc.dart';
 import 'package:flutter_controller/di/Provider.dart';
@@ -23,21 +20,65 @@ class _MotorTabState extends State<MotorTab> {
   static const _notANumber = "notANumber";
   static const _writingNotAllowed = "writingNotAllowed";
   static const _parameterValueAccuracy = 2;
-  static const _onlyIntegerValues = ["motorPolePairs", "motorDirection", "motorSpeedMax", "motorVoltageMax",
-    "motorPositionSensorType", "motorTemperatureSensorType", "fieldWakingCurrent"];
+  static const _sensorType = "sensorType";
+
+  static const _unknownTemperatureSensor = "unknownTemperatureSensor";
   static const _possibleNegativeValues = ["phaseCorrection"];
+  static const _onlyIntegerValues = [
+    "motorPolePairs",
+    "motorDirection",
+    "motorSpeedMax",
+    "motorVoltageMax",
+    "fieldWakingCurrent"
+  ];
+  static const _dropDownInputs = ["motorTemperatureSensorType", "motorPositionSensorType"];
+  static const _temperatureSensorTypes = ["KTY84", "KTY81", "NTC10"];
+  static const _positionSensorTypes = ["hallSensors", "encoder"];
 
   MotorTabBloc _motorTabBloc;
   Map _parameterNames;
   Map _localizedStrings;
+
   final _formKey = GlobalKey<FormState>();
+  Map<String, String Function(String, String)> _validators;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _motorTabBloc = Provider.of(context).motorTabBloc;
-    _localizedStrings = Provider.of(context).localizedStrings;
+    _motorTabBloc = Provider
+      .of(context)
+      .motorTabBloc;
+    _localizedStrings = Provider
+      .of(context)
+      .localizedStrings;
     _parameterNames = _localizedStrings[_motorParameterNames];
+
+    _validators = {
+      "default": (String value, String variableName) {
+        double number = double.parse(value, (e) => null);
+        if (number == null) {
+          return _localizedStrings[_notANumber];
+        }
+        if (_onlyIntegerValues.contains(variableName) && number.round() != number) {
+          return _localizedStrings[_notIntegerNumber];
+        }
+        if (!_possibleNegativeValues.contains(variableName) && number < 0) {
+          return _localizedStrings[_lessThanZero];
+        }
+
+        return null;
+      },
+      "common": (String value, String variableName) {
+        if (value == null) {
+          return _localizedStrings[_invalidValue];
+        }
+        if (value.isEmpty) {
+          return _localizedStrings[_invalidValue];
+        }
+
+        return null;
+      },
+    };
   }
 
   @override
@@ -49,23 +90,21 @@ class _MotorTabState extends State<MotorTab> {
           return _buildError(snapshot.error.toString());
         }
 
-        return ListView(children: [
-          _buildForm(_parameterNames, _formKey, snapshot),
-          _buildBottomButtons()
-        ]);
+        return ListView(children: [_buildForm(_parameterNames, _formKey, snapshot), _buildBottomButtons()]);
       },
     );
   }
 
-  Widget _buildForm(
-      Map parameterNames, Key key, AsyncSnapshot<MotorSettings> snapshot) {
+  Widget _buildForm(Map parameterNames, Key key, AsyncSnapshot<MotorSettings> snapshot) {
     var parameterValues = Map<String, dynamic>();
     if (snapshot.hasData) {
       parameterValues = snapshot.data.toJson();
     }
 
     List<Widget> children = List();
-    children.add(Container(height: 8,));
+    children.add(Container(
+      height: 8,
+    ));
     parameterNames.entries.forEach((nameEntry) {
       String parameterValue = _extractParameterValueFromNum((parameterValues[nameEntry.key] as num));
       String parameterName = nameEntry.value;
@@ -77,36 +116,23 @@ class _MotorTabState extends State<MotorTab> {
       ));
     });
 
-    return Form(
-        key: key,
-        child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center, children: children));
+    return Form(key: key, child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: children));
   }
 
-  Widget _buildRow(String name, String value, String variableName) {
+  Widget _buildRow(String parameterName, String value, String variableName) {
     String Function(String) validator = (String value) {
-      if (value == null) {
-        return _localizedStrings[_invalidValue];
-      }
-      if (value.isEmpty) {
-        return _localizedStrings[_invalidValue];
+      String validationResult = _validators["common"].call(value, variableName);
+
+      if (validationResult == null) {
+        validationResult = (_validators[variableName] ?? _validators["default"])?.call(value, variableName);
       }
 
-      double number = double.parse(value, (e) => null);
-      if (number== null) {
-        return _localizedStrings[_notANumber];
-      }
-      if (_onlyIntegerValues.contains(variableName) &&
-        number.round() != number) {
-        return _localizedStrings[_notIntegerNumber];
-      }
-      if (!_possibleNegativeValues.contains(variableName) &&
-        number < 0) {
-        return _localizedStrings[_lessThanZero];
-      }
-
-      return null;
+      return validationResult;
     };
+
+    Widget inputField = _dropDownInputs.contains(variableName) ?
+    _buildPopUpInput(variableName, value) :
+    _buildTextInput(validator, variableName, value);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -120,7 +146,7 @@ class _MotorTabState extends State<MotorTab> {
             height: 40,
             child: Align(
               alignment: Alignment(-1, 0),
-              child: Text(name),
+              child: Text(parameterName),
             ),
           ),
         ),
@@ -129,18 +155,7 @@ class _MotorTabState extends State<MotorTab> {
           child: Container(
             height: 40,
             child: Align(
-                alignment: Alignment(0.5, 0),
-                child: TextFormField(
-                    validator: validator,
-                    onSaved: (value) {
-                      _motorTabBloc.motorSettingsDataStream
-                          .add(Parameter(variableName, value));
-                    },
-                    controller: TextEditingController()..text = value,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                        errorStyle: TextStyle(height: 0),// Use just red border without text
-                        border: OutlineInputBorder()))),
+              alignment: Alignment(0.5, 0), child: inputField),
           ),
         ),
         Container(
@@ -148,6 +163,62 @@ class _MotorTabState extends State<MotorTab> {
         )
       ],
     );
+  }
+
+  Widget _buildPopUpInput(String variableName, String value) {
+    List<String> options;
+    switch (variableName) {
+      case "motorTemperatureSensorType" :
+        options = _temperatureSensorTypes;
+        break;
+      case "motorPositionSensorType" :
+        options = _positionSensorTypes;
+        break;
+    }
+
+    String title;
+    try {
+      title = _localizedStrings[options[int.parse(value)]];
+    } catch (exc) {
+      print(exc);
+      title = _localizedStrings[_sensorType];
+    }
+
+    return PopupMenuButton<String>(
+
+      onSelected: (newValue) {
+        _motorTabBloc.motorSettingsDataStream.add(Parameter(variableName, newValue));
+        _motorTabBloc.motorSettingsCommandStream.add(MotorSettingsCommand.READ);
+      },
+      child: Row(
+        children: [
+          Icon(Icons.arrow_drop_down),
+          Text(title),
+        ],
+      ),
+      itemBuilder: (BuildContext context) {
+        return options
+          .map((optionName) =>
+          PopupMenuItem<String>(
+            child: Text(_localizedStrings[optionName]),
+            value: optionName,
+          ))
+          .toList();
+      });
+  }
+
+  TextFormField _buildTextInput(validator, String variableName, String value) {
+    return TextFormField(
+      validator: validator,
+      onSaved: (value) {
+        _motorTabBloc.motorSettingsDataStream.add(Parameter(variableName, value));
+      },
+      controller: TextEditingController()
+        ..text = value,
+      keyboardType: TextInputType.number,
+      decoration: InputDecoration(
+        errorStyle: TextStyle(height: 0), // Use just red border without text
+        border: OutlineInputBorder()));
   }
 
   Widget _buildError(String message) {
@@ -177,8 +248,7 @@ class _MotorTabState extends State<MotorTab> {
           RaisedButton(
             child: Text(_localizedStrings[_read]),
             onPressed: () {
-              _motorTabBloc.motorSettingsCommandStream
-                  .add(MotorSettingsCommand.READ);
+              _motorTabBloc.motorSettingsCommandStream.add(MotorSettingsCommand.READ);
             },
           ),
           Expanded(
@@ -187,14 +257,11 @@ class _MotorTabState extends State<MotorTab> {
           RaisedButton(
             onPressed: () {
               if (!_formKey.currentState.validate()) {
-                Scaffold.of(context).showSnackBar(SnackBar(
-                    content:
-                        Text(_localizedStrings[_writingNotAllowed])));
+                Scaffold.of(context).showSnackBar(SnackBar(content: Text(_localizedStrings[_writingNotAllowed])));
                 return;
               } else {
                 _formKey.currentState.save();
-                _motorTabBloc.motorSettingsCommandStream
-                    .add(MotorSettingsCommand.WRITE);
+                _motorTabBloc.motorSettingsCommandStream.add(MotorSettingsCommand.WRITE);
               }
             },
             child: Text(_localizedStrings[_write]),
@@ -202,8 +269,7 @@ class _MotorTabState extends State<MotorTab> {
           Expanded(child: Container()),
           RaisedButton(
             onPressed: () {
-              _motorTabBloc.motorSettingsCommandStream
-                  .add(MotorSettingsCommand.SAVE);
+              _motorTabBloc.motorSettingsCommandStream.add(MotorSettingsCommand.SAVE);
             },
             child: Text(_localizedStrings[_save]),
           ),
@@ -220,12 +286,4 @@ class _MotorTabState extends State<MotorTab> {
     }
     return parameterValue;
   }
-
-/*
-  @override
-  void dispose() {
-    _motorTabBloc.dispose();
-    super.dispose();
-  }
-*/
 }

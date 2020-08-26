@@ -101,9 +101,11 @@ class Packet {
 //  Packet.fromMessage(Uint8List data) :
 //        rawData = data;
 
-  bool get crcValid =>
-      (screenNum + cmd + dataBuffer.fold(0, (previousValue, element) => previousValue + element)) ==
-      crc; // max value = 0x1DE2, no uint16 overflow
+  bool crcValid() {
+    print ("data raw - " + (screenNum + cmd + dataBuffer.fold(0, (previousValue, element) => previousValue + element)).toString());
+    print("data crc - " + crc.toString());
+      return (screenNum + cmd + dataBuffer.fold(0, (previousValue, element) => previousValue + element)) == crc; // max value = 0x1DE2, no uint16 overflow
+  }
 
   Uint8List get toBytes => Uint8List.fromList(<int>[screenNum, cmd] + dataBuffer + [crc, crc >> 8]);
 //  int calcCRC()

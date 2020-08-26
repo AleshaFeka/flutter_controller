@@ -14,13 +14,16 @@ class MotorTabBloc {
   BluetoothInteractor _bluetoothInteractor;
 
   StreamController _motorInstantSettingsStreamController = StreamController<MotorSettings>.broadcast();
+
   Stream get motorInstantSettingsStream => _motorInstantSettingsStreamController.stream;
 
-  StreamController<MotorSettingsCommand> _motorSettingsCommandStreamController = StreamController<MotorSettingsCommand>.broadcast();
+  StreamController<MotorSettingsCommand> _motorSettingsCommandStreamController =
+      StreamController<MotorSettingsCommand>.broadcast();
+
   StreamSink<MotorSettingsCommand> get motorSettingsCommandStream => _motorSettingsCommandStreamController.sink;
 
-  StreamController<Parameter> _motorSettingsDataStreamController
-    = StreamController<Parameter>.broadcast(sync: true); //Sync to avoid async between changing parameters and writing to controller
+  StreamController<Parameter> _motorSettingsDataStreamController = StreamController<Parameter>.broadcast(
+      sync: true); //Sync to avoid async between changing parameters and writing to controller
   StreamSink<Parameter> get motorSettingsDataStream => _motorSettingsDataStreamController.sink;
 
   MotorTabBloc(this._bluetoothInteractor) {
@@ -30,53 +33,70 @@ class MotorTabBloc {
 
   void _handleSettingsData(Parameter motorParameter) {
     switch (motorParameter.name) {
-      case "motorPolePairs" :
+      case "motorPolePairs":
         _motorSettings.motorPolePairs = int.parse(motorParameter.value);
         break;
-      case "motorDirection" :
+      case "motorDirection":
         _motorSettings.motorDirection = int.parse(motorParameter.value);
         break;
-      case "motorSpeedMax" :
+      case "motorSpeedMax":
         _motorSettings.motorSpeedMax = int.parse(motorParameter.value);
         break;
-      case "motorVoltageMax" :
+      case "motorVoltageMax":
         _motorSettings.motorVoltageMax = int.parse(motorParameter.value);
         break;
-      case "fieldWakingCurrent" :
+      case "fieldWakingCurrent":
         _motorSettings.fieldWakingCurrent = int.parse(motorParameter.value);
         break;
-      case "motorPositionSensorType" :
-        _motorSettings.motorPositionSensorType = int.parse(motorParameter.value);
-        break;
-      case "motorTemperatureSensorType" :
-        _motorSettings.motorTemperatureSensorType = int.parse(motorParameter.value);
-        break;
-      case "wheelDiameter" :
+      case "wheelDiameter":
         _motorSettings.wheelDiameter = int.parse(motorParameter.value);
         break;
+      case "motorTemperatureSensorType":
+        switch (motorParameter.value) {
+          case "KTY84":
+            _motorSettings.motorTemperatureSensorType = 0;
+            break;
+          case "KTY81":
+            _motorSettings.motorTemperatureSensorType = 1;
+            break;
+          case "NTC10":
+            _motorSettings.motorTemperatureSensorType = 2;
+            break;
+        }
+        break;
+      case "motorPositionSensorType":
+        switch (motorParameter.value) {
+          case "hallSensors":
+            _motorSettings.motorPositionSensorType = 0;
+            break;
+          case "encoder":
+            _motorSettings.motorPositionSensorType = 1;
+            break;
+        }
+        break;
 
-      case "motorFlux" :
+      case "motorFlux":
         _motorSettings.motorFlux = double.parse(motorParameter.value);
         break;
-      case "motorTemperatureMax" :
+      case "motorTemperatureMax":
         _motorSettings.motorTemperatureMax = double.parse(motorParameter.value);
         break;
-      case "motorTemperatureLimit" :
+      case "motorTemperatureLimit":
         _motorSettings.motorTemperatureLimit = double.parse(motorParameter.value);
         break;
-      case "motorCurrentMax" :
+      case "motorCurrentMax":
         _motorSettings.motorCurrentMax = double.parse(motorParameter.value);
         break;
-      case "motorStatorResistance" :
+      case "motorStatorResistance":
         _motorSettings.motorStatorResistance = double.parse(motorParameter.value);
         break;
-      case "motorInductance" :
+      case "motorInductance":
         _motorSettings.motorInductance = double.parse(motorParameter.value);
         break;
-      case "motorKv" :
+      case "motorKv":
         _motorSettings.motorKv = double.parse(motorParameter.value);
         break;
-      case "phaseCorrection" :
+      case "phaseCorrection":
         _motorSettings.phaseCorrection = double.parse(motorParameter.value);
         break;
     }
@@ -103,17 +123,20 @@ class MotorTabBloc {
   }
 
   void _motorSettingsRead() {
-    _bluetoothInteractor.sendMessage(Packet(1, 0, Uint8List(28)));
-    _bluetoothInteractor.startMonitoring(_packetHandler);
+    if (_motorSettings == null) {
+      _motorSettings = MotorSettings.random(34);
+    }
+    _motorInstantSettingsStreamController.sink.add(_motorSettings);
 
 /*
-    _motorSettings = _bluetoothInteractor.readMotorSettings();
-    _motorInstantSettingsStreamController.sink.add(_motorSettings);
+    _bluetoothInteractor.sendMessage(Packet(1, 0, Uint8List(28)));
+    _bluetoothInteractor.startListenSerial(_packetHandler);
 */
   }
 
   void _motorSettingsWrite() {
-    _bluetoothInteractor.writeMotorSettings(_motorSettings);
+    Packet packet = Mapper.motorSettingsToPacket(_motorSettings);
+    _bluetoothInteractor.sendMessage(packet);
   }
 
   void _motorSettingsSave() {
@@ -121,7 +144,7 @@ class MotorTabBloc {
   }
 
   void dispose() {
-    _bluetoothInteractor.stopMonitoring();
+    _bluetoothInteractor.stopListenSerial();
     _motorInstantSettingsStreamController.close();
     _motorSettingsCommandStreamController.close();
     _motorSettingsDataStreamController.close();

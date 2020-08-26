@@ -36,12 +36,12 @@ class MonitorTabBloc {
   }
 
   void _stopMonitoring() {
-    _interactor.stopMonitoring();
+    _interactor.stopListenSerial();
     _monitoringSubscription.cancel();
   }
 
   void _startMonitoring() async {
-    _interactor.startMonitoring(_packetHandler);
+    _interactor.startListenSerial(_packetHandler);
 
     dynamic Function(int) computation = (count) {
       _interactor.sendMessage(Packet(0, 0, Uint8List(28)));

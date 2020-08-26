@@ -35,18 +35,6 @@ class BluetoothInteractor {
     bluetoothState = await instance.state;
   }
 
-  MotorSettings readMotorSettings() {
-    MotorSettings result = MotorSettings.random(50);
-    return result;
-  }
-
-  void writeMotorSettings(MotorSettings motorSettings) {
-    Packet packet = Mapper.motorSettingsToPacket(motorSettings);
-
-    print("BluetoothInteractor - WRITE - ${motorSettings.toJson()}");
-    sendMessage(packet);
-  }
-
   void save() {
     print("BluetoothInteractor - SAVE");
   }
@@ -98,7 +86,7 @@ class BluetoothInteractor {
       if (buf[pos] == 0x23 && buf[pos + 33] == 0x2A) {
         Uint8List packetData = buf.sublist(pos + 1, pos + 33);
         Packet packet = Packet.fromBytes(packetData);
-        if (packet.crcValid) {
+        if (packet.crcValid()) {
           buf = buf.sublist(pos + 34);
           print("Packet received: ");
           print(packetData);
@@ -130,11 +118,11 @@ class BluetoothInteractor {
     }
   }
 
-  void stopMonitoring() {
+  void stopListenSerial() {
     _subscription.cancel();
   }
 
-  void startMonitoring(Function(Packet) packetHandler) {
+  void startListenSerial(Function(Packet) packetHandler) {
     _subscription = _streamController.stream.listen((event) {
       _onDataReceived(event, packetHandler);
     })

@@ -74,10 +74,16 @@
   "online": "Работа",
   "mode": "Режим",
   "sensorType": "Тип датчика",
-  "hallSensors": "Холлы",
-  "encoder": "Энкодер",
-  "KTY84": "KTY84",
-  "KTY81": "KTY81",
-  "NTC10": "NTC10",
+
+  "MotorTemperatureSensor.KTY84": "KTY84",
+  "MotorTemperatureSensor.KTY83": "KTY83",
+  "MotorTemperatureSensor.KTY83_2K": "KTY83_2K",
+  "MotorTemperatureSensor.KTY81": "KTY81",
+  "MotorTemperatureSensor.NO_SENSOR": "Без датчика",
+
+  "MotorPositionSensor.HALL": "Холлы",
+  "MotorPositionSensor.ENCODER": "Энкодер",
+  "MotorPositionSensor.NO_SENSOR": "Без датчика",
+
   "unknownTemperatureSensor": "Неверный тип"
 }

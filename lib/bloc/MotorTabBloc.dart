@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:flutter_controller/core/Packet.dart';
 import 'package:flutter_controller/interactor/BluetoothInteractor.dart';
@@ -8,6 +7,9 @@ import 'package:flutter_controller/model/Parameter.dart';
 import 'package:flutter_controller/util/Mapper.dart';
 
 enum MotorSettingsCommand { READ, WRITE, SAVE }
+
+enum MotorTemperatureSensor { NO_SENSOR, KTY84, KTY83, KTY81, KTY83_2K }
+enum MotorPositionSensor { NO_SENSOR, HALL, ENCODER }
 
 class MotorTabBloc {
   MotorSettings _motorSettings;
@@ -52,27 +54,52 @@ class MotorTabBloc {
         _motorSettings.wheelDiameter = int.parse(motorParameter.value);
         break;
       case "motorTemperatureSensorType":
+        var sensorType = MotorTemperatureSensor
+          .values
+          .firstWhere((element) => element.toString() == motorParameter.value);
+        _motorSettings.motorTemperatureSensorType = MotorTemperatureSensor.values.indexOf(sensorType);
+
+
+
+/*
         switch (motorParameter.value) {
-          case "KTY84":
+
+          case "MotorTemperatureSensor.NO_SENSOR":
             _motorSettings.motorTemperatureSensorType = 0;
             break;
-          case "KTY81":
+          case "MotorTemperatureSensor.KTY84":
             _motorSettings.motorTemperatureSensorType = 1;
             break;
-          case "NTC10":
+          case "MotorTemperatureSensor.KTY83":
             _motorSettings.motorTemperatureSensorType = 2;
             break;
+          case "MotorTemperatureSensor.KTY81":
+            _motorSettings.motorTemperatureSensorType = 3;
+            break;
+          case "MotorTemperatureSensor.KTY83_2K":
+            _motorSettings.motorTemperatureSensorType = 4;
+            break;
         }
+*/
         break;
       case "motorPositionSensorType":
+        var sensorType = MotorPositionSensor
+          .values
+          .firstWhere((element) => element.toString() == motorParameter.value);
+        _motorSettings.motorPositionSensorType = MotorPositionSensor.values.indexOf(sensorType);
+/*
         switch (motorParameter.value) {
-          case "hallSensors":
+          case "MotorPositionSensor.NO_SENSOR":
             _motorSettings.motorPositionSensorType = 0;
             break;
-          case "encoder":
+          case "MotorPositionSensor.HALL":
             _motorSettings.motorPositionSensorType = 1;
             break;
+          case "MotorPositionSensor.ENCODER":
+            _motorSettings.motorPositionSensorType = 2;
+            break;
         }
+*/
         break;
 
       case "motorFlux":
@@ -100,6 +127,7 @@ class MotorTabBloc {
         _motorSettings.phaseCorrection = double.parse(motorParameter.value);
         break;
     }
+    print(_motorSettings.toJson().toString());
   }
 
   void _handleCommand(MotorSettingsCommand event) {

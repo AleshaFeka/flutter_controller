@@ -32,8 +32,6 @@ class _MotorTabState extends State<MotorTab> {
     "fieldWakingCurrent"
   ];
   static const _dropDownInputs = ["motorTemperatureSensorType", "motorPositionSensorType"];
-  static const _temperatureSensorTypes = ["KTY84", "KTY81", "NTC10"];
-  static const _positionSensorTypes = ["hallSensors", "encoder"];
 
   MotorTabBloc _motorTabBloc;
   Map _parameterNames;
@@ -45,12 +43,8 @@ class _MotorTabState extends State<MotorTab> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _motorTabBloc = Provider
-      .of(context)
-      .motorTabBloc;
-    _localizedStrings = Provider
-      .of(context)
-      .localizedStrings;
+    _motorTabBloc = Provider.of(context).motorTabBloc;
+    _localizedStrings = Provider.of(context).localizedStrings;
     _parameterNames = _localizedStrings[_motorParameterNames];
 
     _validators = {
@@ -130,9 +124,9 @@ class _MotorTabState extends State<MotorTab> {
       return validationResult;
     };
 
-    Widget inputField = _dropDownInputs.contains(variableName) ?
-    _buildPopUpInput(variableName, value) :
-    _buildTextInput(validator, variableName, value);
+    Widget inputField = _dropDownInputs.contains(variableName)
+        ? _buildPopUpInput(variableName, value)
+        : _buildTextInput(validator, variableName, value);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -154,8 +148,7 @@ class _MotorTabState extends State<MotorTab> {
           flex: 2,
           child: Container(
             height: 40,
-            child: Align(
-              alignment: Alignment(0.5, 0), child: inputField),
+            child: Align(alignment: Alignment(0.5, 0), child: inputField),
           ),
         ),
         Container(
@@ -168,11 +161,11 @@ class _MotorTabState extends State<MotorTab> {
   Widget _buildPopUpInput(String variableName, String value) {
     List<String> options;
     switch (variableName) {
-      case "motorTemperatureSensorType" :
-        options = _temperatureSensorTypes;
+      case "motorTemperatureSensorType":
+        options = MotorTemperatureSensor.values.map((e) => e.toString()).toList();
         break;
-      case "motorPositionSensorType" :
-        options = _positionSensorTypes;
+      case "motorPositionSensorType":
+        options = MotorPositionSensor.values.map((e) => e.toString()).toList();
         break;
     }
 
@@ -185,40 +178,37 @@ class _MotorTabState extends State<MotorTab> {
     }
 
     return PopupMenuButton<String>(
-
-      onSelected: (newValue) {
-        _motorTabBloc.motorSettingsDataStream.add(Parameter(variableName, newValue));
-        _motorTabBloc.motorSettingsCommandStream.add(MotorSettingsCommand.READ);
-      },
-      child: Row(
-        children: [
-          Icon(Icons.arrow_drop_down),
-          Text(title),
-        ],
-      ),
-      itemBuilder: (BuildContext context) {
-        return options
-          .map((optionName) =>
-          PopupMenuItem<String>(
-            child: Text(_localizedStrings[optionName]),
-            value: optionName,
-          ))
-          .toList();
-      });
+        onSelected: (newValue) {
+          _motorTabBloc.motorSettingsDataStream.add(Parameter(variableName, newValue));
+          _motorTabBloc.motorSettingsCommandStream.add(MotorSettingsCommand.READ);
+        },
+        child: Row(
+          children: [
+            Icon(Icons.arrow_drop_down),
+            Text(title),
+          ],
+        ),
+        itemBuilder: (BuildContext context) {
+          return options
+              .map((optionName) => PopupMenuItem<String>(
+                    child: Text(_localizedStrings[optionName]),
+                    value: optionName,
+                  ))
+              .toList();
+        });
   }
 
   TextFormField _buildTextInput(validator, String variableName, String value) {
     return TextFormField(
-      validator: validator,
-      onSaved: (value) {
-        _motorTabBloc.motorSettingsDataStream.add(Parameter(variableName, value));
-      },
-      controller: TextEditingController()
-        ..text = value,
-      keyboardType: TextInputType.number,
-      decoration: InputDecoration(
-        errorStyle: TextStyle(height: 0), // Use just red border without text
-        border: OutlineInputBorder()));
+        validator: validator,
+        onSaved: (value) {
+          _motorTabBloc.motorSettingsDataStream.add(Parameter(variableName, value));
+        },
+        controller: TextEditingController()..text = value,
+        keyboardType: TextInputType.number,
+        decoration: InputDecoration(
+            errorStyle: TextStyle(height: 0), // Use just red border without text
+            border: OutlineInputBorder()));
   }
 
   Widget _buildError(String message) {

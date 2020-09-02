@@ -53,53 +53,18 @@ class MotorTabBloc {
       case "wheelDiameter":
         _motorSettings.wheelDiameter = int.parse(motorParameter.value);
         break;
+
       case "motorTemperatureSensorType":
         var sensorType = MotorTemperatureSensor
           .values
           .firstWhere((element) => element.toString() == motorParameter.value);
         _motorSettings.motorTemperatureSensorType = MotorTemperatureSensor.values.indexOf(sensorType);
-
-
-
-/*
-        switch (motorParameter.value) {
-
-          case "MotorTemperatureSensor.NO_SENSOR":
-            _motorSettings.motorTemperatureSensorType = 0;
-            break;
-          case "MotorTemperatureSensor.KTY84":
-            _motorSettings.motorTemperatureSensorType = 1;
-            break;
-          case "MotorTemperatureSensor.KTY83":
-            _motorSettings.motorTemperatureSensorType = 2;
-            break;
-          case "MotorTemperatureSensor.KTY81":
-            _motorSettings.motorTemperatureSensorType = 3;
-            break;
-          case "MotorTemperatureSensor.KTY83_2K":
-            _motorSettings.motorTemperatureSensorType = 4;
-            break;
-        }
-*/
         break;
       case "motorPositionSensorType":
         var sensorType = MotorPositionSensor
           .values
           .firstWhere((element) => element.toString() == motorParameter.value);
         _motorSettings.motorPositionSensorType = MotorPositionSensor.values.indexOf(sensorType);
-/*
-        switch (motorParameter.value) {
-          case "MotorPositionSensor.NO_SENSOR":
-            _motorSettings.motorPositionSensorType = 0;
-            break;
-          case "MotorPositionSensor.HALL":
-            _motorSettings.motorPositionSensorType = 1;
-            break;
-          case "MotorPositionSensor.ENCODER":
-            _motorSettings.motorPositionSensorType = 2;
-            break;
-        }
-*/
         break;
 
       case "motorFlux":

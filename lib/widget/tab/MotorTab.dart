@@ -125,7 +125,7 @@ class _MotorTabState extends State<MotorTab> {
     };
 
     Widget inputField = _dropDownInputs.contains(variableName)
-        ? _buildPopUpInput(variableName, value)
+        ? _buildDropDownInput(variableName, value)
         : _buildTextInput(validator, variableName, value);
 
     return Row(
@@ -158,7 +158,7 @@ class _MotorTabState extends State<MotorTab> {
     );
   }
 
-  Widget _buildPopUpInput(String variableName, String value) {
+  Widget _buildDropDownInput(String variableName, String value) {
     List<String> options;
     switch (variableName) {
       case "motorTemperatureSensorType":

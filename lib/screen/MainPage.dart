@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_controller/di/Provider.dart';
 import 'package:flutter_controller/screen/ConnectPage.dart';
 import 'package:flutter_controller/screen/TabsPage.dart';
+import 'package:flutter_controller/widget/tab/BatteryTab.dart';
 import 'package:flutter_controller/widget/tab/MotorTab.dart';
 
 class MainPage extends StatefulWidget {
@@ -15,7 +16,7 @@ class _MainPage extends State<MainPage> {
   Widget build(BuildContext context) {
 //    return TabsPage();
 //    return ConnectPage();
-    return debugScreen(MotorTab());
+    return debugScreen(BatteryTab());
   }
 
   Widget debugScreen(Widget child) {

@@ -43,6 +43,15 @@
     "wheelDiameter": "Диаметр колеса, мм",
     "phaseCorrection": "Коррекция фаз (уточнить)"
   },
+  "batteryParameterNames": {
+    "maxVoltage": "Максимальное напряжение",
+    "minVoltage": "Минимальное напряжение",
+    "limitCurrentStart": "Предел стартового тока",
+    "maxPower": "Максимальная мощность",
+    "driveCurrent": "Ток езды",
+    "regenCurrent": "Ток рекуперации",
+    "batteryResistance": "Сопротивление батареи"
+  },
   "bluetoothUnavailable": "Блютуз недоступен.",
   "workImpossible": "Продолжение работы невозможно.",
   "understand": "Понятно",

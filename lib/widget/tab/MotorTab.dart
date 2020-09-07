@@ -3,13 +3,14 @@ import 'package:flutter_controller/bloc/MotorTabBloc.dart';
 import 'package:flutter_controller/di/Provider.dart';
 import 'package:flutter_controller/model/MotorSettings.dart';
 import 'package:flutter_controller/model/Parameter.dart';
+import 'package:flutter_controller/widget/tab/CommonSettingsTab.dart';
 
 class MotorTab extends StatefulWidget {
   @override
   _MotorTabState createState() => _MotorTabState();
 }
 
-class _MotorTabState extends State<MotorTab> {
+class _MotorTabState extends CommonSettingsTabState<MotorTab, MotorSettings> {
   static const _motorParameterNames = "motorParameterNames";
   static const _read = "read";
   static const _write = "write";
@@ -22,7 +23,6 @@ class _MotorTabState extends State<MotorTab> {
   static const _parameterValueAccuracy = 2;
   static const _sensorType = "sensorType";
 
-  static const _unknownTemperatureSensor = "unknownTemperatureSensor";
   static const _possibleNegativeValues = ["phaseCorrection"];
   static const _onlyIntegerValues = [
     "motorPolePairs",
@@ -75,21 +75,24 @@ class _MotorTabState extends State<MotorTab> {
     };
   }
 
+/*
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<MotorSettings>(
       stream: _motorTabBloc.motorInstantSettingsStream,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return _buildError(snapshot.error.toString());
+          return buildError(snapshot.error.toString());
         }
 
-        return ListView(children: [_buildForm(_parameterNames, _formKey, snapshot), _buildBottomButtons()]);
+        return ListView(children: [buildForm(_parameterNames, _formKey, snapshot), buildBottomButtons()]);
       },
     );
   }
+*/
 
-  Widget _buildForm(Map parameterNames, Key key, AsyncSnapshot<MotorSettings> snapshot) {
+  @override
+  Widget buildForm(Map parameterNames, Key key, AsyncSnapshot<MotorSettings> snapshot) {
     var parameterValues = Map<String, dynamic>();
     if (snapshot.hasData) {
       parameterValues = snapshot.data.toJson();
@@ -211,6 +214,7 @@ class _MotorTabState extends State<MotorTab> {
             border: OutlineInputBorder()));
   }
 
+/*
   Widget _buildError(String message) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -229,7 +233,9 @@ class _MotorTabState extends State<MotorTab> {
       ],
     );
   }
+*/
 
+/*
   Widget _buildBottomButtons() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -238,7 +244,7 @@ class _MotorTabState extends State<MotorTab> {
           RaisedButton(
             child: Text(_localizedStrings[_read]),
             onPressed: () {
-              _motorTabBloc.motorSettingsCommandStream.add(MotorSettingsCommand.READ);
+              _onRead();
             },
           ),
           Expanded(
@@ -246,26 +252,52 @@ class _MotorTabState extends State<MotorTab> {
           ),
           RaisedButton(
             onPressed: () {
-              if (!_formKey.currentState.validate()) {
-                Scaffold.of(context).showSnackBar(SnackBar(content: Text(_localizedStrings[_writingNotAllowed])));
-                return;
-              } else {
-                _formKey.currentState.save();
-                _motorTabBloc.motorSettingsCommandStream.add(MotorSettingsCommand.WRITE);
-              }
+              _onWrite();
             },
             child: Text(_localizedStrings[_write]),
           ),
           Expanded(child: Container()),
           RaisedButton(
             onPressed: () {
-              _motorTabBloc.motorSettingsCommandStream.add(MotorSettingsCommand.SAVE);
+              _onSave();
             },
             child: Text(_localizedStrings[_save]),
           ),
         ],
       ),
     );
+  }
+*/
+
+  @override
+  GlobalKey<State<StatefulWidget>> getFormKey() => _formKey;
+
+  @override
+  Map getParameterNames() => _parameterNames;
+
+  @override
+  Stream<MotorSettings> getTypedStream() => _motorTabBloc.motorInstantSettingsStream;
+
+  @override
+  void onWrite() {
+    if (!_formKey.currentState.validate()) {
+      Scaffold.of(context).showSnackBar(SnackBar(content: Text(_localizedStrings[_writingNotAllowed])));
+      return;
+    } else {
+      _formKey.currentState.save();
+      _motorTabBloc.motorSettingsCommandStream.add(MotorSettingsCommand.WRITE);
+    }
+
+  }
+
+  @override
+  void onSave() {
+    _motorTabBloc.motorSettingsCommandStream.add(MotorSettingsCommand.SAVE);
+  }
+
+  @override
+  void onRead() {
+    _motorTabBloc.motorSettingsCommandStream.add(MotorSettingsCommand.READ);
   }
 
   String _extractParameterValueFromNum(num raw) {

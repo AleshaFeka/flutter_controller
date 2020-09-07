@@ -16,7 +16,7 @@ class _MainPage extends State<MainPage> {
   Widget build(BuildContext context) {
 //    return TabsPage();
 //    return ConnectPage();
-    return debugScreen(BatteryTab());
+    return debugScreen(MotorTab());
   }
 
   Widget debugScreen(Widget child) {

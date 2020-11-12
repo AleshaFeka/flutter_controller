@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter_controller/core/Packet.dart';
 import 'package:flutter_controller/interactor/BluetoothInteractor.dart';
@@ -6,7 +7,7 @@ import 'package:flutter_controller/model/MotorSettings.dart';
 import 'package:flutter_controller/model/Parameter.dart';
 import 'package:flutter_controller/util/Mapper.dart';
 
-enum MotorSettingsCommand { READ, WRITE, SAVE }
+enum MotorSettingsCommand { READ, WRITE, SAVE, REFRESH }
 
 enum MotorTemperatureSensor { NO_SENSOR, KTY84, KTY83, KTY81, KTY83_2K }
 enum MotorPositionSensor { NO_SENSOR, HALL, ENCODER }
@@ -16,12 +17,9 @@ class MotorTabBloc {
   BluetoothInteractor _bluetoothInteractor;
 
   StreamController _motorInstantSettingsStreamController = StreamController<MotorSettings>.broadcast();
-
   Stream get motorInstantSettingsStream => _motorInstantSettingsStreamController.stream;
 
-  StreamController<MotorSettingsCommand> _motorSettingsCommandStreamController =
-      StreamController<MotorSettingsCommand>.broadcast();
-
+  StreamController<MotorSettingsCommand> _motorSettingsCommandStreamController = StreamController<MotorSettingsCommand>.broadcast();
   StreamSink<MotorSettingsCommand> get motorSettingsCommandStream => _motorSettingsCommandStreamController.sink;
 
   StreamController<Parameter> _motorSettingsDataStreamController = StreamController<Parameter>.broadcast(
@@ -92,7 +90,7 @@ class MotorTabBloc {
         _motorSettings.phaseCorrection = double.parse(motorParameter.value);
         break;
     }
-    print(_motorSettings.toJson().toString());
+//    print(_motorSettings.toJson().toString());
   }
 
   void _handleCommand(MotorSettingsCommand event) {
@@ -106,6 +104,9 @@ class MotorTabBloc {
       case MotorSettingsCommand.SAVE:
         _motorSettingsSave();
         break;
+      case MotorSettingsCommand.REFRESH:
+        _motorSettingsRefresh();
+        break;
     }
   }
 
@@ -115,16 +116,20 @@ class MotorTabBloc {
     _motorInstantSettingsStreamController.sink.add(_motorSettings);
   }
 
-  void _motorSettingsRead() {
+  void _motorSettingsRefresh() {
+    _motorInstantSettingsStreamController.sink.add(_motorSettings);
+  }
+
+    void _motorSettingsRead() {
+/*
     if (_motorSettings == null) {
       _motorSettings = MotorSettings.random(34);
     }
     _motorInstantSettingsStreamController.sink.add(_motorSettings);
+*/
 
-/*
     _bluetoothInteractor.sendMessage(Packet(1, 0, Uint8List(28)));
     _bluetoothInteractor.startListenSerial(_packetHandler);
-*/
   }
 
   void _motorSettingsWrite() {

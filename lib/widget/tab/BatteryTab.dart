@@ -1,60 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_controller/bloc/BatteryTabBloc.dart';
 import 'package:flutter_controller/di/Provider.dart';
+import 'package:flutter_controller/model/BatterySettings.dart';
+import 'package:flutter_controller/widget/tab/CommonSettingsTab.dart';
 
 class BatteryTab extends StatefulWidget{
   @override
   _BatteryTabState createState() => _BatteryTabState();
 }
 
-class _BatteryTabState extends State<BatteryTab> {
+class _BatteryTabState extends CommonSettingsTabState<BatteryTab, BatterySettings> {
   static const _batteryParameterNames = "batteryParameterNames";
+
+  final _formKey = GlobalKey<FormState>();
 
   BatteryTabBloc _batteryTabBloc;
   Map _parameterNames;
-  Map _localizedStrings;
+  Map<String, String Function(String, String)> _validators;
 
 
   @override
   void didChangeDependencies() {
+    super.didChangeDependencies();
     _batteryTabBloc = Provider.of(context).batteryTabBloc;
-    _localizedStrings = Provider.of(context).localizedStrings;
-    _parameterNames = _localizedStrings[_batteryParameterNames];
+    _parameterNames = localizedStrings[_batteryParameterNames];
   }
 
   @override
-  Widget build(BuildContext context) {
-    return _buildContent(_parameterNames);
-  }
-
-  Widget _buildContent(Map parameterNames) {
-    List<Widget> children = List();
-    parameterNames.entries.forEach((element) {
-      children.add(_buildRow(element.key, element.value, element.key));
-      children.add(Divider(
-        height: 1,
-        color: Colors.grey,
-      ));
-    });
-
-
-    return Column(
-      children: children,
-    );
-  }
-
-  Widget _buildRow(String parameterName, String value, String variableName) {
+  Widget buildRow(String parameterName, String value, String variableName) {
     String Function(String) validator = (String value) {
-/*
-      String validationResult = _validators["common"].call(value, variableName);
+      String validationResult = validateNotNullOrEmpty(value, variableName);
 
       if (validationResult == null) {
         validationResult = (_validators[variableName] ?? _validators["default"])?.call(value, variableName);
       }
 
       return validationResult;
-*/
-      return null;
     };
 
     Widget inputField = _buildTextInput(validator, variableName, value);
@@ -102,5 +83,34 @@ class _BatteryTabState extends State<BatteryTab> {
       decoration: InputDecoration(
         errorStyle: TextStyle(height: 0), // Use just red border without text
         border: OutlineInputBorder()));
+  }
+
+  @override
+  GlobalKey<State<StatefulWidget>> getFormKey() => _formKey;
+
+  @override
+  Map getParameterNames() => _parameterNames;
+
+  @override
+  Map getParameterValues(AsyncSnapshot<BatterySettings> snapshot) {
+    return Map<String, dynamic>();
+  }
+
+  @override
+  Stream<BatterySettings> getTypedStream() => _batteryTabBloc.batteryInstantSettingsStream;
+
+  @override
+  void onRead() {
+    print("BatteryTab - onRead");
+  }
+
+  @override
+  void onSave() {
+    print("BatteryTab - onSave");
+  }
+
+  @override
+  void onWrite() {
+    print("BatteryTab - onWrite");
   }
 }

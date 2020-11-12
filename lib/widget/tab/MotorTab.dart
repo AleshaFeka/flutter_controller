@@ -12,15 +12,10 @@ class MotorTab extends StatefulWidget {
 
 class _MotorTabState extends CommonSettingsTabState<MotorTab, MotorSettings> {
   static const _motorParameterNames = "motorParameterNames";
-  static const _read = "read";
-  static const _write = "write";
-  static const _save = "save";
-  static const _invalidValue = "invalidValue";
   static const _notIntegerNumber = "notIntegerNumber";
   static const _lessThanZero = "lessThanZero";
   static const _notANumber = "notANumber";
   static const _writingNotAllowed = "writingNotAllowed";
-  static const _parameterValueAccuracy = 2;
   static const _sensorType = "sensorType";
 
   static const _possibleNegativeValues = ["phaseCorrection"];
@@ -35,7 +30,6 @@ class _MotorTabState extends CommonSettingsTabState<MotorTab, MotorSettings> {
 
   MotorTabBloc _motorTabBloc;
   Map _parameterNames;
-  Map _localizedStrings;
 
   final _formKey = GlobalKey<FormState>();
   Map<String, String Function(String, String)> _validators;
@@ -44,30 +38,19 @@ class _MotorTabState extends CommonSettingsTabState<MotorTab, MotorSettings> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _motorTabBloc = Provider.of(context).motorTabBloc;
-    _localizedStrings = Provider.of(context).localizedStrings;
-    _parameterNames = _localizedStrings[_motorParameterNames];
+    _parameterNames = localizedStrings[_motorParameterNames];
 
     _validators = {
       "default": (String value, String variableName) {
         double number = double.parse(value, (e) => null);
         if (number == null) {
-          return _localizedStrings[_notANumber];
+          return localizedStrings[_notANumber];
         }
         if (_onlyIntegerValues.contains(variableName) && number.round() != number) {
-          return _localizedStrings[_notIntegerNumber];
+          return localizedStrings[_notIntegerNumber];
         }
         if (!_possibleNegativeValues.contains(variableName) && number < 0) {
-          return _localizedStrings[_lessThanZero];
-        }
-
-        return null;
-      },
-      "common": (String value, String variableName) {
-        if (value == null) {
-          return _localizedStrings[_invalidValue];
-        }
-        if (value.isEmpty) {
-          return _localizedStrings[_invalidValue];
+          return localizedStrings[_lessThanZero];
         }
 
         return null;
@@ -75,50 +58,10 @@ class _MotorTabState extends CommonSettingsTabState<MotorTab, MotorSettings> {
     };
   }
 
-/*
   @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<MotorSettings>(
-      stream: _motorTabBloc.motorInstantSettingsStream,
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return buildError(snapshot.error.toString());
-        }
-
-        return ListView(children: [buildForm(_parameterNames, _formKey, snapshot), buildBottomButtons()]);
-      },
-    );
-  }
-*/
-
-  @override
-  Widget buildForm(Map parameterNames, Key key, AsyncSnapshot<MotorSettings> snapshot) {
-    var parameterValues = Map<String, dynamic>();
-    if (snapshot.hasData) {
-      parameterValues = snapshot.data.toJson();
-    }
-
-    List<Widget> children = List();
-    children.add(Container(
-      height: 8,
-    ));
-    parameterNames.entries.forEach((nameEntry) {
-      String parameterValue = _extractParameterValueFromNum((parameterValues[nameEntry.key] as num));
-      String parameterName = nameEntry.value;
-
-      children.add(_buildRow(parameterName, parameterValue, nameEntry.key));
-      children.add(Divider(
-        height: 1,
-        color: Colors.grey,
-      ));
-    });
-
-    return Form(key: key, child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: children));
-  }
-
-  Widget _buildRow(String parameterName, String value, String variableName) {
+  Widget buildRow(String parameterName, String value, String variableName) {
     String Function(String) validator = (String value) {
-      String validationResult = _validators["common"].call(value, variableName);
+      String validationResult = validateNotNullOrEmpty(value, variableName);
 
       if (validationResult == null) {
         validationResult = (_validators[variableName] ?? _validators["default"])?.call(value, variableName);
@@ -174,16 +117,16 @@ class _MotorTabState extends CommonSettingsTabState<MotorTab, MotorSettings> {
 
     String title;
     try {
-      title = _localizedStrings[options[int.parse(value)]];
+      title = localizedStrings[options[int.parse(value)]];
     } catch (exc) {
       print(exc);
-      title = _localizedStrings[_sensorType];
+      title = localizedStrings[_sensorType];
     }
 
     return PopupMenuButton<String>(
         onSelected: (newValue) {
           _motorTabBloc.motorSettingsDataStream.add(Parameter(variableName, newValue));
-          _motorTabBloc.motorSettingsCommandStream.add(MotorSettingsCommand.READ);
+          _motorTabBloc.motorSettingsCommandStream.add(MotorSettingsCommand.REFRESH);
         },
         child: Row(
           children: [
@@ -194,7 +137,7 @@ class _MotorTabState extends CommonSettingsTabState<MotorTab, MotorSettings> {
         itemBuilder: (BuildContext context) {
           return options
               .map((optionName) => PopupMenuItem<String>(
-                    child: Text(_localizedStrings[optionName]),
+                    child: Text(localizedStrings[optionName]),
                     value: optionName,
                   ))
               .toList();
@@ -214,61 +157,6 @@ class _MotorTabState extends CommonSettingsTabState<MotorTab, MotorSettings> {
             border: OutlineInputBorder()));
   }
 
-/*
-  Widget _buildError(String message) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Center(
-          child: Icon(
-            Icons.error,
-            size: 64,
-            color: Colors.red,
-          ),
-        ),
-        Container(
-          height: 16,
-        ),
-        Text(message)
-      ],
-    );
-  }
-*/
-
-/*
-  Widget _buildBottomButtons() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
-        children: [
-          RaisedButton(
-            child: Text(_localizedStrings[_read]),
-            onPressed: () {
-              _onRead();
-            },
-          ),
-          Expanded(
-            child: Container(),
-          ),
-          RaisedButton(
-            onPressed: () {
-              _onWrite();
-            },
-            child: Text(_localizedStrings[_write]),
-          ),
-          Expanded(child: Container()),
-          RaisedButton(
-            onPressed: () {
-              _onSave();
-            },
-            child: Text(_localizedStrings[_save]),
-          ),
-        ],
-      ),
-    );
-  }
-*/
-
   @override
   GlobalKey<State<StatefulWidget>> getFormKey() => _formKey;
 
@@ -276,18 +164,26 @@ class _MotorTabState extends CommonSettingsTabState<MotorTab, MotorSettings> {
   Map getParameterNames() => _parameterNames;
 
   @override
+  Map getParameterValues(AsyncSnapshot<MotorSettings> snapshot) {
+    if (snapshot.hasData) {
+      return snapshot.data.toJson();
+    } else {
+      return Map<String, dynamic>();
+    }
+  }
+
+  @override
   Stream<MotorSettings> getTypedStream() => _motorTabBloc.motorInstantSettingsStream;
 
   @override
   void onWrite() {
     if (!_formKey.currentState.validate()) {
-      Scaffold.of(context).showSnackBar(SnackBar(content: Text(_localizedStrings[_writingNotAllowed])));
+      Scaffold.of(context).showSnackBar(SnackBar(content: Text(localizedStrings[_writingNotAllowed])));
       return;
     } else {
       _formKey.currentState.save();
       _motorTabBloc.motorSettingsCommandStream.add(MotorSettingsCommand.WRITE);
     }
-
   }
 
   @override
@@ -298,14 +194,5 @@ class _MotorTabState extends CommonSettingsTabState<MotorTab, MotorSettings> {
   @override
   void onRead() {
     _motorTabBloc.motorSettingsCommandStream.add(MotorSettingsCommand.READ);
-  }
-
-  String _extractParameterValueFromNum(num raw) {
-    if (raw == null) return "";
-    String parameterValue = raw.toStringAsFixed(_parameterValueAccuracy);
-    if (raw.roundToDouble() == raw) {
-      parameterValue = raw.toInt().toString();
-    }
-    return parameterValue;
   }
 }

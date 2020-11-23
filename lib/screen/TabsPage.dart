@@ -114,7 +114,7 @@ class _TabsPage extends State<TabsPage> {
     //todo replace later...
     List<Widget> _tabs = [ MonitorTab(), MotorTab(), BatteryTab()/*, DriveTab(), AnalogTab(), RegsTab(), SensorLessTab(), IdentTab(), LogsTab()*/ ];
 
-    if (tabIndex > 1) return _tabs[0];//todo change when new tabs will added, remove at the end))
+    if (tabIndex > 2) return _tabs[0];//todo change when new tabs will added, remove at the end))
     return _tabs[tabIndex];
   }
 

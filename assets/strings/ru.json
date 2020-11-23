@@ -45,13 +45,12 @@
     "phaseCorrection": "Коррекция фаз (уточнить)"
   },
   "batteryParameterNames": {
-    "maxVoltage": "Максимальное напряжение",
-    "minVoltage": "Минимальное напряжение",
-    "limitCurrentStart": "Предел стартового тока",
+    "fullVoltage": "Максимальное напряжение",
+    "lowVoltage": "Минимальное напряжение",
     "maxPower": "Максимальная мощность",
     "driveCurrent": "Ток езды",
     "regenCurrent": "Ток рекуперации",
-    "batteryResistance": "Сопротивление батареи"
+    "powerReductionVoltage": "Напряжение снижения мощности"
   },
   "bluetoothUnavailable": "Блютуз недоступен.",
   "workImpossible": "Продолжение работы невозможно.",

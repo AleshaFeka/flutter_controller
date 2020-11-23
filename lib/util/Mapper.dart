@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter_controller/core/Packet.dart';
+import 'package:flutter_controller/model/BatterySettings.dart';
 import 'package:flutter_controller/model/MotorSettings.dart';
 
 class Mapper {
@@ -51,4 +52,38 @@ class Mapper {
 
     return result;
   }
+
+  static Packet batterySettingsToPacket(BatterySettings settings) {
+    int screenNumber = 2;
+    int command = 1;
+
+    Uint8List data = Uint8List(PACKET_LENGTH);
+    ByteData dataBuffer = data.buffer.asByteData();
+
+    dataBuffer.setUint16(0, settings.fullVoltage, Endian.little);
+    dataBuffer.setUint16(2, settings.lowVoltage.toInt(), Endian.little);
+    dataBuffer.setUint16(4, settings.driveCurrent.toInt(), Endian.little);
+    dataBuffer.setUint16(6, settings.regenCurrent, Endian.little);
+    dataBuffer.setUint16(8, settings.maxPower, Endian.little);
+    dataBuffer.setUint16(10, settings.powerReductionVoltage, Endian.little);
+
+
+    return Packet(screenNumber, command, data);
+  }
+
+  static BatterySettings packetToBatterySettings(Packet packet) {
+    BatterySettings result = BatterySettings.zero();
+    ByteBuffer buffer = packet.toBytes.sublist(SCREEN_NUM_AND_COMMAND_NUM_OFFSET).buffer;
+
+    result.fullVoltage = ByteData.view(buffer).getUint16(0, Endian.little);
+    result.lowVoltage = ByteData.view(buffer).getUint16(2, Endian.little);
+    result.driveCurrent = ByteData.view(buffer).getUint16(4, Endian.little);
+    result.regenCurrent = ByteData.view(buffer).getUint16(6, Endian.little);
+    result.maxPower = ByteData.view(buffer).getUint16(8, Endian.little);
+    result.powerReductionVoltage = ByteData.view(buffer).getUint16(10, Endian.little);
+
+    return result;
+  }
+
+
 }

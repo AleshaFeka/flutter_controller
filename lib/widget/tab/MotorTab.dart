@@ -12,10 +12,6 @@ class MotorTab extends StatefulWidget {
 
 class _MotorTabState extends CommonSettingsTabState<MotorTab, MotorSettings> {
   static const _motorParameterNames = "motorParameterNames";
-  static const _notIntegerNumber = "notIntegerNumber";
-  static const _lessThanZero = "lessThanZero";
-  static const _notANumber = "notANumber";
-  static const _writingNotAllowed = "writingNotAllowed";
   static const _sensorType = "sensorType";
 
   static const _possibleNegativeValues = ["phaseCorrection"];
@@ -44,13 +40,13 @@ class _MotorTabState extends CommonSettingsTabState<MotorTab, MotorSettings> {
       "default": (String value, String variableName) {
         double number = double.parse(value, (e) => null);
         if (number == null) {
-          return localizedStrings[_notANumber];
+          return localizedStrings[CommonSettingsTabState.NOT_NUMBER];
         }
         if (_onlyIntegerValues.contains(variableName) && number.round() != number) {
-          return localizedStrings[_notIntegerNumber];
+          return localizedStrings[CommonSettingsTabState.NOT_INTEGER_NUMBER];
         }
         if (!_possibleNegativeValues.contains(variableName) && number < 0) {
-          return localizedStrings[_lessThanZero];
+          return localizedStrings[CommonSettingsTabState.LESS_THAN_ZERO];
         }
 
         return null;
@@ -178,7 +174,7 @@ class _MotorTabState extends CommonSettingsTabState<MotorTab, MotorSettings> {
   @override
   void onWrite() {
     if (!_formKey.currentState.validate()) {
-      Scaffold.of(context).showSnackBar(SnackBar(content: Text(localizedStrings[_writingNotAllowed])));
+      Scaffold.of(context).showSnackBar(SnackBar(content: Text(localizedStrings[CommonSettingsTabState.WRITING_NOT_ALLOWED])));
       return;
     } else {
       _formKey.currentState.save();

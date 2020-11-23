@@ -8,6 +8,10 @@ abstract class CommonSettingsTabState <TWidget extends StatefulWidget, TData> ex
   static const _write = "write";
   static const _save = "save";
   static const emptyValue = "emptyValue";
+  static const NOT_INTEGER_NUMBER = "notIntegerNumber";
+  static const LESS_THAN_ZERO = "lessThanZero";
+  static const NOT_NUMBER = "notANumber";
+  static const WRITING_NOT_ALLOWED = "writingNotAllowed";
 
   Map localizedStrings;
 

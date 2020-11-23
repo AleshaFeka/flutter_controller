@@ -22,8 +22,7 @@ class MotorTabBloc {
   StreamController<MotorSettingsCommand> _motorSettingsCommandStreamController = StreamController<MotorSettingsCommand>.broadcast();
   StreamSink<MotorSettingsCommand> get motorSettingsCommandStream => _motorSettingsCommandStreamController.sink;
 
-  StreamController<Parameter> _motorSettingsDataStreamController = StreamController<Parameter>.broadcast(
-      sync: true); //Sync to avoid async between changing parameters and writing to controller
+  StreamController<Parameter> _motorSettingsDataStreamController = StreamController<Parameter>.broadcast(sync: true); //Sync to avoid async between changing parameters and writing to controller
   StreamSink<Parameter> get motorSettingsDataStream => _motorSettingsDataStreamController.sink;
 
   MotorTabBloc(this._bluetoothInteractor) {
@@ -90,7 +89,6 @@ class MotorTabBloc {
         _motorSettings.phaseCorrection = double.parse(motorParameter.value);
         break;
     }
-//    print(_motorSettings.toJson().toString());
   }
 
   void _handleCommand(MotorSettingsCommand event) {
@@ -121,13 +119,6 @@ class MotorTabBloc {
   }
 
     void _motorSettingsRead() {
-/*
-    if (_motorSettings == null) {
-      _motorSettings = MotorSettings.random(34);
-    }
-    _motorInstantSettingsStreamController.sink.add(_motorSettings);
-*/
-
     _bluetoothInteractor.sendMessage(Packet(1, 0, Uint8List(28)));
     _bluetoothInteractor.startListenSerial(_packetHandler);
   }

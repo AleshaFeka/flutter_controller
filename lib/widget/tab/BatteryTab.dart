@@ -2,15 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_controller/bloc/BatteryTabBloc.dart';
 import 'package:flutter_controller/di/Provider.dart';
 import 'package:flutter_controller/model/BatterySettings.dart';
+import 'package:flutter_controller/model/Parameter.dart';
 import 'package:flutter_controller/widget/tab/CommonSettingsTab.dart';
 
-class BatteryTab extends StatefulWidget{
+class BatteryTab extends StatefulWidget {
   @override
   _BatteryTabState createState() => _BatteryTabState();
 }
 
 class _BatteryTabState extends CommonSettingsTabState<BatteryTab, BatterySettings> {
   static const _batteryParameterNames = "batteryParameterNames";
+  static const _possibleNegativeValues = [ ];
+  static const _onlyIntegerValues = [ ];
 
   final _formKey = GlobalKey<FormState>();
 
@@ -18,12 +21,30 @@ class _BatteryTabState extends CommonSettingsTabState<BatteryTab, BatterySetting
   Map _parameterNames;
   Map<String, String Function(String, String)> _validators;
 
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _batteryTabBloc = Provider.of(context).batteryTabBloc;
     _parameterNames = localizedStrings[_batteryParameterNames];
+
+    _validators = {
+      "default": (String value, String variableName) {
+        double number = double.parse(value, (e) => null);
+        if (number == null) {
+          return localizedStrings[CommonSettingsTabState.NOT_NUMBER];
+        }
+        if (_onlyIntegerValues.contains(variableName) && number.round() != number) {
+          return localizedStrings[CommonSettingsTabState.NOT_INTEGER_NUMBER];
+        }
+        if (!_possibleNegativeValues.contains(variableName) && number < 0) {
+          return localizedStrings[CommonSettingsTabState.LESS_THAN_ZERO];
+        }
+
+        return null;
+      },
+    };
+    
+    _batteryTabBloc.batterySettingsCommandStream.add(BatterySettingsCommand.REFRESH);
   }
 
   @override
@@ -72,17 +93,15 @@ class _BatteryTabState extends CommonSettingsTabState<BatteryTab, BatterySetting
 
   TextFormField _buildTextInput(validator, String variableName, String value) {
     return TextFormField(
-      validator: validator,
-/*
+        validator: validator,
       onSaved: (value) {
-        _motorTabBloc.motorSettingsDataStream.add(Parameter(variableName, value));
+        _batteryTabBloc.batterySettingsDataStream.add(Parameter(variableName, value));
       },
-*/
-      controller: TextEditingController()..text = value,
-      keyboardType: TextInputType.number,
-      decoration: InputDecoration(
-        errorStyle: TextStyle(height: 0), // Use just red border without text
-        border: OutlineInputBorder()));
+        controller: TextEditingController()..text = value,
+        keyboardType: TextInputType.number,
+        decoration: InputDecoration(
+            errorStyle: TextStyle(height: 0), // Use just red border without text
+            border: OutlineInputBorder()));
   }
 
   @override
@@ -93,7 +112,11 @@ class _BatteryTabState extends CommonSettingsTabState<BatteryTab, BatterySetting
 
   @override
   Map getParameterValues(AsyncSnapshot<BatterySettings> snapshot) {
-    return Map<String, dynamic>();
+    if (snapshot.hasData) {
+      return snapshot.data.toJson();
+    } else {
+      return Map<String, dynamic>();
+    }
   }
 
   @override
@@ -101,16 +124,23 @@ class _BatteryTabState extends CommonSettingsTabState<BatteryTab, BatterySetting
 
   @override
   void onRead() {
-    print("BatteryTab - onRead");
+    _batteryTabBloc.batterySettingsCommandStream.add(BatterySettingsCommand.READ);
   }
 
   @override
   void onSave() {
-    print("BatteryTab - onSave");
+    _batteryTabBloc.batterySettingsCommandStream.add(BatterySettingsCommand.SAVE);
   }
 
   @override
   void onWrite() {
-    print("BatteryTab - onWrite");
+    if (!_formKey.currentState.validate()) {
+      Scaffold.of(context).showSnackBar(SnackBar(content: Text(localizedStrings[CommonSettingsTabState.WRITING_NOT_ALLOWED])));
+      return;
+    } else {
+      _formKey.currentState.save();
+      _batteryTabBloc.batterySettingsCommandStream.add(BatterySettingsCommand.WRITE);
+    }
+
   }
 }

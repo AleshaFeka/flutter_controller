@@ -81,7 +81,7 @@ class BatteryTabBloc {
   void _packetHandler(Packet packet) {
     print(packet.toBytes);
     _batterySettings = Mapper.packetToBatterySettings(packet);
-    _batteryInstantSettingsStreamController.sink.add(_batterySettings);
+    _batterySettingsRefresh();
   }
 
   void _batterySettingsRead() {
@@ -91,19 +91,16 @@ class BatteryTabBloc {
   }
 
   void _batterySettingsWrite() {
-    print("_batterySettingsWrite");
     Packet packet = Mapper.batterySettingsToPacket(_batterySettings);
-    print("packet = ${packet.dataBuffer}");
     _bluetoothInteractor.sendMessage(packet);
   }
 
   void _batterySettingsSave() {
-    print("_batterySettingsSave");
-    print("_batterySettings = ${_batterySettings.toJson()}");
+    _bluetoothInteractor.save();
   }
 
   void _batterySettingsRefresh() {
     print("_batterySettingsRefresh");
-    _batterySettings = BatterySettings.random(72);
+    _batteryInstantSettingsStreamController.sink.add(_batterySettings);
   }
 }

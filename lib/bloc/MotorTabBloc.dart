@@ -16,8 +16,8 @@ class MotorTabBloc {
   MotorSettings _motorSettings;
   BluetoothInteractor _bluetoothInteractor;
 
-  StreamController _motorInstantSettingsStreamController = StreamController<MotorSettings>.broadcast();
-  Stream get motorInstantSettingsStream => _motorInstantSettingsStreamController.stream;
+  StreamController _motorViewModelStreamController = StreamController<MotorSettings>.broadcast();
+  Stream get motorViewModelStream => _motorViewModelStreamController.stream;
 
   StreamController<MotorSettingsCommand> _motorSettingsCommandStreamController = StreamController<MotorSettingsCommand>.broadcast();
   StreamSink<MotorSettingsCommand> get motorSettingsCommandStream => _motorSettingsCommandStreamController.sink;
@@ -111,11 +111,11 @@ class MotorTabBloc {
   void _packetHandler(Packet packet) {
     print(packet.toBytes);
     _motorSettings = Mapper.packetToMotorSettings(packet);
-    _motorInstantSettingsStreamController.sink.add(_motorSettings);
+    _motorViewModelStreamController.sink.add(_motorSettings);
   }
 
   void _motorSettingsRefresh() {
-    _motorInstantSettingsStreamController.sink.add(_motorSettings);
+    _motorViewModelStreamController.sink.add(_motorSettings);
   }
 
     void _motorSettingsRead() {
@@ -134,7 +134,7 @@ class MotorTabBloc {
 
   void dispose() {
     _bluetoothInteractor.stopListenSerial();
-    _motorInstantSettingsStreamController.close();
+    _motorViewModelStreamController.close();
     _motorSettingsCommandStreamController.close();
     _motorSettingsDataStreamController.close();
   }

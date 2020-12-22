@@ -18,7 +18,7 @@ abstract class CommonSettingsTabState <TWidget extends StatefulWidget, TData> ex
 
   Widget buildRow(String parameterName, String value, String variableName);
 
-  Stream<TData> getTypedStream();
+  Stream<TData> getViewModelStream();
 
   Map getParameterNames();
 
@@ -52,7 +52,7 @@ abstract class CommonSettingsTabState <TWidget extends StatefulWidget, TData> ex
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: getTypedStream(),
+      stream: getViewModelStream(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return buildError(snapshot.error.toString());

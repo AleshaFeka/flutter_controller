@@ -13,9 +13,9 @@ class BatteryTabBloc {
   BluetoothInteractor _bluetoothInteractor;
   BatterySettings _batterySettings;
 
-  StreamController _batteryInstantSettingsStreamController = StreamController<BatterySettings>.broadcast();
+  StreamController _batteryViewModelStreamController = StreamController<BatterySettings>.broadcast();
 
-  Stream get batteryInstantSettingsStream => _batteryInstantSettingsStreamController.stream;
+  Stream get batteryViewModelStream => _batteryViewModelStreamController.stream;
 
   StreamController<BatterySettingsCommand> _batterySettingsCommandStreamController =
       StreamController<BatterySettingsCommand>.broadcast();
@@ -32,7 +32,7 @@ class BatteryTabBloc {
   }
 
   void dispose() {
-    _batteryInstantSettingsStreamController.close();
+    _batteryViewModelStreamController.close();
     _batterySettingsCommandStreamController.close();
     _batterySettingsDataStreamController.close();
   }
@@ -101,6 +101,6 @@ class BatteryTabBloc {
 
   void _batterySettingsRefresh() {
     print("_batterySettingsRefresh");
-    _batteryInstantSettingsStreamController.sink.add(_batterySettings);
+    _batteryViewModelStreamController.sink.add(_batterySettings);
   }
 }

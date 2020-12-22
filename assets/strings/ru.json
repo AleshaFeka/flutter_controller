@@ -52,6 +52,18 @@
     "regenCurrent": "Ток рекуперации",
     "powerReductionVoltage": "Напряжение снижения мощности"
   },
+  "analogParameterNames": {
+    "throttleMin": "Мин. значение ручки газа в вольтах",
+    "throttleMax": "Макс. значение ручки газа в вольтах",
+    "throttleCurveCoefficient1": "Коэффициент кривой К1 ручки газа",
+    "throttleCurveCoefficient2": "Коэффициент кривой К2 ручки газа",
+    "throttleCurveCoefficient3": "Коэффициент кривой К3 ручки газа",
+    "brakeMin": "Мин. значение ручки тормоза в вольтах",
+    "brakeMax": "Макс. значение ручки тормоза в вольтах",
+    "brakeCurveCoefficient1": "Коэффициент кривой К1 ручки тормоза",
+    "brakeCurveCoefficient2": "Коэффициент кривой К2 ручки тормоза",
+    "brakeCurveCoefficient3": "Коэффициент кривой К3 ручки тормоза"
+  },
   "bluetoothUnavailable": "Блютуз недоступен.",
   "workImpossible": "Продолжение работы невозможно.",
   "understand": "Понятно",

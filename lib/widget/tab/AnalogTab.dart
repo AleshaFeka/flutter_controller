@@ -1,35 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_controller/bloc/BatteryTabBloc.dart';
+import 'package:flutter_controller/bloc/AnalogTabBloc.dart';
 import 'package:flutter_controller/di/Provider.dart';
-import 'package:flutter_controller/model/BatterySettings.dart';
-import 'package:flutter_controller/model/Parameter.dart';
+import 'package:flutter_controller/model/AnalogSettings.dart';
 import 'package:flutter_controller/widget/tab/CommonSettingsTab.dart';
 
-class BatteryTab extends StatefulWidget {
+class AnalogTab extends StatefulWidget {
   @override
-  _BatteryTabState createState() => _BatteryTabState();
+  _AnalogTabState createState() => _AnalogTabState();
 }
 
-class _BatteryTabState extends CommonSettingsTabState<BatteryTab, BatterySettings> {
-  static const _batteryParameterNames = "batteryParameterNames";
+class _AnalogTabState extends CommonSettingsTabState<AnalogTab, AnalogSettings> {
+  static const _analogParameterNames = "analogParameterNames";
   static const _possibleNegativeValues = [ ];
   static const _onlyIntegerValues = [ ];
 
   final _formKey = GlobalKey<FormState>();
-
-  BatteryTabBloc _batteryTabBloc;
+  AnalogTabBloc _analogTabBloc;
   Map _parameterNames;
   Map<String, String Function(String, String)> _validators;
+
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _batteryTabBloc = Provider.of(context).batteryTabBloc;
-    _parameterNames = localizedStrings[_batteryParameterNames];
-
+    _parameterNames = localizedStrings[_analogParameterNames];
+    _analogTabBloc = Provider.of(context).analogTabBloc;
     _validators = {
       "default": (String value, String variableName) {
-        double number = double.parse(value, (e) => null);
+        double number = double.parse(value);
         if (number == null) {
           return localizedStrings[CommonSettingsTabState.NOT_NUMBER];
         }
@@ -43,9 +41,23 @@ class _BatteryTabState extends CommonSettingsTabState<BatteryTab, BatterySetting
         return null;
       },
     };
-    
-    _batteryTabBloc.batterySettingsCommandStream.add(BatterySettingsCommand.REFRESH);
+
   }
+
+  @override
+  Map getParameterNames() => _parameterNames;
+
+  @override
+  Map getParameterValues(AsyncSnapshot<AnalogSettings> snapshot) {
+    if (snapshot.hasData) {
+      return snapshot.data.toJson();
+    } else {
+      return Map<String, dynamic>();
+    }
+  }
+
+  @override
+  Stream<AnalogSettings> getViewModelStream() => _analogTabBloc.analogViewModelStream;
 
   @override
   Widget buildRow(String parameterName, String value, String variableName) {
@@ -93,54 +105,32 @@ class _BatteryTabState extends CommonSettingsTabState<BatteryTab, BatterySetting
 
   TextFormField _buildTextInput(validator, String variableName, String value) {
     return TextFormField(
-        validator: validator,
+      validator: validator,
       onSaved: (value) {
-        _batteryTabBloc.batterySettingsDataStream.add(Parameter(variableName, value));
+//        _batteryTabBloc.batterySettingsDataStream.add(Parameter(variableName, value));
       },
-        controller: TextEditingController()..text = value,
-        keyboardType: TextInputType.number,
-        decoration: InputDecoration(
-            errorStyle: TextStyle(height: 0), // Use just red border without text
-            border: OutlineInputBorder()));
+      controller: TextEditingController()..text = value,
+      keyboardType: TextInputType.number,
+      decoration: InputDecoration(
+        errorStyle: TextStyle(height: 0), // Use just red border without text
+        border: OutlineInputBorder()));
   }
-
-  @override
-  GlobalKey<State<StatefulWidget>> getFormKey() => _formKey;
-
-  @override
-  Map getParameterNames() => _parameterNames;
-
-  @override
-  Map getParameterValues(AsyncSnapshot<BatterySettings> snapshot) {
-    if (snapshot.hasData) {
-      return snapshot.data.toJson();
-    } else {
-      return Map<String, dynamic>();
-    }
-  }
-
-  @override
-  Stream<BatterySettings> getViewModelStream() => _batteryTabBloc.batteryViewModelStream;
 
   @override
   void onRead() {
-    _batteryTabBloc.batterySettingsCommandStream.add(BatterySettingsCommand.READ);
+    print("onRead");
   }
 
   @override
   void onSave() {
-    _batteryTabBloc.batterySettingsCommandStream.add(BatterySettingsCommand.SAVE);
+    print("onSave");
   }
 
   @override
   void onWrite() {
-    if (!_formKey.currentState.validate()) {
-      Scaffold.of(context).showSnackBar(SnackBar(content: Text(localizedStrings[CommonSettingsTabState.WRITING_NOT_ALLOWED])));
-      return;
-    } else {
-      _formKey.currentState.save();
-      _batteryTabBloc.batterySettingsCommandStream.add(BatterySettingsCommand.WRITE);
-    }
-
+    print("onWrite");
   }
+
+  @override
+  GlobalKey<State<StatefulWidget>> getFormKey() => _formKey;
 }

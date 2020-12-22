@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_controller/bloc/AnalogTabBloc.dart';
 import 'package:flutter_controller/bloc/BatteryTabBloc.dart';
 import 'package:flutter_controller/bloc/ConnectPageBloc.dart';
 import 'package:flutter_controller/bloc/MonitorTabBloc.dart';
@@ -22,6 +23,7 @@ class Provider extends InheritedWidget {
   MotorTabBloc motorTabBloc;
   MonitorTabBloc monitorTabBloc;
   BatteryTabBloc batteryTabBloc;
+  AnalogTabBloc analogTabBloc;
   
   Map get localizedStrings => _resourceInteractor.localizedStrings;
 
@@ -32,6 +34,7 @@ class Provider extends InheritedWidget {
     monitorTabBloc = MonitorTabBloc(_bluetoothInteractor);
     motorTabBloc = MotorTabBloc(_bluetoothInteractor);
     batteryTabBloc = BatteryTabBloc(_bluetoothInteractor);
+    analogTabBloc = AnalogTabBloc();
   }
 
   @override

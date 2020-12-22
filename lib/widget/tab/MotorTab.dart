@@ -52,6 +52,8 @@ class _MotorTabState extends CommonSettingsTabState<MotorTab, MotorSettings> {
         return null;
       },
     };
+    _motorTabBloc.motorSettingsCommandStream.add(MotorSettingsCommand.REFRESH);
+
   }
 
   @override
@@ -169,7 +171,7 @@ class _MotorTabState extends CommonSettingsTabState<MotorTab, MotorSettings> {
   }
 
   @override
-  Stream<MotorSettings> getTypedStream() => _motorTabBloc.motorInstantSettingsStream;
+  Stream<MotorSettings> getViewModelStream() => _motorTabBloc.motorViewModelStream;
 
   @override
   void onWrite() {

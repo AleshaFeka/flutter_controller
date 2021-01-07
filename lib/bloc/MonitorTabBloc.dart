@@ -34,7 +34,7 @@ class MonitorTabBloc {
 
   void _packetHandler(Packet packet) {
     print('MonitorTabBloc   _packetHandler');
-    if (packet.screenNum == 0) {
+    if (packet.screenNum == _SCREEN_NUMBER) {
       _settings = MonitorTabSettingsData.build(LiveData.fromBytes(packet.toBytes), MonitorTabSettings.load());
       _monitorSettingsStreamController.sink.add(_settings);
     }

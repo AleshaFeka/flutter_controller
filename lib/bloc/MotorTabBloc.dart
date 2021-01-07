@@ -13,7 +13,7 @@ enum MotorTemperatureSensor { NO_SENSOR, KTY84, KTY83, KTY81, KTY83_2K }
 enum MotorPositionSensor { NO_SENSOR, HALL, ENCODER }
 
 class MotorTabBloc {
-  static const _SCREEN_NUMBER = 1;
+  static const SCREEN_NUMBER = 1;
 
   MotorSettings _motorSettings;
   BluetoothInteractor _bluetoothInteractor;
@@ -112,15 +112,15 @@ class MotorTabBloc {
 
   void _packetHandler(Packet packet) {
     print('MotorTabBloc   _packetHandler');
-    if (packet.screenNum == 1) {
-      print(packet.toBytes);
+    print(packet.toBytes);
+    if (packet.screenNum == SCREEN_NUMBER) {
       _motorSettings = Mapper.packetToMotorSettings(packet);
       _motorSettingsRefresh();
     }
   }
 
     void _motorSettingsRead() {
-    _bluetoothInteractor.sendMessage(Packet(_SCREEN_NUMBER, 0, Uint8List(28)));
+    _bluetoothInteractor.sendMessage(Packet(SCREEN_NUMBER, 0, Uint8List(28)));
     _bluetoothInteractor.startListenSerial(_packetHandler);
   }
 

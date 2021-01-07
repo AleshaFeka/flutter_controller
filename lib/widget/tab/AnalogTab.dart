@@ -41,7 +41,7 @@ class _AnalogTabState extends CommonSettingsTabState<AnalogTab, AnalogSettings> 
         return null;
       },
     };
-
+    _analogTabBloc.batterySettingsCommandStream.add(AnalogSettingsCommand.REFRESH);
   }
 
   @override
@@ -119,16 +119,19 @@ class _AnalogTabState extends CommonSettingsTabState<AnalogTab, AnalogSettings> 
   @override
   void onRead() {
     print("onRead");
+    _analogTabBloc.batterySettingsCommandStream.add(AnalogSettingsCommand.READ);
   }
 
   @override
   void onSave() {
     print("onSave");
+    _analogTabBloc.batterySettingsCommandStream.add(AnalogSettingsCommand.SAVE);
   }
 
   @override
   void onWrite() {
     print("onWrite");
+    _analogTabBloc.batterySettingsCommandStream.add(AnalogSettingsCommand.WRITE);
   }
 
   @override

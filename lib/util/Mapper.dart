@@ -1,6 +1,10 @@
 import 'dart:typed_data';
 
+import 'package:flutter_controller/bloc/AnalogTabBloc.dart';
+import 'package:flutter_controller/bloc/BatteryTabBloc.dart';
+import 'package:flutter_controller/bloc/MotorTabBloc.dart';
 import 'package:flutter_controller/core/Packet.dart';
+import 'package:flutter_controller/model/AnalogSettings.dart';
 import 'package:flutter_controller/model/BatterySettings.dart';
 import 'package:flutter_controller/model/MotorSettings.dart';
 
@@ -9,7 +13,6 @@ class Mapper {
   static const SCREEN_NUM_AND_COMMAND_NUM_OFFSET = 2;
 
   static Packet motorSettingsToPacket(MotorSettings settings) {
-    int screenNumber = 1;
     int command = 1;
 
     Uint8List data = Uint8List(PACKET_LENGTH);
@@ -30,7 +33,7 @@ class Mapper {
     dataBuffer.setUint16(22, settings.wheelDiameter, Endian.little);
 
 
-    return Packet(screenNumber, command, data);
+    return Packet(MotorTabBloc.SCREEN_NUMBER, command, data);
   }
 
   static MotorSettings packetToMotorSettings(Packet packet) {
@@ -54,7 +57,6 @@ class Mapper {
   }
 
   static Packet batterySettingsToPacket(BatterySettings settings) {
-    int screenNumber = 2;
     int command = 1;
 
     Uint8List data = Uint8List(PACKET_LENGTH);
@@ -68,7 +70,7 @@ class Mapper {
     dataBuffer.setUint16(10, settings.powerReductionVoltage, Endian.little);
 
 
-    return Packet(screenNumber, command, data);
+    return Packet(BatteryTabBloc.SCREEN_NUMBER, command, data);
   }
 
   static BatterySettings packetToBatterySettings(Packet packet) {
@@ -85,5 +87,44 @@ class Mapper {
     return result;
   }
 
+  static AnalogSettings packetToAnalogSettings(Packet packet) {
+    AnalogSettings result = AnalogSettings.zero();
+    ByteBuffer buffer = packet.toBytes.sublist(SCREEN_NUM_AND_COMMAND_NUM_OFFSET).buffer;
+
+    result.throttleMin = ByteData.view(buffer).getUint16(0, Endian.little) / 1000.0;
+    result.throttleMax = ByteData.view(buffer).getUint16(2, Endian.little) / 1000.0;
+    result.throttleCurveCoefficient1 = ByteData.view(buffer).getUint16(4, Endian.little) ~/ 2048.0;
+    result.throttleCurveCoefficient2 = ByteData.view(buffer).getUint16(6, Endian.little) ~/ 2048.0;
+    result.throttleCurveCoefficient3 = ByteData.view(buffer).getUint16(8, Endian.little) ~/ 2048.0;
+
+    result.brakeMin = ByteData.view(buffer).getUint16(10, Endian.little) / 1000.0;
+    result.brakeMax = ByteData.view(buffer).getUint16(12, Endian.little) / 1000.0;
+    result.brakeCurveCoefficient1 = ByteData.view(buffer).getUint16(14, Endian.little) ~/ 2048.0;
+    result.brakeCurveCoefficient2 = ByteData.view(buffer).getUint16(16, Endian.little) ~/ 2048.0;
+    result.brakeCurveCoefficient3 = ByteData.view(buffer).getUint16(18, Endian.little) ~/ 2048.0;
+
+
+    return result;
+  }
+
+  static Packet analogSettingsToPacket(AnalogSettings settings) {
+    int command = 1;
+
+    Uint8List data = Uint8List(PACKET_LENGTH);
+    ByteData dataBuffer = data.buffer.asByteData();
+
+    dataBuffer.setUint16(0, (settings.throttleMin * 1000).toInt(), Endian.little);
+    dataBuffer.setUint16(0, (settings.throttleMax * 1000).toInt(), Endian.little);
+    dataBuffer.setUint16(0, (settings.throttleCurveCoefficient1 * 2048).toInt(), Endian.little);
+    dataBuffer.setUint16(0, (settings.throttleCurveCoefficient2 * 2048).toInt(), Endian.little);
+    dataBuffer.setUint16(0, (settings.throttleCurveCoefficient3 * 2048).toInt(), Endian.little);
+    dataBuffer.setUint16(0, (settings.brakeMin * 1000).toInt(), Endian.little);
+    dataBuffer.setUint16(0, (settings.brakeMax * 1000).toInt(), Endian.little);
+    dataBuffer.setUint16(0, (settings.brakeCurveCoefficient1 * 2048).toInt(), Endian.little);
+    dataBuffer.setUint16(0, (settings.brakeCurveCoefficient2 * 2048).toInt(), Endian.little);
+    dataBuffer.setUint16(0, (settings.brakeCurveCoefficient3 * 2048).toInt(), Endian.little);
+
+    return Packet(AnalogTabBloc.SCREEN_NUMBER, command, data);
+  }
 
 }

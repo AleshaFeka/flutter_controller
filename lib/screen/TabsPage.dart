@@ -3,6 +3,7 @@ import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:flutter_controller/bloc/TabsPageBloc.dart';
 import 'package:flutter_controller/di/Provider.dart';
 import 'package:flutter_controller/util/Util.dart';
+import 'package:flutter_controller/widget/tab/AnalogTab.dart';
 import 'package:flutter_controller/widget/tab/BatteryTab.dart';
 import 'package:flutter_controller/widget/tab/MonitorTab.dart';
 import 'package:flutter_controller/widget/tab/MotorTab.dart';
@@ -25,8 +26,8 @@ class _TabsPage extends State<TabsPage> {
     0: Icons.computer,
     1: Icons.adjust,
     2: Icons.battery_charging_full,
-    3: Icons.motorcycle,
-    4: Icons.surround_sound,
+    3: Icons.surround_sound,
+    4: Icons.motorcycle,
     5: Icons.build,
     6: Icons.leak_remove,
     7: Icons.leak_add,
@@ -112,9 +113,9 @@ class _TabsPage extends State<TabsPage> {
 
   Widget _buildTab(int tabIndex) {
     //todo replace later...
-    List<Widget> _tabs = [ MonitorTab(), MotorTab(), BatteryTab()/*, DriveTab(), AnalogTab(), RegsTab(), SensorLessTab(), IdentTab(), LogsTab()*/ ];
+    List<Widget> _tabs = [ MonitorTab(), MotorTab(), BatteryTab(), AnalogTab()/*, DriveTab(), RegsTab(), SensorLessTab(), IdentTab(), LogsTab()*/ ];
 
-    if (tabIndex > 2) return _tabs[0];//todo change when new tabs will added, remove at the end))
+    if (tabIndex > (_tabs.length - 1)) return _tabs[0];//todo change when new tabs will added, remove at the end))
     return _tabs[tabIndex];
   }
 

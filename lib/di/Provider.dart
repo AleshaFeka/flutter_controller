@@ -34,7 +34,7 @@ class Provider extends InheritedWidget {
     monitorTabBloc = MonitorTabBloc(_bluetoothInteractor);
     motorTabBloc = MotorTabBloc(_bluetoothInteractor);
     batteryTabBloc = BatteryTabBloc(_bluetoothInteractor);
-    analogTabBloc = AnalogTabBloc();
+    analogTabBloc = AnalogTabBloc(_bluetoothInteractor);
   }
 
   @override

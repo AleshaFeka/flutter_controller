@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter_controller/core/Packet.dart';
 import 'package:flutter_controller/interactor/BluetoothInteractor.dart';
 import 'package:flutter_controller/model/AnalogSettings.dart';
+import 'package:flutter_controller/model/Parameter.dart';
 import 'package:flutter_controller/util/Mapper.dart';
 
 enum AnalogSettingsCommand { READ, WRITE, SAVE, REFRESH }
@@ -17,11 +18,16 @@ class AnalogTabBloc {
   StreamController<AnalogSettingsCommand> _analogSettingsCommandStreamController =  StreamController<AnalogSettingsCommand>.broadcast();
   StreamSink<AnalogSettingsCommand> get batterySettingsCommandStream => _analogSettingsCommandStreamController.sink;
 
+
+  StreamController<Parameter> _analogSettingsDataStreamController = StreamController<Parameter>.broadcast(sync: true);
+  StreamSink<Parameter> get analogSettingsDataStream => _analogSettingsDataStreamController.sink;
+
   BluetoothInteractor _bluetoothInteractor;
   AnalogSettings _analogSettings;
 
   AnalogTabBloc(this._bluetoothInteractor){
     _analogSettingsCommandStreamController.stream.listen(_handleCommand);
+    _analogSettingsDataStreamController.stream.listen(_handleSettingsData);
   }
 
   void _handleCommand(AnalogSettingsCommand event) {
@@ -41,8 +47,43 @@ class AnalogTabBloc {
     }
   }
 
+  void _handleSettingsData(Parameter analogParameter) {
+    print(analogParameter.name + " = " + analogParameter.value);
+    switch (analogParameter.name) {
+      case "throttleMin":
+        _analogSettings.throttleMin = double.parse(analogParameter.value);
+        break;
+      case "throttleMax":
+        _analogSettings.throttleMax = double.parse(analogParameter.value);
+        break;
+      case "throttleCurveCoefficient1":
+        _analogSettings.throttleCurveCoefficient1 = int.parse(analogParameter.value);
+        break;
+      case "throttleCurveCoefficient2":
+        _analogSettings.throttleCurveCoefficient2 = int.parse(analogParameter.value);
+        break;
+      case "throttleCurveCoefficient3":
+        _analogSettings.throttleCurveCoefficient3 = int.parse(analogParameter.value);
+        break;
+      case "brakeMin":
+        _analogSettings.brakeMin = double.parse(analogParameter.value);
+        break;
+      case "brakeMax":
+        _analogSettings.brakeMax = double.parse(analogParameter.value);
+        break;
+      case "brakeCurveCoefficient1":
+        _analogSettings.brakeCurveCoefficient1 = int.parse(analogParameter.value);
+        break;
+      case "brakeCurveCoefficient2":
+        _analogSettings.brakeCurveCoefficient2 = int.parse(analogParameter.value);
+        break;
+      case "brakeCurveCoefficient3":
+        _analogSettings.brakeCurveCoefficient3 = int.parse(analogParameter.value);
+        break;
+    }
+  }
+
   void _analogSettingsRead() {
-    print("_analogSettingsRead");
     _bluetoothInteractor.sendMessage(Packet(SCREEN_NUMBER, 0, Uint8List(28)));
     _bluetoothInteractor.startListenSerial(_packetHandler);
   }
@@ -57,6 +98,7 @@ class AnalogTabBloc {
   }
 
   void _analogSettingsWrite() {
+    print("_analogSettings - ${_analogSettings.toJson()}");
     Packet packet = Mapper.analogSettingsToPacket(_analogSettings);
     _bluetoothInteractor.sendMessage(packet);
   }
@@ -71,6 +113,7 @@ class AnalogTabBloc {
   }
 
   void dispose() {
+    _analogSettingsDataStreamController.close();
     _analogViewModelStreamController.close();
     _analogSettingsCommandStreamController.close();
   }

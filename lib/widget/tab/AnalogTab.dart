@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_controller/bloc/AnalogTabBloc.dart';
 import 'package:flutter_controller/di/Provider.dart';
 import 'package:flutter_controller/model/AnalogSettings.dart';
+import 'package:flutter_controller/model/Parameter.dart';
 import 'package:flutter_controller/widget/tab/CommonSettingsTab.dart';
 
 class AnalogTab extends StatefulWidget {
@@ -107,7 +108,7 @@ class _AnalogTabState extends CommonSettingsTabState<AnalogTab, AnalogSettings> 
     return TextFormField(
       validator: validator,
       onSaved: (value) {
-//        _batteryTabBloc.batterySettingsDataStream.add(Parameter(variableName, value));
+        _analogTabBloc.analogSettingsDataStream.add(Parameter(variableName, value));
       },
       controller: TextEditingController()..text = value,
       keyboardType: TextInputType.number,
@@ -118,20 +119,23 @@ class _AnalogTabState extends CommonSettingsTabState<AnalogTab, AnalogSettings> 
 
   @override
   void onRead() {
-    print("onRead");
     _analogTabBloc.batterySettingsCommandStream.add(AnalogSettingsCommand.READ);
   }
 
   @override
   void onSave() {
-    print("onSave");
     _analogTabBloc.batterySettingsCommandStream.add(AnalogSettingsCommand.SAVE);
   }
 
   @override
   void onWrite() {
-    print("onWrite");
-    _analogTabBloc.batterySettingsCommandStream.add(AnalogSettingsCommand.WRITE);
+    if (!_formKey.currentState.validate()) {
+      Scaffold.of(context).showSnackBar(SnackBar(content: Text(localizedStrings[CommonSettingsTabState.WRITING_NOT_ALLOWED])));
+      return;
+    } else {
+      _formKey.currentState.save();
+      _analogTabBloc.batterySettingsCommandStream.add(AnalogSettingsCommand.WRITE);
+    }
   }
 
   @override

@@ -114,15 +114,15 @@ class Mapper {
     ByteData dataBuffer = data.buffer.asByteData();
 
     dataBuffer.setUint16(0, (settings.throttleMin * 1000).toInt(), Endian.little);
-    dataBuffer.setUint16(0, (settings.throttleMax * 1000).toInt(), Endian.little);
-    dataBuffer.setUint16(0, (settings.throttleCurveCoefficient1 * 2048).toInt(), Endian.little);
-    dataBuffer.setUint16(0, (settings.throttleCurveCoefficient2 * 2048).toInt(), Endian.little);
-    dataBuffer.setUint16(0, (settings.throttleCurveCoefficient3 * 2048).toInt(), Endian.little);
-    dataBuffer.setUint16(0, (settings.brakeMin * 1000).toInt(), Endian.little);
-    dataBuffer.setUint16(0, (settings.brakeMax * 1000).toInt(), Endian.little);
-    dataBuffer.setUint16(0, (settings.brakeCurveCoefficient1 * 2048).toInt(), Endian.little);
-    dataBuffer.setUint16(0, (settings.brakeCurveCoefficient2 * 2048).toInt(), Endian.little);
-    dataBuffer.setUint16(0, (settings.brakeCurveCoefficient3 * 2048).toInt(), Endian.little);
+    dataBuffer.setUint16(2, (settings.throttleMax * 1000).toInt(), Endian.little);
+    dataBuffer.setUint16(4, (settings.throttleCurveCoefficient1 * 2048).toInt(), Endian.little);
+    dataBuffer.setUint16(6, (settings.throttleCurveCoefficient2 * 2048).toInt(), Endian.little);
+    dataBuffer.setUint16(8, (settings.throttleCurveCoefficient3 * 2048).toInt(), Endian.little);
+    dataBuffer.setUint16(10, (settings.brakeMin * 1000).toInt(), Endian.little);
+    dataBuffer.setUint16(12, (settings.brakeMax * 1000).toInt(), Endian.little);
+    dataBuffer.setUint16(14, (settings.brakeCurveCoefficient1 * 2048).toInt(), Endian.little);
+    dataBuffer.setUint16(16, (settings.brakeCurveCoefficient2 * 2048).toInt(), Endian.little);
+    dataBuffer.setUint16(18, (settings.brakeCurveCoefficient3 * 2048).toInt(), Endian.little);
 
     return Packet(AnalogTabBloc.SCREEN_NUMBER, command, data);
   }

@@ -10,6 +10,8 @@ import 'package:flutter_controller/util/Mapper.dart';
 enum BatterySettingsCommand { READ, WRITE, SAVE, REFRESH }
 
 class BatteryTabBloc {
+  static const _SCREEN_NUMBER = 4;
+
   BluetoothInteractor _bluetoothInteractor;
   BatterySettings _batterySettings;
 
@@ -79,14 +81,19 @@ class BatteryTabBloc {
   }
 
   void _packetHandler(Packet packet) {
-    print(packet.toBytes);
-    _batterySettings = Mapper.packetToBatterySettings(packet);
-    _batterySettingsRefresh();
+    print('BatteryTabBloc   _packetHandler');
+      print(packet.toBytes);
+      _batterySettings = Mapper.packetToBatterySettings(packet);
+      _batterySettingsRefresh();
+/*
+    if (packet.screenNum == 2) {
+    }
+*/
   }
 
   void _batterySettingsRead() {
     print("_batterySettingsRead");
-    _bluetoothInteractor.sendMessage(Packet(2, 0, Uint8List(28)));
+    _bluetoothInteractor.sendMessage(Packet(_SCREEN_NUMBER, 0, Uint8List(28)));
     _bluetoothInteractor.startListenSerial(_packetHandler);
   }
 

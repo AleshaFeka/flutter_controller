@@ -9,7 +9,9 @@ import 'package:flutter_controller/model/MonitorSettings.dart';
 enum MonitorTabCommand { READ, START_MONITORING, STOP_MONITORING }
 
 class MonitorTabBloc {
-  static const _monitoringInterval = 500;
+  static const _SCREEN_NUMBER = 0;
+  static const _MONITORING_INTERVAL = 500;
+
   LiveData liveDataStub = LiveData.fromBytes(Uint8List(28));
   StreamSubscription _monitoringSubscription;
 
@@ -31,8 +33,11 @@ class MonitorTabBloc {
   }
 
   void _packetHandler(Packet packet) {
-    _settings = MonitorTabSettingsData.build(LiveData.fromBytes(packet.toBytes), MonitorTabSettings.load());
-    _monitorSettingsStreamController.sink.add(_settings);
+    print('MonitorTabBloc   _packetHandler');
+    if (packet.screenNum == 0) {
+      _settings = MonitorTabSettingsData.build(LiveData.fromBytes(packet.toBytes), MonitorTabSettings.load());
+      _monitorSettingsStreamController.sink.add(_settings);
+    }
   }
 
   void _stopMonitoring() {
@@ -44,12 +49,10 @@ class MonitorTabBloc {
     _interactor.startListenSerial(_packetHandler);
 
     dynamic Function(int) computation = (count) {
-      _interactor.sendMessage(Packet(0, 0, Uint8List(28)));
+      _interactor.sendMessage(Packet(_SCREEN_NUMBER, 0, Uint8List(28)));
     };
 
-    _monitoringSubscription = Stream.periodic(Duration(milliseconds: _monitoringInterval), computation).listen((event) {
-      print(event);
-    });
+    _monitoringSubscription = Stream.periodic(Duration(milliseconds: _MONITORING_INTERVAL), computation).listen((_) {});
 
   }
 

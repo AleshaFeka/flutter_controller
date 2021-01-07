@@ -102,8 +102,8 @@ class Packet {
 //        rawData = data;
 
   bool crcValid() {
-    print ("data raw - " + (screenNum + cmd + dataBuffer.fold(0, (previousValue, element) => previousValue + element)).toString());
-    print("data crc - " + crc.toString());
+//    print ("data raw - " + (screenNum + cmd + dataBuffer.fold(0, (previousValue, element) => previousValue + element)).toString());
+//    print("data crc - " + crc.toString());
       return (screenNum + cmd + dataBuffer.fold(0, (previousValue, element) => previousValue + element)) == crc; // max value = 0x1DE2, no uint16 overflow
   }
 

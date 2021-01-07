@@ -16,6 +16,7 @@ class BluetoothInteractor {
 
   Stream<Uint8List> _connectionStream;
   StreamSubscription<Uint8List> _subscription;
+  StreamSubscription<Uint8List> _readSubscription;
   StreamController<Uint8List> _streamController = StreamController<Uint8List>.broadcast();
 
   Stream<Uint8List> get fromBtConnectionStream => _streamController.stream;
@@ -76,7 +77,7 @@ class BluetoothInteractor {
 
   void _onDataReceived(Uint8List data, Function(Packet) packetHandler) {
     print("Data received: ");
-    print(data);
+//    print(data);
 
     // skip till 0x23, search for (0x23, 32 bytes, 0x2A)
     Uint8List buf = Uint8List.fromList(_inBuffer.toList() + data.toList()); // old data + new data
@@ -89,7 +90,7 @@ class BluetoothInteractor {
         if (packet.crcValid()) {
           buf = buf.sublist(pos + 34);
           print("Packet received: ");
-          print(packetData);
+//          print(packetData);
 
           packetHandler(packet);
 
@@ -108,8 +109,7 @@ class BluetoothInteractor {
     try {
       final msg = Uint8List.fromList(<int>[0x23] + packet.toBytes + <int>[0x2A]);
       connection.output.add(msg);
-      print("Sent");
-      print(msg);
+      print("Sent $msg");
       await connection.output.allSent;
     } catch (e) {
       print("_sendMessage error - ${e.toString()}");
@@ -119,11 +119,12 @@ class BluetoothInteractor {
   }
 
   void stopListenSerial() {
-    _subscription.cancel();
+    _readSubscription?.cancel();
   }
 
   void startListenSerial(Function(Packet) packetHandler) {
-    _subscription = _streamController.stream.listen((event) {
+    stopListenSerial();
+    _readSubscription = _streamController.stream.listen((event) {
       _onDataReceived(event, packetHandler);
     })
       ..onDone(() {

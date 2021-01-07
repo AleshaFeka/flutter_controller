@@ -44,8 +44,8 @@ class Mapper {
     result.motorDirection = ByteData.view(buffer).getUint16(8, Endian.little);
     result.motorTemperatureSensorType = ByteData.view(buffer).getUint16(10, Endian.little);
     result.motorPositionSensorType = ByteData.view(buffer).getUint16(12, Endian.little);
-    result.motorStatorResistance = ByteData.view(buffer).getUint16(14, Endian.little) / 1000.0;
-    result.motorInductance = ByteData.view(buffer).getUint16(16, Endian.little) / 1000000.0;
+    result.motorStatorResistance = ByteData.view(buffer).getUint16(14, Endian.little).toDouble();
+    result.motorInductance = ByteData.view(buffer).getUint16(16, Endian.little).toDouble();
     result.motorFlux = ByteData.view(buffer).getUint16(18, Endian.little) / 100000.0;
     result.phaseCorrection = ByteData.view(buffer).getUint16(20, Endian.little) / 1000.0;
     result.wheelDiameter = ByteData.view(buffer).getUint16(22, Endian.little);

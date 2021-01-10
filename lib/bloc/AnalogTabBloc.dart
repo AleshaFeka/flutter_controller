@@ -10,7 +10,7 @@ import 'package:flutter_controller/util/Mapper.dart';
 enum AnalogSettingsCommand { READ, WRITE, SAVE, REFRESH }
 
 class AnalogTabBloc {
-  static const SCREEN_NUMBER = 6;
+  static const SCREEN_NUMBER = 9;
 
   StreamController _analogViewModelStreamController = StreamController<AnalogSettings>.broadcast();
   Stream get analogViewModelStream => _analogViewModelStreamController.stream;
@@ -92,9 +92,9 @@ class AnalogTabBloc {
     print('AnalogTabBloc   _packetHandler');
     print(packet.toBytes);
     if (packet.screenNum == SCREEN_NUMBER) {
+    }
       _analogSettings = Mapper.packetToAnalogSettings(packet);
       _analogSettingsRefresh();
-    }
   }
 
   void _analogSettingsWrite() {

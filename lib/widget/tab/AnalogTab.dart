@@ -12,8 +12,15 @@ class AnalogTab extends StatefulWidget {
 
 class _AnalogTabState extends CommonSettingsTabState<AnalogTab, AnalogSettings> {
   static const _analogParameterNames = "analogParameterNames";
-  static const _possibleNegativeValues = [ ];
-  static const _onlyIntegerValues = [ ];
+  static const _possibleNegativeValues = [
+    "throttleCurveCoefficient1",
+    "throttleCurveCoefficient2",
+    "throttleCurveCoefficient3",
+    "brakeCurveCoefficient1",
+    "brakeCurveCoefficient2",
+    "brakeCurveCoefficient3"
+  ];
+  static const _onlyIntegerValues = [  ];
 
   final _formKey = GlobalKey<FormState>();
   AnalogTabBloc _analogTabBloc;

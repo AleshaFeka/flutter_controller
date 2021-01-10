@@ -92,9 +92,9 @@ class AnalogTabBloc {
     print('AnalogTabBloc   _packetHandler');
     print(packet.toBytes);
     if (packet.screenNum == SCREEN_NUMBER) {
-    }
       _analogSettings = Mapper.packetToAnalogSettings(packet);
       _analogSettingsRefresh();
+    }
   }
 
   void _analogSettingsWrite() {

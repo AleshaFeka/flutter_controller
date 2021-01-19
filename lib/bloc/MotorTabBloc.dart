@@ -10,7 +10,7 @@ import 'package:flutter_controller/util/Mapper.dart';
 enum MotorSettingsCommand { READ, WRITE, SAVE, REFRESH }
 
 enum MotorTemperatureSensor { NO_SENSOR, KTY84, KTY83, KTY81, KTY83_2K }
-enum MotorPositionSensor { NO_SENSOR, HALL, ENCODER }
+enum MotorPositionSensor { HALL, ENCODER }
 
 class MotorTabBloc {
   static const SCREEN_NUMBER = 1;

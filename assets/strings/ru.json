@@ -60,6 +60,23 @@
     "brakeCurveCoefficient2": "Коэффициент кривой К2 ручки тормоза",
     "brakeCurveCoefficient3": "Коэффициент кривой К3 ручки тормоза"
   },
+  "driveParameterNames": {
+    "throttleUpSpeed": "Скорость нарастания тока двигателя газ",
+    "throttleDownSpeed": "Скорость спадания тока двигателя газ",
+    "throttlePhaseCurrentMax": "Максимальный фазный ток двигателя газ",
+    "brakeUpSpeed": "Скорость нарастания тока двигателя тормоз",
+    "brakeDownSpeed": "Скорость спадания тока двигателя тормоз",
+    "brakePhaseCurrentMax": "Максимальный фазный ток двигателя тормоз",
+    "discreetBrakeCurrentUpSpeed": "Скорость нарастания тока дискретный тормоз",
+    "discreetBrakeCurrentDownSpeed": "Скорость спадания тока дискретный тормоз",
+    "discreetBrakeCurrentMax": "Максимальный ток дискретный тормоз",
+    "modeControlCommandWord": "Командное слово управления режимами",
+    "phaseWeakingCurrent": "Ток ослабления потока",
+    "pwmFrequency": "Частота ШИМ",
+    "processorIdHigh": "Идентификатор процессора High",
+    "processorIdLow": "Идентификатор процессора Low"
+  },
+
   "bluetoothUnavailable": "Блютуз недоступен.",
   "workImpossible": "Продолжение работы невозможно.",
   "understand": "Понятно",

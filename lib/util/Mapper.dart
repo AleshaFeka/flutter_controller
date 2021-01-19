@@ -2,10 +2,12 @@ import 'dart:typed_data';
 
 import 'package:flutter_controller/bloc/AnalogTabBloc.dart';
 import 'package:flutter_controller/bloc/BatteryTabBloc.dart';
+import 'package:flutter_controller/bloc/DriveTabBloc.dart';
 import 'package:flutter_controller/bloc/MotorTabBloc.dart';
 import 'package:flutter_controller/core/Packet.dart';
 import 'package:flutter_controller/model/AnalogSettings.dart';
 import 'package:flutter_controller/model/BatterySettings.dart';
+import 'package:flutter_controller/model/DriveSettings.dart';
 import 'package:flutter_controller/model/MotorSettings.dart';
 
 class Mapper {
@@ -127,4 +129,57 @@ class Mapper {
     return result;
   }
 
+
+  static Packet driveSettingsToPacket(DriveSettings settings) {
+    int command = 1;
+
+    Uint8List data = Uint8List(PACKET_LENGTH);
+    ByteData dataBuffer = data.buffer.asByteData();
+
+    dataBuffer.setUint16(0, settings.throttleUpSpeed, Endian.little);
+    dataBuffer.setUint16(2, settings.throttleDownSpeed, Endian.little);
+    dataBuffer.setUint16(4, settings.throttlePhaseCurrentMax, Endian.little);
+
+    dataBuffer.setUint16(6, settings.brakeUpSpeed, Endian.little);
+    dataBuffer.setUint16(8, settings.brakeDownSpeed, Endian.little);
+    dataBuffer.setUint16(10, settings.brakePhaseCurrentMax, Endian.little);
+
+    dataBuffer.setUint16(12, settings.discreetBrakeCurrentUpSpeed, Endian.little);
+    dataBuffer.setUint16(14, settings.discreetBrakeCurrentDownSpeed, Endian.little);
+    dataBuffer.setUint16(16, settings.discreetBrakeCurrentMax, Endian.little);
+
+    dataBuffer.setUint16(18, settings.modeControlCommandWord, Endian.little);
+    dataBuffer.setUint16(20, settings.phaseWeakingCurrent, Endian.little);
+    dataBuffer.setUint16(22, settings.pwmFrequency, Endian.little);
+    dataBuffer.setUint16(24, settings.processorIdHigh, Endian.little);
+    dataBuffer.setUint16(26, settings.processorIdLow, Endian.little);
+
+
+    return Packet(DriveTabBloc.SCREEN_NUMBER, command, data);
+  }
+
+  static DriveSettings packetToDriveSettings(Packet packet) {
+    DriveSettings result = DriveSettings.zero();
+    ByteBuffer buffer = packet.toBytes.sublist(SCREEN_NUM_AND_COMMAND_NUM_OFFSET).buffer;
+
+    result.throttleUpSpeed = ByteData.view(buffer).getUint16(0, Endian.little);
+    result.throttleDownSpeed = ByteData.view(buffer).getUint16(2, Endian.little);
+    result.throttlePhaseCurrentMax = ByteData.view(buffer).getUint16(4, Endian.little);
+
+    result.brakeUpSpeed = ByteData.view(buffer).getUint16(6, Endian.little);
+    result.brakeDownSpeed = ByteData.view(buffer).getUint16(8, Endian.little);
+    result.brakePhaseCurrentMax = ByteData.view(buffer).getUint16(10, Endian.little);
+
+    result.discreetBrakeCurrentUpSpeed = ByteData.view(buffer).getUint16(12, Endian.little);
+    result.discreetBrakeCurrentDownSpeed = ByteData.view(buffer).getUint16(14, Endian.little);
+    result.discreetBrakeCurrentMax = ByteData.view(buffer).getUint16(16, Endian.little);
+
+    result.modeControlCommandWord = ByteData.view(buffer).getUint16(18, Endian.little);
+    result.phaseWeakingCurrent = ByteData.view(buffer).getUint16(20, Endian.little);
+    result.pwmFrequency = ByteData.view(buffer).getUint16(22, Endian.little);
+    result.processorIdHigh = ByteData.view(buffer).getUint16(24, Endian.little);
+    result.processorIdLow = ByteData.view(buffer).getUint16(26, Endian.little);
+
+    return result;
+  }
 }

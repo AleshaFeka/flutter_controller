@@ -95,7 +95,7 @@ class Packet {
   Packet.fromBytes(Uint8List data)
       : screenNum = data[0],
         cmd = data[1],
-        dataBuffer = data.sublist(2, dataLen - 2),
+        dataBuffer = data.sublist(2, 30/*dataLen - 2*/),
         crc = ByteData.view(data.buffer, 30, 2).getUint16(0, Endian.little);
 
 //  Packet.fromMessage(Uint8List data) :

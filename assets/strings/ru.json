@@ -70,7 +70,7 @@
     "discreetBrakeCurrentUpSpeed": "Скорость нарастания тока дискретный тормоз",
     "discreetBrakeCurrentDownSpeed": "Скорость спадания тока дискретный тормоз",
     "discreetBrakeCurrentMax": "Максимальный ток дискретный тормоз",
-    "modeControlCommandWord": "Командное слово управления режимами",
+    "controlMode": "Режим управления",
     "phaseWeakingCurrent": "Ток ослабления потока",
     "pwmFrequency": "Частота ШИМ",
     "processorIdHigh": "Идентификатор процессора High",
@@ -118,6 +118,19 @@
   "MotorPositionSensor.HALL": "Холлы",
   "MotorPositionSensor.ENCODER": "Энкодер",
   "MotorPositionSensor.NO_SENSOR": "Без датчика",
+
+  "DriveControlMode.FOC": "FOC",
+  "DriveControlMode.SENSORLESS": "Бездатчиковый",
+  "DriveControlMode.BLDC": "BLDC",
+  "DriveControlMode.SINE": "Синусный",
+
+  "DrivePwmFrequency.PWM8000": "8000",
+  "DrivePwmFrequency.PWM10000": "10000",
+  "DrivePwmFrequency.PWM12000": "12000",
+  "DrivePwmFrequency.PWM15000": "15000",
+  "DrivePwmFrequency.PWM18000": "18000",
+  "DrivePwmFrequency.PWM20000": "20000",
+  "DrivePwmFrequency.PWM22000": "22000",
 
   "unknownTemperatureSensor": "Неверный тип"
 }

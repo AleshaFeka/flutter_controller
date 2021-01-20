@@ -3,6 +3,7 @@ import 'package:flutter_controller/bloc/DriveTabBloc.dart';
 import 'package:flutter_controller/di/Provider.dart';
 import 'package:flutter_controller/model/DriveSettings.dart';
 import 'package:flutter_controller/model/Parameter.dart';
+import 'package:flutter_controller/util/Mapper.dart';
 import 'package:flutter_controller/widget/tab/CommonSettingsTab.dart';
 
 class DriveTab extends StatefulWidget {
@@ -14,8 +15,10 @@ class DriveTab extends StatefulWidget {
 class _DriveTabState extends CommonSettingsTabState<DriveTab, DriveSettings> {
 
   static const _driveParameterNames = "driveParameterNames";
-  static const _possibleNegativeValues = [];
+  static const _possibleNegativeValues = ["phaseWeakingCurrent"];
   static const _onlyIntegerValues = [];
+  static const _dropDownInputs = ["pwmFrequency", "controlMode"];
+  static const _sensorType = "sensorType";
 
 
   DriveTabBloc _driveTabBloc;
@@ -61,7 +64,9 @@ class _DriveTabState extends CommonSettingsTabState<DriveTab, DriveSettings> {
       return validationResult;
     };
 
-    Widget inputField =  _buildTextInput(validator, variableName, value);
+    Widget inputField = _dropDownInputs.contains(variableName)
+      ? _buildDropDownInput(variableName, value)
+      : _buildTextInput(validator, variableName, value);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -91,6 +96,52 @@ class _DriveTabState extends CommonSettingsTabState<DriveTab, DriveSettings> {
         )
       ],
     );
+  }
+
+
+  Widget _buildDropDownInput(String variableName, String value) {
+    List<String> options;
+    switch (variableName) {
+      case "pwmFrequency":
+        value = Mapper.mapPwmFrequency(value);
+
+        options = DrivePwmFrequency.values.map((e) => e.toString()).toList();
+        break;
+      case "controlMode":
+        options = DriveControlMode.values.map((e) => e.toString()).toList();
+        break;
+    }
+
+    print("options = ${options}");
+    print("value = ${value}");
+
+    String title;
+    try {
+      title = localizedStrings[options[int.parse(value)]];
+    } catch (exc) {
+      print(exc);
+      title = localizedStrings[_sensorType];
+    }
+
+    return PopupMenuButton<String>(
+      onSelected: (newValue) {
+        _driveTabBloc.driveSettingsDataStream.add(Parameter(variableName, newValue));
+        _driveTabBloc.driveSettingsCommandStream.add(DriveSettingsCommand.REFRESH);
+      },
+      child: Row(
+        children: [
+          Icon(Icons.arrow_drop_down),
+          Flexible(child: Text(title, overflow: TextOverflow.fade, maxLines: 1,)),
+        ],
+      ),
+      itemBuilder: (BuildContext context) {
+        return options
+          .map((optionName) => PopupMenuItem<String>(
+          child: Text(localizedStrings[optionName]),
+          value: optionName,
+        ))
+          .toList();
+      });
   }
 
   TextFormField _buildTextInput(validator, String variableName, String value) {

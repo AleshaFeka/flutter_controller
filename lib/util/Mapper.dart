@@ -14,6 +14,34 @@ class Mapper {
   static const PACKET_LENGTH = 28;
   static const SCREEN_NUM_AND_COMMAND_NUM_OFFSET = 2;
 
+  static String mapPwmFrequency(String input) {
+    String value;
+    switch (input) {
+      case "8000" :
+        value = "0";
+        break;
+      case "10000" :
+        value = "1";
+        break;
+      case "12000" :
+        value = "2";
+        break;
+      case "15000" :
+        value = "3";
+        break;
+      case "18000" :
+        value = "4";
+        break;
+      case "20000" :
+        value = "5";
+        break;
+      case "22000" :
+        value = "6";
+        break;
+    }
+    return value;
+  }
+
   static Packet motorSettingsToPacket(MotorSettings settings) {
     int command = 1;
 
@@ -148,7 +176,7 @@ class Mapper {
     dataBuffer.setUint16(14, settings.discreetBrakeCurrentDownSpeed, Endian.little);
     dataBuffer.setUint16(16, settings.discreetBrakeCurrentMax, Endian.little);
 
-    dataBuffer.setUint16(18, settings.modeControlCommandWord, Endian.little);
+    dataBuffer.setUint16(18, settings.controlMode, Endian.little);
     dataBuffer.setUint16(20, settings.phaseWeakingCurrent, Endian.little);
     dataBuffer.setUint16(22, settings.pwmFrequency, Endian.little);
     dataBuffer.setUint16(24, settings.processorIdHigh, Endian.little);
@@ -174,8 +202,8 @@ class Mapper {
     result.discreetBrakeCurrentDownSpeed = ByteData.view(buffer).getUint16(14, Endian.little);
     result.discreetBrakeCurrentMax = ByteData.view(buffer).getUint16(16, Endian.little);
 
-    result.modeControlCommandWord = ByteData.view(buffer).getUint16(18, Endian.little);
-    result.phaseWeakingCurrent = ByteData.view(buffer).getUint16(20, Endian.little);
+    result.controlMode = ByteData.view(buffer).getUint16(18, Endian.little);
+    result.phaseWeakingCurrent = ByteData.view(buffer).getInt16(20, Endian.little);
     result.pwmFrequency = ByteData.view(buffer).getUint16(22, Endian.little);
     result.processorIdHigh = ByteData.view(buffer).getUint16(24, Endian.little);
     result.processorIdLow = ByteData.view(buffer).getUint16(26, Endian.little);

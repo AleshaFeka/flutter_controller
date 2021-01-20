@@ -8,6 +8,8 @@ import 'package:flutter_controller/model/Parameter.dart';
 import 'package:flutter_controller/util/Mapper.dart';
 
 enum DriveSettingsCommand { READ, WRITE, SAVE, REFRESH }
+enum DriveControlMode { SINE, FOC, SENSORLESS, BLDC }
+enum DrivePwmFrequency { PWM8000, PWM10000, PWM12000, PWM15000, PWM18000, PWM20000, PWM22000 }
 
 class DriveTabBloc {
   static const SCREEN_NUMBER = 2;
@@ -65,10 +67,26 @@ class DriveTabBloc {
         _driveSettings.phaseWeakingCurrent = int.parse(motorParameter.value);
         break;
       case "pwmFrequency":
-        _driveSettings.pwmFrequency = int.parse(motorParameter.value);
+        print("motorParameter.value = ${motorParameter.value}");
+        final index = motorParameter.value.trim().indexOf(".PWM") + ".PWM".length;
+        final frequency = motorParameter.value.trim().substring(index);
+
+/*
+        var sensorType = DrivePwmFrequency
+          .values
+          .firstWhere((element) => element.toString() == motorParameter.value);
+        _driveSettings.pwmFrequency = DrivePwmFrequency.values.indexOf(sensorType);
+*/
+
+        _driveSettings.pwmFrequency = int.parse(frequency);
         break;
-      case "modeControlCommandWord":
-        _driveSettings.modeControlCommandWord = int.parse(motorParameter.value);
+      case "controlMode":
+        var sensorType = DriveControlMode
+          .values
+          .firstWhere((element) => element.toString() == motorParameter.value);
+        _driveSettings.controlMode = DriveControlMode.values.indexOf(sensorType);
+
+//        _driveSettings.controlMode = int.parse(motorParameter.value);
         break;
 
       case "processorIdHigh":

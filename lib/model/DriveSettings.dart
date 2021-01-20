@@ -8,7 +8,7 @@ class DriveSettings {
   int discreetBrakeCurrentUpSpeed = 0;
   int discreetBrakeCurrentDownSpeed = 0;
   int discreetBrakeCurrentMax = 0;
-  int modeControlCommandWord = 0;
+  int controlMode = 0;
   int phaseWeakingCurrent = 0;
   int pwmFrequency = 0;
   int processorIdHigh = 0;
@@ -27,7 +27,7 @@ class DriveSettings {
       'discreetBrakeCurrentUpSpeed': discreetBrakeCurrentUpSpeed,
       'discreetBrakeCurrentDownSpeed': discreetBrakeCurrentDownSpeed,
       'discreetBrakeCurrentMax': discreetBrakeCurrentMax,
-      'modeControlCommandWord': modeControlCommandWord,
+      'controlMode': controlMode,
       'phaseWeakingCurrent': phaseWeakingCurrent,
       'pwmFrequency': pwmFrequency,
       'processorIdHigh': processorIdHigh,

@@ -33,9 +33,10 @@ class MonitorTabBloc {
   }
 
   void _packetHandler(Packet packet) {
-    print('MonitorTabBloc   _packetHandler');
+//    print('MonitorTabBloc   _packetHandler');
     if (packet.screenNum == _SCREEN_NUMBER) {
-      _settings = MonitorTabSettingsData.build(LiveData.fromBytes(packet.toBytes), MonitorTabSettings.load());
+//      print(LiveData.fromBytes(packet.toBytes).toString());
+      _settings = MonitorTabSettingsData.build(LiveData.fromBytes(packet.dataBuffer), MonitorTabSettings.load());
       _monitorSettingsStreamController.sink.add(_settings);
     }
   }

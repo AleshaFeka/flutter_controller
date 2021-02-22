@@ -2,10 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
-import 'package:flutter_controller/core/LiveData.dart';
 import 'package:flutter_controller/core/Packet.dart';
-import 'package:flutter_controller/model/MotorSettings.dart';
-import 'package:flutter_controller/util/Mapper.dart';
 
 class BluetoothInteractor {
   FlutterBluetoothSerial instance = FlutterBluetoothSerial.instance;
@@ -76,8 +73,8 @@ class BluetoothInteractor {
   }
 
   void _onDataReceived(Uint8List data, Function(Packet) packetHandler) {
-    print("Data received: ");
-    print(data);
+//    print("Data received: ");
+//    print(data);
 
     // skip till 0x23, search for (0x23, 32 bytes, 0x2A)
     Uint8List buf = Uint8List.fromList(_inBuffer.toList() + data.toList()); // old data + new data
@@ -87,14 +84,9 @@ class BluetoothInteractor {
       if (buf[pos] == 0x23 && buf[pos + 33] == 0x2A) {
         Uint8List packetData = buf.sublist(pos + 1, pos + 33);
         Packet packet = Packet.fromBytes(packetData);
-        print("packetData : $packetData ");
-        print("Data : ${packet.toBytes} ");
-        print("crc : ${packet.crc} ");
-        print("packet.crcValid : ${packet.crcValid()} ");
         if (packet.crcValid()) {
           buf = buf.sublist(pos + 34);
-          print("Packet received: ");
-//          print(packetData);
+          print("Packet received: ${packet.toBytes}");
 
           packetHandler(packet);
 
@@ -113,7 +105,7 @@ class BluetoothInteractor {
     try {
       final msg = Uint8List.fromList(<int>[0x23] + packet.toBytes + <int>[0x2A]);
       connection.output.add(msg);
-      print("Sent $msg");
+//      print("Sent $msg");
       await connection.output.allSent;
     } catch (e) {
       print("_sendMessage error - ${e.toString()}");

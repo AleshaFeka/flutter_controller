@@ -21,6 +21,7 @@ class MonitorTabSettings {
     this.leftBottom = Settings.getValue<int>(leftBottomParameter, 3);
     this.rightTop = Settings.getValue<int>(rightTopParameter, 4);
     this.rightBottom = Settings.getValue<int>(rightBottomParameter, 5);
+//    print("centerParam - $centerParam.  leftTop - $leftTop.  leftBottom - $leftBottom.  rightTop - $rightTop.  rightBottom - $rightBottom.  ");
   }
 }
 

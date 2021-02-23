@@ -74,6 +74,31 @@
     "processorIdHigh": "Идентификатор процессора High",
     "processorIdLow": "Идентификатор процессора Low"
   },
+  "functionParameterNames": {
+    "fullVoltage": "Максимальное напряжение",
+
+
+    "in1": "Вход 1",
+    "in2": "Вход 2",
+    "in3": "Вход 3",
+    "in4": "Вход 4",
+
+    "invert": "Инвертировать",
+
+    "useCan": "CAN-шина",
+
+    "s1MaxTorqueCurrent": "Максимальный фазный ток",
+    "s1MaxBrakeCurrent": "Максимальный ток торможения",
+    "s1MaxSpeed": "Максимальная скорость",
+    "s1MaxBatteryCurrent": "Максимальный батарейный ток",
+    "s1MaxFieldWeakingCurrent": "Максимальный ток ослабления поля",
+
+    "s2MaxTorqueCurrent": "Максимальный фазный ток",
+    "s2MaxBrakeCurrent": "Максимальный ток торможения",
+    "s2MaxSpeed": "Максимальная скорость",
+    "s2MaxBatteryCurrent": "Максимальный батарейный ток",
+    "s2MaxFieldWeakingCurrent": "Максимальный ток ослабления поля"
+  },
 
   "bluetoothUnavailable": "Блютуз недоступен.",
   "workImpossible": "Продолжение работы невозможно.",
@@ -130,5 +155,16 @@
   "DrivePwmFrequency.PWM20000": "20000",
   "DrivePwmFrequency.PWM22000": "22000",
 
+  "InputFunctions.NO_FUNC": "Нет функции",
+  "InputFunctions.TRQ_SPD": "Момент/скорость",
+  "InputFunctions.REV_FWD": "Вперед/назад",
+  "InputFunctions.CRUIZE": "Круиз контроль",
+  "InputFunctions.S1": "Профиль S1",
+  "InputFunctions.S2": "Профиль S2",
+  "InputFunctions.FALL": "Ошибка (???)",
+  "InputFunctions.STOP": "Стоп",
+
+  "yes": "Да",
+  "no": "Нет",
   "unknownTemperatureSensor": "Неверный тип"
 }

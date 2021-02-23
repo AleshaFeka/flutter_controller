@@ -6,6 +6,7 @@ import 'package:flutter_controller/screen/TabsPage.dart';
 import 'package:flutter_controller/widget/tab/AnalogTab.dart';
 import 'package:flutter_controller/widget/tab/BatteryTab.dart';
 import 'package:flutter_controller/widget/tab/DriveTab.dart';
+import 'package:flutter_controller/widget/tab/FuncTab.dart';
 import 'package:flutter_controller/widget/tab/MotorTab.dart';
 
 class MainPage extends StatefulWidget {
@@ -16,8 +17,8 @@ class MainPage extends StatefulWidget {
 class _MainPage extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
-    return ConnectPage();
-//    return debugScreen(DriveTab());
+//    return ConnectPage();
+    return debugScreen(FuncTab());
   }
 
   Widget debugScreen(Widget child) {

@@ -17,8 +17,8 @@ class MainPage extends StatefulWidget {
 class _MainPage extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
-//    return ConnectPage();
-    return debugScreen(FuncTab());
+    return ConnectPage();
+//    return debugScreen(FuncTab());
   }
 
   Widget debugScreen(Widget child) {

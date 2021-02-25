@@ -86,7 +86,7 @@ class BluetoothInteractor {
         Packet packet = Packet.fromBytes(packetData);
         if (packet.crcValid()) {
           buf = buf.sublist(pos + 34);
-          print("Packet received: ${packet.toBytes}");
+//          print("Packet received: ${packet.toBytes}");
 
           packetHandler(packet);
 

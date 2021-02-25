@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_controller/bloc/FuncTabBloc.dart';
 import 'package:flutter_controller/di/Provider.dart';
@@ -30,6 +32,7 @@ class _FuncTabState extends State<FuncTab> {
   Map _parameterNames;
   FuncTabBloc _bloc;
   Map<String, String Function(String, String)> _validators;
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void didChangeDependencies() {
@@ -117,22 +120,25 @@ class _FuncTabState extends State<FuncTab> {
   }
 
   Widget _buildContent(BuildContext context, FuncSettings settings) {
-    return Column(
-      children: [
-        Flexible(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                _buildInOptions(context, settings),
-                _buildCanOption(context, "canInput", "dropDownTitle", (value) => print(value), settings.useCan),
-                _buildS1ProfileOptions(context, settings),
-                _buildS2ProfileOptions(context, settings),
-              ],
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          Flexible(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  _buildInOptions(context, settings),
+                  _buildCanOption(context, settings.useCan),
+                  _buildS1ProfileOptions(context, settings),
+                  _buildS2ProfileOptions(context, settings),
+                ],
+              ),
             ),
           ),
-        ),
-        _buildButtons()
-      ],
+          _buildButtons()
+        ],
+      ),
     );
   }
 
@@ -144,7 +150,7 @@ class _FuncTabState extends State<FuncTab> {
           RaisedButton(
             child: Text(_localizedStrings[_read]),
             onPressed: () {
-//              onRead();
+              _bloc.funcSettingsCommandStream.add(FuncSettingsCommand.READ);
             },
           ),
           Expanded(
@@ -152,14 +158,21 @@ class _FuncTabState extends State<FuncTab> {
           ),
           RaisedButton(
             onPressed: () {
-//              onWrite();
+              if (!_formKey.currentState.validate()) {
+                Scaffold.of(context).showSnackBar(
+                    SnackBar(content: Text(_localizedStrings[CommonSettingsTabState.WRITING_NOT_ALLOWED])));
+                return;
+              } else {
+                _formKey.currentState.save();
+                _bloc.funcSettingsCommandStream.add(FuncSettingsCommand.WRITE);
+              }
             },
             child: Text(_localizedStrings[_write]),
           ),
           Expanded(child: Container()),
           RaisedButton(
             onPressed: () {
-//              onSave();
+              _bloc.funcSettingsCommandStream.add(FuncSettingsCommand.SAVE);
             },
             child: Text(_localizedStrings[_save]),
           ),
@@ -176,16 +189,14 @@ class _FuncTabState extends State<FuncTab> {
     final s1MaxFieldWeakingCurrent = "s1MaxFieldWeakingCurrent";
 
     return TitledCard(
-        title: _PROFILE_1,
+        title: getString(_PROFILE_1),
         child: Column(
           children: [
             _buildRow(_parameterNames[s1MaxTorqueCurrent], settings.s1MaxTorqueCurrent.toString(), s1MaxTorqueCurrent),
             _buildRow(_parameterNames[s1MaxBrakeCurrent], settings.s1MaxBrakeCurrent.toString(), s1MaxBrakeCurrent),
             _buildRow(_parameterNames[s1MaxSpeed], settings.s1MaxSpeed.toString(), s1MaxSpeed),
-            _buildRow(
-                _parameterNames[s1MaxBatteryCurrent], settings.s1MaxBatteryCurrent.toString(), s1MaxBatteryCurrent),
-            _buildRow(_parameterNames[s1MaxFieldWeakingCurrent], settings.s1MaxFieldWeakingCurrent.toString(),
-                s1MaxFieldWeakingCurrent),
+            _buildRow(_parameterNames[s1MaxBatteryCurrent], settings.s1MaxBatteryCurrent.toString(), s1MaxBatteryCurrent),
+            _buildRow(_parameterNames[s1MaxFieldWeakingCurrent], settings.s1MaxFieldWeakingCurrent.toString(),s1MaxFieldWeakingCurrent),
             Container(
               height: 8,
             )
@@ -194,23 +205,21 @@ class _FuncTabState extends State<FuncTab> {
   }
 
   Widget _buildS2ProfileOptions(BuildContext context, FuncSettings settings) {
-    final s2MaxTorqueCurrent = "s1MaxTorqueCurrent";
-    final s2MaxBrakeCurrent = "s1MaxBrakeCurrent";
-    final s2MaxSpeed = "s1MaxSpeed";
-    final s2MaxBatteryCurrent = "s1MaxBatteryCurrent";
-    final s2MaxFieldWeakingCurrent = "s1MaxFieldWeakingCurrent";
+    final s2MaxTorqueCurrent = "s2MaxTorqueCurrent";
+    final s2MaxBrakeCurrent = "s2MaxBrakeCurrent";
+    final s2MaxSpeed = "s2MaxSpeed";
+    final s2MaxBatteryCurrent = "s2MaxBatteryCurrent";
+    final s2MaxFieldWeakingCurrent = "s2MaxFieldWeakingCurrent";
 
     return TitledCard(
-        title: _PROFILE_2,
+        title: getString(_PROFILE_2),
         child: Column(
           children: [
             _buildRow(_parameterNames[s2MaxTorqueCurrent], settings.s2MaxTorqueCurrent.toString(), s2MaxTorqueCurrent),
             _buildRow(_parameterNames[s2MaxBrakeCurrent], settings.s2MaxBrakeCurrent.toString(), s2MaxBrakeCurrent),
             _buildRow(_parameterNames[s2MaxSpeed], settings.s2MaxSpeed.toString(), s2MaxSpeed),
-            _buildRow(
-                _parameterNames[s2MaxBatteryCurrent], settings.s2MaxBatteryCurrent.toString(), s2MaxBatteryCurrent),
-            _buildRow(_parameterNames[s2MaxFieldWeakingCurrent], settings.s2MaxFieldWeakingCurrent.toString(),
-                s2MaxFieldWeakingCurrent),
+            _buildRow(_parameterNames[s2MaxBatteryCurrent], settings.s2MaxBatteryCurrent.toString(), s2MaxBatteryCurrent),
+            _buildRow(_parameterNames[s2MaxFieldWeakingCurrent], settings.s2MaxFieldWeakingCurrent.toString(), s2MaxFieldWeakingCurrent),
             Container(
               height: 8,
             )
@@ -263,7 +272,7 @@ class _FuncTabState extends State<FuncTab> {
     return TextFormField(
         validator: validator,
         onSaved: (value) {
-//        _driveTabBloc.driveSettingsDataStream.add(Parameter(variableName, value));
+          _bloc.funcSettingsDataStream.add(Parameter(variableName, value));
         },
         controller: TextEditingController()..text = value,
         keyboardType: TextInputType.number,
@@ -283,26 +292,26 @@ class _FuncTabState extends State<FuncTab> {
   }
 
   Widget _buildInOptions(BuildContext context, FuncSettings settings) => TitledCard(
-        title: _ACTIVE_FUNCTIONS,
+        title: getString(_ACTIVE_FUNCTIONS),
         elevation: 0.4,
         child: Column(
           children: [
             _buildSingleInOption(context, "in1", settings.in1, "invertIn1", settings.invertIn1),
-          Divider(
-            height: 1,
-          ),
+            Divider(
+              height: 1,
+            ),
             _buildSingleInOption(context, "in2", settings.in2, "invertIn2", settings.invertIn2),
-          Divider(
-            height: 1,
-          ),
+            Divider(
+              height: 1,
+            ),
             _buildSingleInOption(context, "in3", settings.in3, "invertIn3", settings.invertIn3),
-          Divider(
-            height: 1,
-          ),
+            Divider(
+              height: 1,
+            ),
             _buildSingleInOption(context, "in4", settings.in4, "invertIn4", settings.invertIn4),
-          Divider(
-            height: 1,
-          ),
+            Divider(
+              height: 1,
+            ),
           ],
         ),
       );
@@ -319,11 +328,13 @@ class _FuncTabState extends State<FuncTab> {
     final checkBoxTitle = _parameterNames[_INVERT];
 
     final onCheckBoxChanged = (isChecked) => _onInvertChecked(checkBoxVariableName, isChecked.toString());
-    final onDropDownSelect =
-        (newDropDownValue) => _onDropDownChecked(dropDownVariableName, newDropDownValue.toString());
+    final onDropDownSelect = (newDropDownValue)  {
+      FocusScope.of(context).requestFocus(FocusNode());
+      _onDropDownChecked(dropDownVariableName, newDropDownValue.toString());
+    };
 
     final options = InputFunctions.values.map((inputFunction) => getString(inputFunction)).toList();
-    final dropDown = _buildDropDownMenu(context, dropDownTitle, options, onDropDownSelect, dropDownTitle);
+    final dropDown = _buildDropDownMenu(context, options, onDropDownSelect, dropDownTitle);
 
     return Row(
       children: [
@@ -344,8 +355,7 @@ class _FuncTabState extends State<FuncTab> {
     );
   }
 
-  Widget _buildDropDownMenu(
-      BuildContext context, String title, List<String> options, Function(String) onSelect, String initial) {
+  Widget _buildDropDownMenu(BuildContext context, List<String> options, Function(String) onSelect, String initial) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: PopupMenuButton<String>(
@@ -375,21 +385,22 @@ class _FuncTabState extends State<FuncTab> {
     );
   }
 
-  Widget _buildCanOption(
-      BuildContext context, String optionTitle, String dropDownTitle, Function(String) onDropDownSelect, bool useCan) {
-    final options = [getString("yes"), getString("no")];
-    final dropDown =
-        _buildDropDownMenu(context, dropDownTitle, options, onDropDownSelect, useCan ? options[0] : options[1]);
+  Widget _buildCanOption(BuildContext context, bool useCan) {
+    final onCheckBoxChanged = (isChecked) => _onInvertChecked("useCan", isChecked.toString());
+    final optionTitle = _parameterNames["useCan"];
     return TitledCard(
-      title: _CAN_CONTROL,
+      title: getString(_CAN_CONTROL),
       child: Row(
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(optionTitle),
           ),
-          Flexible(child: dropDown),
           Expanded(child: Container()),
+          Checkbox(
+            value: useCan,
+            onChanged: onCheckBoxChanged,
+          ),
         ],
       ),
     );

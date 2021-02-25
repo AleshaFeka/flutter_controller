@@ -5,10 +5,11 @@
     "2": "Батарея",
     "3": "Аналог",
     "4": "Езда",
-    "5": "Регенерация",
-    "6": "Безсенсорный",
-    "7": "Идентификация",
-    "8": "Логи"
+    "5": "Функции",
+    "6": "Регенерация",
+    "7": "Безсенсорный",
+    "8": "Идентификация",
+    "9": "Логи"
   },
   "monitorSettingsParameters": {
     "1": "Напряжение батареи",
@@ -159,10 +160,15 @@
   "InputFunctions.TRQ_SPD": "Момент/скорость",
   "InputFunctions.REV_FWD": "Вперед/назад",
   "InputFunctions.CRUIZE": "Круиз контроль",
-  "InputFunctions.S1": "Профиль S1",
-  "InputFunctions.S2": "Профиль S2",
+  "InputFunctions.S1": "Профиль 1",
+  "InputFunctions.S2": "Профиль 2",
   "InputFunctions.FALL": "Ошибка (???)",
   "InputFunctions.STOP": "Стоп",
+
+  "activeFunctions": "Активные функции (???)",
+  "canBusControl": "Управление по CAN",
+  "profile1": "Профиль 1",
+  "profile2": "Профиль 2",
 
   "yes": "Да",
   "no": "Нет",

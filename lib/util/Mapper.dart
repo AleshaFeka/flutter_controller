@@ -3,11 +3,13 @@ import 'dart:typed_data';
 import 'package:flutter_controller/bloc/AnalogTabBloc.dart';
 import 'package:flutter_controller/bloc/BatteryTabBloc.dart';
 import 'package:flutter_controller/bloc/DriveTabBloc.dart';
+import 'package:flutter_controller/bloc/FuncTabBloc.dart';
 import 'package:flutter_controller/bloc/MotorTabBloc.dart';
 import 'package:flutter_controller/core/Packet.dart';
 import 'package:flutter_controller/model/AnalogSettings.dart';
 import 'package:flutter_controller/model/BatterySettings.dart';
 import 'package:flutter_controller/model/DriveSettings.dart';
+import 'package:flutter_controller/model/FuncSettings.dart';
 import 'package:flutter_controller/model/MotorSettings.dart';
 
 class Mapper {
@@ -17,29 +19,102 @@ class Mapper {
   static String mapPwmFrequency(String input) {
     String value;
     switch (input) {
-      case "8000" :
+      case "8000":
         value = "0";
         break;
-      case "10000" :
+      case "10000":
         value = "1";
         break;
-      case "12000" :
+      case "12000":
         value = "2";
         break;
-      case "15000" :
+      case "15000":
         value = "3";
         break;
-      case "18000" :
+      case "18000":
         value = "4";
         break;
-      case "20000" :
+      case "20000":
         value = "5";
         break;
-      case "22000" :
+      case "22000":
         value = "6";
         break;
     }
     return value;
+  }
+
+  static Packet funcSettingsToPacket(FuncSettings settings) {
+    int command = 1;
+
+    Uint8List data = Uint8List(PACKET_LENGTH);
+    ByteData dataBuffer = data.buffer.asByteData();
+
+    int inWord = settings.in1;
+    inWord |= (settings.in2 * 16);
+    inWord |= (settings.in3 * 256);
+    inWord |= (settings.in4 * 4096);
+
+    int inInversionWord = (settings.invertIn1 ? 1 : 0) << 0;
+    inInversionWord |= (settings.invertIn2 ? 1 : 0) << 1;
+    inInversionWord |= (settings.invertIn3 ? 1 : 0) << 2;
+    inInversionWord |= (settings.invertIn4 ? 1 : 0) << 3;
+
+//    inInversionWord *= 1000;
+
+    dataBuffer.setUint16(0, inWord, Endian.little);
+    dataBuffer.setUint16(2, inInversionWord, Endian.little);
+
+    dataBuffer.setUint16(4, settings.s1MaxTorqueCurrent, Endian.little);
+    dataBuffer.setUint16(6, settings.s1MaxBrakeCurrent.toInt(), Endian.little);
+    dataBuffer.setUint16(8, settings.s1MaxSpeed.toInt(), Endian.little);
+    dataBuffer.setUint16(10, settings.s1MaxBatteryCurrent.toInt(), Endian.little);
+    dataBuffer.setUint16(12, settings.s1MaxFieldWeakingCurrent.toInt(), Endian.little);
+
+    dataBuffer.setUint16(14, settings.s2MaxTorqueCurrent, Endian.little);
+    dataBuffer.setUint16(16, settings.s2MaxBrakeCurrent.toInt(), Endian.little);
+    dataBuffer.setUint16(18, settings.s2MaxSpeed.toInt(), Endian.little);
+    dataBuffer.setUint16(20, settings.s2MaxBatteryCurrent.toInt(), Endian.little);
+    dataBuffer.setUint16(22, settings.s2MaxFieldWeakingCurrent.toInt(), Endian.little);
+
+    dataBuffer.setUint16(26, settings.useCan ? 1 : 0, Endian.little);
+
+    return Packet(FuncTabBloc.SCREEN_NUMBER, command, data);
+  }
+
+  static FuncSettings packetToFuncSettings(Packet packet) {
+    if (packet.cmd == 31) return null;  // todo remove division after firmware update.
+
+    FuncSettings result = FuncSettings.zero();
+    ByteBuffer buffer = packet.toBytes.sublist(SCREEN_NUM_AND_COMMAND_NUM_OFFSET).buffer;
+
+    int inWord = ByteData.view(buffer).getUint16(0, Endian.little);
+    result.in1 = (inWord>>0) & 0xf;
+    result.in2 = (inWord>>4) & 0xf;
+    result.in3 = (inWord>>8) & 0xf;
+    result.in4 = (inWord>>12) & 0xf;
+
+    int inInversionWord = ByteData.view(buffer).getUint16(2, Endian.little) ~/ 1000; // todo remove division after firmware update.
+    result.invertIn1 = ((inInversionWord>>0) & 0x1 == 1);
+    result.invertIn2 = ((inInversionWord>>1) & 0x1 == 1);
+    result.invertIn3 = ((inInversionWord>>2) & 0x1 == 1);
+    result.invertIn4 = ((inInversionWord>>3) & 0x1 == 1);
+
+
+    result.s1MaxTorqueCurrent = ByteData.view(buffer).getInt16(4, Endian.little);
+    result.s1MaxBrakeCurrent = ByteData.view(buffer).getInt16(6, Endian.little);
+    result.s1MaxSpeed = ByteData.view(buffer).getInt16(8, Endian.little);
+    result.s1MaxBatteryCurrent = ByteData.view(buffer).getInt16(10, Endian.little);
+    result.s1MaxFieldWeakingCurrent = ByteData.view(buffer).getInt16(12, Endian.little);
+
+    result.s2MaxTorqueCurrent = ByteData.view(buffer).getInt16(14, Endian.little);
+    result.s2MaxBrakeCurrent = ByteData.view(buffer).getInt16(16, Endian.little);
+    result.s2MaxSpeed = ByteData.view(buffer).getInt16(18, Endian.little);
+    result.s2MaxBatteryCurrent = ByteData.view(buffer).getInt16(20, Endian.little);
+    result.s2MaxFieldWeakingCurrent = ByteData.view(buffer).getInt16(22, Endian.little);
+
+    result.useCan = ByteData.view(buffer).getInt16(26, Endian.little) == 1;
+    return result;
   }
 
   static Packet motorSettingsToPacket(MotorSettings settings) {
@@ -58,10 +133,9 @@ class Mapper {
     dataBuffer.setUint16(12, settings.motorPositionSensorType, Endian.little);
     dataBuffer.setUint16(14, (settings.motorStatorResistance).toInt(), Endian.little);
     dataBuffer.setUint16(16, (settings.motorInductance).toInt(), Endian.little);
-    dataBuffer.setUint16(18, ( settings.motorFlux * 100000.0 ).toInt(), Endian.little);
-    dataBuffer.setUint16(20, ( settings.phaseCorrection * 1000.0 ).toInt(), Endian.little);
+    dataBuffer.setUint16(18, (settings.motorFlux * 100000.0).toInt(), Endian.little);
+    dataBuffer.setUint16(20, (settings.phaseCorrection * 1000.0).toInt(), Endian.little);
     dataBuffer.setUint16(22, settings.wheelDiameter, Endian.little);
-
 
     return Packet(MotorTabBloc.SCREEN_NUMBER, command, data);
   }
@@ -98,7 +172,6 @@ class Mapper {
     dataBuffer.setUint16(6, settings.regenCurrent, Endian.little);
     dataBuffer.setUint16(8, settings.maxPower, Endian.little);
     dataBuffer.setUint16(10, settings.powerReductionVoltage, Endian.little);
-
 
     return Packet(BatteryTabBloc.SCREEN_NUMBER, command, data);
   }
@@ -153,10 +226,8 @@ class Mapper {
     result.brakeCurveCoefficient2 = ByteData.view(buffer).getInt16(16, Endian.little) ~/ 2048.0;
     result.brakeCurveCoefficient3 = ByteData.view(buffer).getInt16(18, Endian.little) ~/ 2048.0;
 
-
     return result;
   }
-
 
   static Packet driveSettingsToPacket(DriveSettings settings) {
     int command = 1;
@@ -181,7 +252,6 @@ class Mapper {
     dataBuffer.setUint16(22, settings.pwmFrequency, Endian.little);
     dataBuffer.setUint16(24, settings.processorIdHigh, Endian.little);
     dataBuffer.setUint16(26, settings.processorIdLow, Endian.little);
-
 
     return Packet(DriveTabBloc.SCREEN_NUMBER, command, data);
   }

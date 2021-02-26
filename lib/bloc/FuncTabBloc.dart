@@ -55,8 +55,10 @@ class FuncTabBloc {
 
   void _packetHandler(Packet packet) {
     print('FuncTabBloc   _packetHandler');
-    _settings = Mapper.packetToFuncSettings(packet) ?? _settings;
-    _funcSettingsRefresh();
+    if (packet.screenNum == SCREEN_NUMBER) {
+      _settings = Mapper.packetToFuncSettings(packet) ?? _settings;
+      _funcSettingsRefresh();
+    }
   }
 
   void _funcSettingsRead() {

@@ -16,6 +16,8 @@ class Mapper {
   static const PACKET_LENGTH = 28;
   static const SCREEN_NUM_AND_COMMAND_NUM_OFFSET = 2;
 
+  static const _COMMAND_SCREEN_NUMBER = 127;
+
   static String mapPwmFrequency(String input) {
     String value;
     switch (input) {
@@ -42,6 +44,21 @@ class Mapper {
         break;
     }
     return value;
+  }
+
+  static buildSavePacket() {
+    Uint8List data = Uint8List(PACKET_LENGTH);
+    ByteData dataBuffer = data.buffer.asByteData();
+    int command = 1;
+
+    final saveWord = "SAVE";
+
+    dataBuffer.setInt16(0, saveWord.codeUnitAt(0), Endian.little);
+    dataBuffer.setInt16(2, saveWord.codeUnitAt(1), Endian.little);
+    dataBuffer.setInt16(4, saveWord.codeUnitAt(2), Endian.little);
+    dataBuffer.setInt16(6, saveWord.codeUnitAt(3), Endian.little);
+
+    return Packet(_COMMAND_SCREEN_NUMBER, command, data);
   }
 
   static Packet funcSettingsToPacket(FuncSettings settings) {

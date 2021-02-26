@@ -18,7 +18,7 @@ class _MainPage extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return ConnectPage();
-//    return debugScreen(FuncTab());
+//    return debugScreen(TabsPage());
   }
 
   Widget debugScreen(Widget child) {

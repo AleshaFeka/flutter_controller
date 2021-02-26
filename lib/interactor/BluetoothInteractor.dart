@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:flutter_controller/core/Packet.dart';
+import 'package:flutter_controller/util/Mapper.dart';
 
 class BluetoothInteractor {
   FlutterBluetoothSerial instance = FlutterBluetoothSerial.instance;
@@ -34,7 +35,7 @@ class BluetoothInteractor {
   }
 
   void save() {
-    print("BluetoothInteractor - SAVE");
+    sendMessage(Mapper.buildSavePacket());
   }
 
   Future<bool> connect(String address) async {

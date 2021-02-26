@@ -80,6 +80,11 @@ class _TabsPage extends State<TabsPage> {
               title: Text(tabName),
               actions: <Widget>[
                 IconButton(
+                  icon: Icon(Icons.close),
+                  onPressed: _handleCloseClick,
+                ),
+                Container(width: 24,),
+                IconButton(
                   icon: Icon(Icons.info_outline),
                   onPressed: _handleAboutClick,
                 ),
@@ -148,15 +153,14 @@ class _TabsPage extends State<TabsPage> {
 
   void _handleTabSelectClick(int choice) {
     _tabsPageBloc.tabsCommandStream.add(choice);
-    // Causes the app to rebuild with the new _selectedChoice.
-/*
-    setState(() {
-      _selectedChoice = choice;
-    });
-*/
   }
 
   void _handleAboutClick() {
     showAbout(context);
+  }
+
+  void _handleCloseClick() async {
+    await _tabsPageBloc.tabsCommandStream.add(-1);
+    Navigator.of(context).pop();
   }
 }

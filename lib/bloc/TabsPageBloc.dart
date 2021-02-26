@@ -22,7 +22,11 @@ class TabsPageBloc {
       });
   }
 
-  void _handleCommand(int tabIndex) {
+  void _handleCommand(int tabIndex) async {
+    if (tabIndex < 0) {
+      await _interactor.connection?.close();
+      return;
+    }
     _tabsStreamController.sink.add(tabIndex);
   }
 

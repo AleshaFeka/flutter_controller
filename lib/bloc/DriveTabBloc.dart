@@ -70,14 +70,6 @@ class DriveTabBloc {
         print("motorParameter.value = ${motorParameter.value}");
         final index = motorParameter.value.trim().indexOf(".PWM") + ".PWM".length;
         final frequency = motorParameter.value.trim().substring(index);
-
-/*
-        var sensorType = DrivePwmFrequency
-          .values
-          .firstWhere((element) => element.toString() == motorParameter.value);
-        _driveSettings.pwmFrequency = DrivePwmFrequency.values.indexOf(sensorType);
-*/
-
         _driveSettings.pwmFrequency = int.parse(frequency);
         break;
       case "controlMode":
@@ -85,8 +77,6 @@ class DriveTabBloc {
           .values
           .firstWhere((element) => element.toString() == motorParameter.value);
         _driveSettings.controlMode = DriveControlMode.values.indexOf(sensorType);
-
-//        _driveSettings.controlMode = int.parse(motorParameter.value);
         break;
 
       case "processorIdHigh":
@@ -134,11 +124,9 @@ class DriveTabBloc {
   }
 
   void _packetHandler(Packet packet) {
-    print('DriveTabBloc   _packetHandler');
-    print(packet.toBytes);
+    if (packet.screenNum == SCREEN_NUMBER) {
       _driveSettings = Mapper.packetToDriveSettings(packet);
       _driveSettingsRefresh();
-    if (packet.screenNum == SCREEN_NUMBER) {
     }
   }
 

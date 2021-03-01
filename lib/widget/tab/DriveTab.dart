@@ -112,9 +112,6 @@ class _DriveTabState extends CommonSettingsTabState<DriveTab, DriveSettings> {
         break;
     }
 
-    print("options = ${options}");
-    print("value = ${value}");
-
     String title;
     try {
       title = localizedStrings[options[int.parse(value)]];

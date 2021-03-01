@@ -40,7 +40,7 @@ class _TabsPage extends State<TabsPage> {
   Map<int, String> tabNames;
   Map<String, dynamic> _localizedStrings;
 
-  int _selectedChoice = 0; // Selected tab
+  List<Widget> _tabs = [ MonitorTab(), MotorTab(), BatteryTab(), AnalogTab(), DriveTab(), FuncTab()/*, RegsTab(), SensorLessTab(), IdentTab(), LogsTab()*/ ];
 
   @override
   void didChangeDependencies() {
@@ -120,7 +120,6 @@ class _TabsPage extends State<TabsPage> {
 
   Widget _buildTab(int tabIndex) {
     //todo replace later...
-    List<Widget> _tabs = [ MonitorTab(), MotorTab(), BatteryTab(), AnalogTab(), DriveTab(), FuncTab()/*, RegsTab(), SensorLessTab(), IdentTab(), LogsTab()*/ ];
 
     if (tabIndex > (_tabs.length - 1)) return _tabs[0];//todo change when new tabs will added, remove at the end))
     return _tabs[tabIndex];

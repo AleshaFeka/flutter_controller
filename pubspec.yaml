@@ -29,7 +29,7 @@ dependencies:
 #  settings_ui: ^0.3.0
   flutter_settings_screens: ^0.2.0+1
   package_info: ^0.4.0+16
-  url_launcher: ^4.2.0+3
+  url_launcher: 5.7.10
   rxdart: ^0.24.1
 
   # The following adds the Cupertino Icons font to your application.

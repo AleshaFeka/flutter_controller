@@ -30,6 +30,8 @@ jobs:
           name: release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
 
+      - run mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/app-release.1apk1
+
       - name: Send mail
         uses: dawidd6/action-send-mail@v2
         with:
@@ -47,4 +49,4 @@ jobs:
           # Optional converting Markdown to HTML (set content_type to text/html too):
           convert_markdown: true
           # Optional attachments:
-          attachments: build/app/outputs/flutter-apk/app-release.apk
+          attachments: build/app/outputs/flutter-apk/app-release.1apk1

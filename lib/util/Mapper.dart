@@ -5,12 +5,14 @@ import 'package:flutter_controller/bloc/BatteryTabBloc.dart';
 import 'package:flutter_controller/bloc/DriveTabBloc.dart';
 import 'package:flutter_controller/bloc/FuncTabBloc.dart';
 import 'package:flutter_controller/bloc/MotorTabBloc.dart';
+import 'package:flutter_controller/bloc/RegTabBloc.dart';
 import 'package:flutter_controller/core/Packet.dart';
 import 'package:flutter_controller/model/AnalogSettings.dart';
 import 'package:flutter_controller/model/BatterySettings.dart';
 import 'package:flutter_controller/model/DriveSettings.dart';
 import 'package:flutter_controller/model/FuncSettings.dart';
 import 'package:flutter_controller/model/MotorSettings.dart';
+import 'package:flutter_controller/model/RegSettings.dart';
 
 class Mapper {
   static const PACKET_LENGTH = 28;
@@ -76,8 +78,6 @@ class Mapper {
     inInversionWord |= (settings.invertIn2 ? 1 : 0) << 1;
     inInversionWord |= (settings.invertIn3 ? 1 : 0) << 2;
     inInversionWord |= (settings.invertIn4 ? 1 : 0) << 3;
-
-//    inInversionWord *= 1000;
 
     dataBuffer.setUint16(0, inWord, Endian.little);
     dataBuffer.setUint16(2, inInversionWord, Endian.little);
@@ -296,5 +296,51 @@ class Mapper {
     result.processorIdLow = ByteData.view(buffer).getUint16(26, Endian.little);
 
     return result;
+  }
+
+  static RegSettings packetToRegSettings(Packet packet) {
+    if (packet.cmd == 31) return null;  // todo remove division after firmware update.
+
+    RegSettings result = RegSettings.zero();
+    ByteBuffer buffer = packet.toBytes.sublist(SCREEN_NUM_AND_COMMAND_NUM_OFFSET).buffer;
+
+    result.currentBandwidth = ByteData.view(buffer).getUint16(0, Endian.little);
+
+    result.speedKp = ByteData.view(buffer).getUint16(2, Endian.little) ~/ 10000;
+    result.speedKi = ByteData.view(buffer).getUint16(4, Endian.little) ~/ 10000;
+
+    result.fieldWeakingKp = ByteData.view(buffer).getUint16(6, Endian.little) ~/ 10000;
+    result.fieldWeakingKi = ByteData.view(buffer).getUint16(8, Endian.little) ~/ 10000;
+
+    result.batteryCurrentKp = ByteData.view(buffer).getUint16(10, Endian.little) ~/ 10000;
+    result.batteryCurrentKi = ByteData.view(buffer).getUint16(12, Endian.little) ~/ 10000;
+
+    result.powerUpSpeed = ByteData.view(buffer).getUint16(14, Endian.little);
+    result.motorCurrentLimitRange = ByteData.view(buffer).getUint16(16, Endian.little);
+
+    return result;
+  }
+
+  static Packet regSettingsToPacket(RegSettings settings) {
+    int command = 1;
+
+    Uint8List data = Uint8List(PACKET_LENGTH);
+    ByteData dataBuffer = data.buffer.asByteData();
+
+    dataBuffer.setUint16(0, settings.currentBandwidth, Endian.little);
+
+    dataBuffer.setUint16(2, settings.speedKp * 10000, Endian.little);
+    dataBuffer.setUint16(4, settings.speedKi * 10000, Endian.little);
+
+    dataBuffer.setUint16(6, settings.fieldWeakingKp * 10000, Endian.little);
+    dataBuffer.setUint16(8, settings.fieldWeakingKi * 10000, Endian.little);
+
+    dataBuffer.setUint16(10, settings.batteryCurrentKp * 10000, Endian.little);
+    dataBuffer.setUint16(12, settings.batteryCurrentKi * 10000, Endian.little);
+
+    dataBuffer.setUint16(14, settings.powerUpSpeed, Endian.little);
+    dataBuffer.setUint16(16, settings.motorCurrentLimitRange, Endian.little);
+
+    return Packet(RegTabBloc.SCREEN_NUMBER, command, data);
   }
 }

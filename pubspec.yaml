@@ -49,6 +49,7 @@ flutter:
   assets:
     - assets/strings/ru.json
     - assets/images/logo.png
+    - assets/images/scale.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

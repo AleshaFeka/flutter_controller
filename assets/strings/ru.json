@@ -110,6 +110,19 @@
     "powerUpSpeed": "Скорость нарастания мощности",
     "motorCurrentLimitRange": "Диапазон границы тока двигателя"
   },
+  "systemSettingsParameterNames": {
+    "hall1": "Холл 1",
+    "hall2": "Холл 2",
+    "hall3": "Холл 3",
+    "hall4": "Холл 4",
+    "hall5": "Холл 5",
+    "hall6": "Холл 6",
+    "motorResistance": "Сопротивление мотора",
+    "motorInduction": "Индуктивность мотора",
+    "motorMagnetStream": "Магнитный поток мотора",
+    "identificationMode": "Режим идентификации",
+    "identificationCurrent": "Ток режима идентификации"
+  },
 
   "bluetoothUnavailable": "Блютуз недоступен.",
   "workImpossible": "Продолжение работы невозможно.",

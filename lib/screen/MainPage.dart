@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_controller/di/Provider.dart';
 import 'package:flutter_controller/screen/ConnectPage.dart';
 import 'package:flutter_controller/screen/TabsPage.dart';
+import 'package:flutter_controller/widget/Voltmeter.dart';
 import 'package:flutter_controller/widget/tab/AnalogTab.dart';
 import 'package:flutter_controller/widget/tab/BatteryTab.dart';
 import 'package:flutter_controller/widget/tab/DriveTab.dart';
@@ -18,7 +19,7 @@ class _MainPage extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return ConnectPage();
-//    return debugScreen(TabsPage());
+//    return debugScreen(AnalogTab());
   }
 
   Widget debugScreen(Widget child) {

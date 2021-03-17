@@ -3,6 +3,7 @@ import 'package:flutter_controller/bloc/AnalogTabBloc.dart';
 import 'package:flutter_controller/di/Provider.dart';
 import 'package:flutter_controller/model/AnalogSettings.dart';
 import 'package:flutter_controller/model/Parameter.dart';
+import 'package:flutter_controller/widget/Voltmeter.dart';
 import 'package:flutter_controller/widget/tab/CommonSettingsTab.dart';
 
 class AnalogTab extends StatefulWidget {
@@ -53,7 +54,7 @@ class _AnalogTabState extends CommonSettingsTabState<AnalogTab, AnalogSettings> 
   }
 
   @override
-  Map getParameterNames() => _parameterNames;
+  Map getParameterNames() => Map()..putIfAbsent("voltmeter", () => "Voltmeter")..addAll(_parameterNames);
 
   @override
   Map getParameterValues(AsyncSnapshot<AnalogSettings> snapshot) {
@@ -69,6 +70,10 @@ class _AnalogTabState extends CommonSettingsTabState<AnalogTab, AnalogSettings> 
 
   @override
   Widget buildRow(String parameterName, String value, String variableName) {
+    if (variableName == "voltmeter") {
+      return _buildVoltmeter();
+    }
+
     String Function(String) validator = (String value) {
       String validationResult = validateNotNullOrEmpty(value, variableName);
 
@@ -108,6 +113,41 @@ class _AnalogTabState extends CommonSettingsTabState<AnalogTab, AnalogSettings> 
           width: 4,
         )
       ],
+    );
+  }
+
+
+  @override
+  void dispose() {
+    super.dispose();
+    _analogTabBloc.batterySettingsCommandStream.add(AnalogSettingsCommand.STOP_MONITORING);
+  }
+
+  StreamBuilder<int> _buildVoltmeter() {
+    return StreamBuilder<int>(
+      stream: _analogTabBloc.throttleValueStream,
+      builder: (context, snapshot) {
+        Voltmeter voltmeter;
+        if (snapshot.hasData) {
+          voltmeter = Voltmeter(milliVolts: snapshot.data,);
+        } else {
+          voltmeter =  Voltmeter(milliVolts: 0,);
+        }
+        return FittedBox(
+          child: Row(
+            children: [
+              voltmeter,
+              SizedBox(
+                height: 200,
+                width: 200,
+                child: Center(child: Text(
+                  voltmeter.volts,
+                  style: TextStyle(fontSize: 48),
+                )))
+            ],
+          ),
+        );
+      }
     );
   }
 

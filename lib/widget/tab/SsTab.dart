@@ -17,12 +17,16 @@ class SsTabState extends State<SsTab> {
   final _hallValuesKey = GlobalKey<FormState>();
 
   FormFieldValidator<String> _currentValidator = (value) {
-    return int.tryParse(value) == null ? "" : null;
+    var result;
+    final number = int.tryParse(value);
+    if (number == null || number < 1) {
+      result = "";
+    }
+    return result;
   };
 
   FormFieldValidator<String> _hallValidator = (value) {
     var result;
-
     final values = value.split(";");
     if (values.length != 6) {
       result = "";

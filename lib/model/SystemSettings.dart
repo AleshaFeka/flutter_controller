@@ -1,3 +1,5 @@
+import 'dart:math';
+
 class SystemSettings {
   int hall1 = 0;
   int hall2 = 0;
@@ -12,6 +14,22 @@ class SystemSettings {
   int identificationCurrent = 0;
 
   SystemSettings.zero();
+
+  SystemSettings.random() {
+    final r = Random();
+    final max = 9;
+    hall1 = r.nextInt(max);
+    hall2 = r.nextInt(max);
+    hall3 = r.nextInt(max);
+    hall4 = r.nextInt(max);
+    hall5 = r.nextInt(max);
+    hall6 = r.nextInt(max);
+    motorResistance = r.nextDouble() * max;
+    motorInduction = r.nextDouble() * max;
+    motorMagnetStream = r.nextDouble() * max;
+    identificationMode = r.nextInt(max);
+    identificationCurrent = r.nextInt(max);
+  }
 
   Map<String, dynamic> toJson() =>
     {

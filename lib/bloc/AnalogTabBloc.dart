@@ -19,7 +19,7 @@ class AnalogTabBloc {
   Stream get analogViewModelStream => _analogViewModelStreamController.stream;
 
   StreamController<AnalogSettingsCommand> _analogSettingsCommandStreamController =  StreamController<AnalogSettingsCommand>.broadcast();
-  StreamSink<AnalogSettingsCommand> get batterySettingsCommandStream => _analogSettingsCommandStreamController.sink;
+  StreamSink<AnalogSettingsCommand> get analogSettingsCommandStream => _analogSettingsCommandStreamController.sink;
 
   StreamController<Parameter> _analogSettingsDataStreamController = StreamController<Parameter>.broadcast(sync: true);
   StreamSink<Parameter> get analogSettingsDataStream => _analogSettingsDataStreamController.sink;
@@ -87,7 +87,6 @@ class AnalogTabBloc {
   }
 
   void _handleSettingsData(Parameter analogParameter) {
-    print(analogParameter.name + " = " + analogParameter.value);
     switch (analogParameter.name) {
       case "throttleMin":
         _analogSettings.throttleMin = double.parse(analogParameter.value);

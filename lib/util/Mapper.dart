@@ -6,6 +6,7 @@ import 'package:flutter_controller/bloc/DriveTabBloc.dart';
 import 'package:flutter_controller/bloc/FuncTabBloc.dart';
 import 'package:flutter_controller/bloc/MotorTabBloc.dart';
 import 'package:flutter_controller/bloc/RegTabBloc.dart';
+import 'package:flutter_controller/bloc/SystemSettingsTabBloc.dart';
 import 'package:flutter_controller/core/Packet.dart';
 import 'package:flutter_controller/model/AnalogSettings.dart';
 import 'package:flutter_controller/model/BatterySettings.dart';
@@ -13,6 +14,7 @@ import 'package:flutter_controller/model/DriveSettings.dart';
 import 'package:flutter_controller/model/FuncSettings.dart';
 import 'package:flutter_controller/model/MotorSettings.dart';
 import 'package:flutter_controller/model/RegSettings.dart';
+import 'package:flutter_controller/model/SystemSettings.dart';
 
 class Mapper {
   static const PACKET_LENGTH = 28;
@@ -342,5 +344,49 @@ class Mapper {
     dataBuffer.setUint16(16, settings.motorCurrentLimitRange, Endian.little);
 
     return Packet(RegTabBloc.SCREEN_NUMBER, command, data);
+  }
+
+  static SystemSettings packetToSystemSettings(Packet packet) {
+    if (packet.cmd == 31) return null;  // todo remove division after firmware update.
+
+    SystemSettings result = SystemSettings.zero();
+    ByteBuffer buffer = packet.toBytes.sublist(SCREEN_NUM_AND_COMMAND_NUM_OFFSET).buffer;
+
+    result.hall1 = ByteData.view(buffer).getUint16(0, Endian.little);
+    result.hall2 = ByteData.view(buffer).getUint16(2, Endian.little);
+    result.hall3 = ByteData.view(buffer).getUint16(4, Endian.little);
+    result.hall4 = ByteData.view(buffer).getUint16(6, Endian.little);
+    result.hall5 = ByteData.view(buffer).getUint16(8, Endian.little);
+    result.hall6 = ByteData.view(buffer).getUint16(10, Endian.little);
+
+    result.motorResistance = ByteData.view(buffer).getUint16(12, Endian.little) / 1000;
+    result.motorInduction = ByteData.view(buffer).getUint16(14, Endian.little) / 1000000;
+    result.motorMagnetStream = ByteData.view(buffer).getUint16(16, Endian.little) / 10000;
+    result.identificationMode = ByteData.view(buffer).getUint16(18, Endian.little);
+    result.identificationCurrent = ByteData.view(buffer).getUint16(20, Endian.little);
+
+    return result;
+  }
+
+  static Packet systemSettingsToPacket(SystemSettings settings) {
+    int command = 1;
+
+    Uint8List data = Uint8List(PACKET_LENGTH);
+    ByteData dataBuffer = data.buffer.asByteData();
+
+    dataBuffer.setUint16(0, settings.identificationMode, Endian.little);
+    dataBuffer.setUint16(2, settings.identificationCurrent, Endian.little);
+
+    dataBuffer.setUint16(4, 0, Endian.little);
+    dataBuffer.setUint16(6, 0, Endian.little);
+
+    dataBuffer.setUint16(8, settings.hall1, Endian.little);
+    dataBuffer.setUint16(10, settings.hall2, Endian.little);
+    dataBuffer.setUint16(12, settings.hall3, Endian.little);
+    dataBuffer.setUint16(14, settings.hall4, Endian.little);
+    dataBuffer.setUint16(16, settings.hall5, Endian.little);
+    dataBuffer.setUint16(18, settings.hall6, Endian.little);
+
+    return Packet(SystemSettingsTabBloc.SCREEN_NUMBER, command, data);
   }
 }

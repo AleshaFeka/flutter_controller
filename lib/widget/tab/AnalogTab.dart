@@ -50,7 +50,7 @@ class _AnalogTabState extends CommonSettingsTabState<AnalogTab, AnalogSettings> 
         return null;
       },
     };
-    _analogTabBloc.batterySettingsCommandStream.add(AnalogSettingsCommand.REFRESH);
+    _analogTabBloc.analogSettingsCommandStream.add(AnalogSettingsCommand.REFRESH);
   }
 
   @override
@@ -120,7 +120,7 @@ class _AnalogTabState extends CommonSettingsTabState<AnalogTab, AnalogSettings> 
   @override
   void dispose() {
     super.dispose();
-    _analogTabBloc.batterySettingsCommandStream.add(AnalogSettingsCommand.STOP_MONITORING);
+    _analogTabBloc.analogSettingsCommandStream.add(AnalogSettingsCommand.STOP_MONITORING);
   }
 
   StreamBuilder<int> _buildVoltmeter() {
@@ -166,12 +166,12 @@ class _AnalogTabState extends CommonSettingsTabState<AnalogTab, AnalogSettings> 
 
   @override
   void onRead() {
-    _analogTabBloc.batterySettingsCommandStream.add(AnalogSettingsCommand.READ);
+    _analogTabBloc.analogSettingsCommandStream.add(AnalogSettingsCommand.READ);
   }
 
   @override
   void onSave() {
-    _analogTabBloc.batterySettingsCommandStream.add(AnalogSettingsCommand.SAVE);
+    _analogTabBloc.analogSettingsCommandStream.add(AnalogSettingsCommand.SAVE);
   }
 
   @override
@@ -181,7 +181,7 @@ class _AnalogTabState extends CommonSettingsTabState<AnalogTab, AnalogSettings> 
       return;
     } else {
       _formKey.currentState.save();
-      _analogTabBloc.batterySettingsCommandStream.add(AnalogSettingsCommand.WRITE);
+      _analogTabBloc.analogSettingsCommandStream.add(AnalogSettingsCommand.WRITE);
     }
   }
 

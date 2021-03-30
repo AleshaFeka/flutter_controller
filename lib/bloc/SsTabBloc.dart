@@ -3,7 +3,6 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter_controller/core/Packet.dart';
-import 'package:flutter_controller/di/Provider.dart';
 import 'package:flutter_controller/interactor/BluetoothInteractor.dart';
 import 'package:flutter_controller/model/Parameter.dart';
 import 'package:flutter_controller/model/SystemSettings.dart';
@@ -15,33 +14,49 @@ enum SsCommand { DISABLE, MEASURE_RS, MEASURE_LS, MEASURE_HALLS, MEASURE_HALLS_W
 class SsTabBloc {
   static const SCREEN_NUMBER = 3;
 
-  StreamController<SsCommand> _commandController = StreamController.broadcast();
-
   BluetoothInteractor _bluetoothInteractor;
-
-  StreamSink<SsCommand> get commandSink => _commandController.sink;
-
-  StreamController<Parameter> _dataController = StreamController.broadcast();
-  StreamSink<Parameter> get dataSink => _dataController.sink;
-
-  StreamController<SystemSettings> _viewModelController = StreamController.broadcast();
-  Stream<SystemSettings> get viewModelStream => _viewModelController.stream;
-
   SystemSettings _settings = SystemSettings.zero();
 
-  StreamController<int> _controllerStateStreamController ;
-  Stream<int> get throttleValueStream => _controllerStateStreamController.stream;
+  StreamController<SsCommand> _commandController;
+  StreamSink<SsCommand> get commandSink => _commandController.sink;
 
+  StreamController<Parameter> _dataController;
+  StreamSink<Parameter> get dataSink => _dataController.sink;
+
+  StreamController<SystemSettings> _viewModelController;
+  Stream<SystemSettings> get viewModelStream => _viewModelController.stream;
+
+
+  StreamController<int> _controllerStateStreamController ;
   StreamSubscription _controllerStateSubscription;
 
   SsTabBloc(this._bluetoothInteractor) {
+/*
     _commandController.stream.listen(_handleCommand);
     _dataController.stream.listen(_handleDataChanged);
+*/
 
+/*
     _controllerStateStreamController = StreamController<int>.broadcast(
       onListen: _startMonitoringControllerState,
       onCancel: _stopMonitoringControllerState
     );
+*/
+  }
+
+  void init() {
+
+    _commandController = StreamController.broadcast();
+    _dataController = StreamController.broadcast();
+    _viewModelController = StreamController.broadcast();
+    _controllerStateStreamController = StreamController<int>.broadcast(
+      onListen: _startMonitoringControllerState,
+      onCancel: _stopMonitoringControllerState
+    );
+
+    _commandController.stream.listen(_handleCommand);
+    _dataController.stream.listen(_handleDataChanged);
+
   }
 
   void _startMonitoringControllerState() {
@@ -61,7 +76,6 @@ class SsTabBloc {
   void _controllerSettingsPacketHandler(Packet packet) {
     if (packet.screenNum == SCREEN_NUMBER) {
       final settings = Mapper.packetToSystemSettings(packet);
-      print("Receiving packet... IdentificationMode = ${settings.identificationMode}");
       _viewModelController.sink.add(settings);
       if (settings.identificationMode == 0) {
         _stopMonitoringControllerState();
@@ -74,7 +88,6 @@ class SsTabBloc {
       case "identificationCurrent" :
         final current = int.tryParse(parameter.value);
         current?.let((amps) {
-          print("amps = $amps");
           _settings.identificationCurrent = amps;
         });
         break;
@@ -151,27 +164,22 @@ class SsTabBloc {
   }
 
   void _measureRs() {
-    print("_measureRs");
     _startMeasureMotorParameter(SsCommand.MEASURE_RS);
   }
 
   void _measureLs() {
-    print("_measureLs");
     _startMeasureMotorParameter(SsCommand.MEASURE_LS);
   }
 
   void _measureFlux() {
-    print("_measureFlux");
     _startMeasureMotorParameter(SsCommand.MEASURE_FLUX);
   }
 
   void _startIdentification() {
-    print("_startIdentification");
     _startMeasureMotorParameter(SsCommand.MEASURE_HALLS);
   }
 
   void _writeHallTable() {
-    print("_writeHallTable");
     _startMeasureMotorParameter(SsCommand.WRITE_HALLS_TABLE);
   }
 

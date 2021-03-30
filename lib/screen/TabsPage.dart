@@ -34,9 +34,8 @@ class _TabsPage extends State<TabsPage> {
     3: Icons.surround_sound,
     4: Icons.motorcycle,
     5: Icons.build,
-    6: Icons.leak_remove,
-    7: Icons.leak_add,
-    8: Icons.short_text,
+    6: Icons.leak_add,
+    7: Icons.short_text,
   };
 
   TabsPageBloc _tabsPageBloc;

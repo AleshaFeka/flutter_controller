@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_controller/bloc/SsTabBloc.dart';
+import 'package:flutter_controller/di/Provider.dart';
 import 'package:flutter_controller/model/Parameter.dart';
 import 'package:flutter_controller/model/SystemSettings.dart';
 import 'package:flutter_controller/widget/TitledCard.dart';
@@ -10,7 +11,7 @@ class SsTab extends StatefulWidget {
 }
 
 class SsTabState extends State<SsTab> {
-  final _bloc = SsTabBloc();
+  SsTabBloc _bloc;
   final _identificationCurrentEditingController = TextEditingController();
   final _writeHallsManuallyEditingController = TextEditingController();
   final _currentValueKey = GlobalKey<FormState>();
@@ -44,6 +45,7 @@ class SsTabState extends State<SsTab> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    _bloc = Provider.of(context).ssTabBloc;
     _bloc.commandSink.add(SsCommand.READ);
   }
 
@@ -58,30 +60,55 @@ class SsTabState extends State<SsTab> {
                 child: CircularProgressIndicator(),
               );
             }
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 2),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildIdentificationCurrentSection(snapshot.data.identificationCurrent),
-                  _buildMotorSection(
-                    snapshot.data.motorResistance,
-                    snapshot.data.motorInduction,
-                    snapshot.data.motorMagnetStream,
-                  ),
-                  _buildHallSection([
-                    snapshot.data.hall1,
-                    snapshot.data.hall2,
-                    snapshot.data.hall3,
-                    snapshot.data.hall4,
-                    snapshot.data.hall5,
-                    snapshot.data.hall6
-                  ]),
-                ],
+            print("identificationMode = ${snapshot.data.identificationMode}");
+            return Stack(children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildIdentificationCurrentSection(snapshot.data.identificationCurrent),
+                    _buildMotorSection(
+                      snapshot.data.motorResistance,
+                      snapshot.data.motorInduction,
+                      snapshot.data.motorMagnetStream,
+                    ),
+                    _buildHallSection([
+                      snapshot.data.hall1,
+                      snapshot.data.hall2,
+                      snapshot.data.hall3,
+                      snapshot.data.hall4,
+                      snapshot.data.hall5,
+                      snapshot.data.hall6
+                    ]),
+                  ],
+                ),
               ),
-            );
+              if (snapshot.data.identificationMode > 0) _buildWaiting(context)
+            ]);
           }),
+    );
+  }
+
+  Widget _buildWaiting(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          height: 150,
+        ),
+        AlertDialog(
+          title: Center(child: Text("Please wait.")),
+          content: Column(
+            children: [
+              Text("Measuring in process..."),
+              Container(
+                padding: EdgeInsets.all(48),
+                child: CircularProgressIndicator())
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -126,19 +153,25 @@ class SsTabState extends State<SsTab> {
         child: Column(
           children: [
             _buildMeasureSingleLine("Measure Rs", rS, () {
-              _bloc.commandSink.add(SsCommand.MEASURE_RS);
+              if (_currentValueKey.currentState.validate() ?? false) {
+                _bloc.commandSink.add(SsCommand.MEASURE_RS);
+              }
             }),
             Container(
               height: 8,
             ),
             _buildMeasureSingleLine("Measure Ls", lS, () {
-              _bloc.commandSink.add(SsCommand.MEASURE_LS);
+              if (_currentValueKey.currentState.validate() ?? false) {
+                _bloc.commandSink.add(SsCommand.MEASURE_LS);
+              }
             }),
             Container(
               height: 8,
             ),
             _buildMeasureSingleLine("Measure Flux", flux, () {
+              if (_currentValueKey.currentState.validate() ?? false) {
               _bloc.commandSink.add(SsCommand.MEASURE_FLUX);
+              }
             }),
             Container(
               height: 32,
@@ -201,7 +234,17 @@ class SsTabState extends State<SsTab> {
             key: _hallValuesKey,
             child: _buildTextInput(
                 validator: _hallValidator,
-                controller: _writeHallsManuallyEditingController,
+                controller: _writeHallsManuallyEditingController..addListener(() {
+                  final text = _writeHallsManuallyEditingController.value.text;
+                  final halls = text.split(";");
+                  _bloc.dataSink.add(Parameter("hall1", halls[0]));
+                  _bloc.dataSink.add(Parameter("hall2", halls[1]));
+                  _bloc.dataSink.add(Parameter("hall3", halls[2]));
+                  _bloc.dataSink.add(Parameter("hall4", halls[3]));
+                  _bloc.dataSink.add(Parameter("hall5", halls[4]));
+                  _bloc.dataSink.add(Parameter("hall6", halls[5]));
+
+                }),
                 initialValue: hallValues.join(";"))),
         Container(
           height: 16,

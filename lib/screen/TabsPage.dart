@@ -10,6 +10,7 @@ import 'package:flutter_controller/widget/tab/FuncTab.dart';
 import 'package:flutter_controller/widget/tab/MonitorTab.dart';
 import 'package:flutter_controller/widget/tab/MotorTab.dart';
 import 'package:flutter_controller/widget/tab/RegTab.dart';
+import 'package:flutter_controller/widget/tab/SsTab.dart';
 import 'package:flutter_controller/widget/tab/SystemSettingsTab.dart';
 
 import 'SettingsPage.dart';
@@ -42,7 +43,7 @@ class _TabsPage extends State<TabsPage> {
   Map<int, String> tabNames;
   Map<String, dynamic> _localizedStrings;
 
-  List<Widget> _tabs = [ MonitorTab(), MotorTab(), BatteryTab(), AnalogTab(), DriveTab(), FuncTab(), RegTab(), SystemSettingsTab() ];
+  List<Widget> _tabs = [ MonitorTab(), MotorTab(), BatteryTab(), AnalogTab(), DriveTab(), FuncTab(), RegTab(), SsTab() ];
 
   @override
   void didChangeDependencies() {

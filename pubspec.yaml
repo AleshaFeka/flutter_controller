@@ -48,6 +48,7 @@ dev_dependencies:
 flutter:
   assets:
     - assets/strings/ru.json
+    - assets/strings/en.json
     - assets/images/logo.png
     - assets/images/scale.png
 

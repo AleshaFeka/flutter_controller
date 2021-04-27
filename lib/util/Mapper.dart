@@ -21,6 +21,7 @@ class Mapper {
   static const SCREEN_NUM_AND_COMMAND_NUM_OFFSET = 2;
 
   static const _COMMAND_SCREEN_NUMBER = 127;
+  static const _INFO_SCREEN_NUMBER = 126;
 
   static String mapPwmFrequency(String input) {
     String value;
@@ -56,6 +57,37 @@ class Mapper {
     int command = 1;
 
     final saveWord = "SAVE";
+
+    dataBuffer.setInt16(0, saveWord.codeUnitAt(0), Endian.little);
+    dataBuffer.setInt16(2, saveWord.codeUnitAt(1), Endian.little);
+    dataBuffer.setInt16(4, saveWord.codeUnitAt(2), Endian.little);
+    dataBuffer.setInt16(6, saveWord.codeUnitAt(3), Endian.little);
+
+    return Packet(_COMMAND_SCREEN_NUMBER, command, data);
+  }
+
+  static buildRestartPacket() {
+    Uint8List data = Uint8List(PACKET_LENGTH);
+    ByteData dataBuffer = data.buffer.asByteData();
+    int command = 1;
+
+    final saveWord = "RESET";
+
+    dataBuffer.setInt16(0, saveWord.codeUnitAt(0), Endian.little);
+    dataBuffer.setInt16(2, saveWord.codeUnitAt(1), Endian.little);
+    dataBuffer.setInt16(4, saveWord.codeUnitAt(2), Endian.little);
+    dataBuffer.setInt16(6, saveWord.codeUnitAt(3), Endian.little);
+    dataBuffer.setInt16(8, saveWord.codeUnitAt(4), Endian.little);
+
+    return Packet(_COMMAND_SCREEN_NUMBER, command, data);
+  }
+
+  static buildResetPacket() {
+    Uint8List data = Uint8List(PACKET_LENGTH);
+    ByteData dataBuffer = data.buffer.asByteData();
+    int command = 1;
+
+    final saveWord = "LOAD";
 
     dataBuffer.setInt16(0, saveWord.codeUnitAt(0), Endian.little);
     dataBuffer.setInt16(2, saveWord.codeUnitAt(1), Endian.little);

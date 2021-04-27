@@ -19,7 +19,7 @@ class Provider extends InheritedWidget {
     return context.dependOnInheritedWidgetOfExactType<Provider>();
   }
 
-  BluetoothInteractor _bluetoothInteractor;
+  BluetoothInteractor bluetoothInteractor;
   ResourceInteractor _resourceInteractor;
 
   ConnectPageBloc connectPageBloc;
@@ -35,18 +35,18 @@ class Provider extends InheritedWidget {
 
   Map get localizedStrings => _resourceInteractor.localizedStrings;
 
-  Provider(this._resourceInteractor, this._bluetoothInteractor, {Key key, Widget child})
+  Provider(this._resourceInteractor, this.bluetoothInteractor, {Key key, Widget child})
       : super(key: key, child: child) {
-    connectPageBloc = ConnectPageBloc(_bluetoothInteractor);
-    tabsPageBloc = TabsPageBloc(_bluetoothInteractor);
-    monitorTabBloc = MonitorTabBloc(_bluetoothInteractor);
-    motorTabBloc = MotorTabBloc(_bluetoothInteractor);
-    batteryTabBloc = BatteryTabBloc(_bluetoothInteractor);
-    analogTabBloc = AnalogTabBloc(_bluetoothInteractor);
-    driveTabBloc = DriveTabBloc(_bluetoothInteractor);
-    funcTabBloc = FuncTabBloc(_bluetoothInteractor);
-    regTabBloc = RegTabBloc(_bluetoothInteractor);
-    ssTabBloc = IdentificationTabBloc(_bluetoothInteractor);
+    connectPageBloc = ConnectPageBloc(bluetoothInteractor);
+    tabsPageBloc = TabsPageBloc(bluetoothInteractor);
+    monitorTabBloc = MonitorTabBloc(bluetoothInteractor);
+    motorTabBloc = MotorTabBloc(bluetoothInteractor);
+    batteryTabBloc = BatteryTabBloc(bluetoothInteractor);
+    analogTabBloc = AnalogTabBloc(bluetoothInteractor);
+    driveTabBloc = DriveTabBloc(bluetoothInteractor);
+    funcTabBloc = FuncTabBloc(bluetoothInteractor);
+    regTabBloc = RegTabBloc(bluetoothInteractor);
+    ssTabBloc = IdentificationTabBloc(bluetoothInteractor);
   }
 
   @override

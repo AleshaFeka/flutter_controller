@@ -210,6 +210,10 @@
   "hall": "Hall sensor ",
   "motor": "Motor",
 
+  "resetToDefaults": "Reset to defaults",
+  "restartController": "Restart controller",
+  "bootloaderMode": "BootLoader mode",
+
 
   "yes": "Yes",
   "no": "No",

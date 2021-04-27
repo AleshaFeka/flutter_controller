@@ -211,6 +211,10 @@
   "motor": "Двигатель",
 
 
+  "resetToDefaults": "Сбросить настройки",
+  "restartController": "Перезагрузить контроллер",
+  "bootloaderMode": "Режим BootLoader",
+
   "yes": "Да",
   "no": "Нет",
   "unknownTemperatureSensor": "Неверный тип"

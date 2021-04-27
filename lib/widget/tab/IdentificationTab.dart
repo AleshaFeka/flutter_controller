@@ -29,13 +29,21 @@ class IdentificationTabState extends State<IdentificationTab> {
 
   FormFieldValidator<String> _hallValidator = (value) {
     var result;
-    final values = value.split(";");
+    final values = value.split("");
+
     if (values.length != 6) {
       result = "";
     }
+
     values.forEach((element) {
       final number = int.tryParse(element);
       if (number == null || number > 6 || number < 1) {
+        result = "";
+      }
+    });
+
+    values.forEach((element) {
+      if(values.indexOf(element) != values.lastIndexOf(element)) {
         result = "";
       }
     });
@@ -178,14 +186,6 @@ class IdentificationTabState extends State<IdentificationTab> {
             Container(
               height: 32,
             ),
-            RaisedButton(
-              child: Text(_localizedStrings["startIdentification"]),
-              onPressed: () {
-                if (_currentValueKey.currentState.validate() ?? false) {
-                  _bloc.commandSink.add(IdentificationCommand.MEASURE_HALLS);
-                }
-              },
-            ),
           ],
         ),
       ),
@@ -195,14 +195,27 @@ class IdentificationTabState extends State<IdentificationTab> {
   Widget _buildHallSection(List<int> hallValues) {
     final child = Container(
         padding: EdgeInsets.all(8),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+        child: Column(
           children: [
-            Flexible(child: _buildWriteHalls(hallValues)),
-            Container(
-              width: 16,
+            RaisedButton(
+              child: Text(_localizedStrings["startIdentification"]),
+              onPressed: () {
+                if (_currentValueKey.currentState.validate() ?? false) {
+                  _bloc.commandSink.add(IdentificationCommand.MEASURE_HALLS);
+                }
+              },
             ),
-            _buildHallValues(hallValues)
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Flexible(child: _buildWriteHalls(hallValues)),
+                Container(
+                  width: 16,
+                ),
+                _buildHallValues(hallValues)
+              ],
+            ),
           ],
         ));
     return TitledCard(title: _localizedStrings["halls"], child: child);
@@ -240,7 +253,7 @@ class IdentificationTabState extends State<IdentificationTab> {
                   final halls = _writeHallsManuallyEditingController
                     .value
                     .text
-                    .split(";");
+                    .split("");
                   _bloc.dataSink.add(Parameter("hall1", halls[0]));
                   _bloc.dataSink.add(Parameter("hall2", halls[1]));
                   _bloc.dataSink.add(Parameter("hall3", halls[2]));
@@ -249,7 +262,7 @@ class IdentificationTabState extends State<IdentificationTab> {
                   _bloc.dataSink.add(Parameter("hall6", halls[5]));
 
                 }),
-                initialValue: hallValues.join(";"))),
+                initialValue: hallValues.join(""))),
         Container(
           height: 16,
         ),
@@ -259,6 +272,12 @@ class IdentificationTabState extends State<IdentificationTab> {
             if (_hallValuesKey.currentState.validate() ?? false) {
               _bloc.commandSink.add(IdentificationCommand.WRITE_HALLS_TABLE);
             }
+          },
+        ),
+        ElevatedButton(
+          child: Text(_localizedStrings["readHalls"]),
+          onPressed: () {
+            _bloc.commandSink.add(IdentificationCommand.READ);
           },
         ),
       ],

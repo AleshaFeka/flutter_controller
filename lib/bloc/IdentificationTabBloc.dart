@@ -153,7 +153,7 @@ class IdentificationTabBloc {
   }
 
   void _readSettings() {
-    _settings = SystemSettings.zero();
+    _startMeasureMotorParameter(IdentificationCommand.DISABLE);
   }
 
   void _startMeasureMotorParameter(IdentificationCommand mode) {

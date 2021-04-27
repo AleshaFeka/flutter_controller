@@ -106,7 +106,10 @@
     "batteryCurrentKp": "Kp регулятора тока батареи",
     "batteryCurrentKi": "Ki регулятора тока батареи",
     "powerUpSpeed": "Скорость нарастания мощности",
-    "motorCurrentLimitRange": "Диапазон границы тока двигателя"
+    "motorCurrentLimitRange": "Диапазон границы тока двигателя",
+    "speedUpSpeed": "Скорость нарастания скорости",
+    "speedDownSpeed": "Скорость спадания скорости",
+    "fieldWeakingMaxCurrent": "Макс. ток ослабления поля"
   },
   "systemSettingsParameterNames": {
     "hall1": "Холл 1",

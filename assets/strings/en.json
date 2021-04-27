@@ -105,7 +105,11 @@
     "batteryCurrentKp": "Battery Reg Kp",
     "batteryCurrentKi": "Battery Reg Ki",
     "powerUpSpeed": "Power Rise kW/sec",
-    "motorCurrentLimitRange": "Current Limit range"
+    "motorCurrentLimitRange": "Current Limit range",
+    "speedUpSpeed": "Speed rise",
+    "speedDownSpeed": "Speed decrease",
+    "fieldWeakingMaxCurrent": "Field Weaking Max Current"
+
   },
   "systemSettingsParameterNames": {
     "hall1": "Hall 1",

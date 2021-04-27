@@ -124,19 +124,16 @@ class _RegTabState extends CommonSettingsTabState<RegTab, RegSettings> {
 
   @override
   void onRead() {
-    print("onRead");
     _regTabBloc.regSettingsCommandStream.add(RegSettingsCommand.READ);
   }
 
   @override
   void onSave() {
-    print("onSave");
     _regTabBloc.regSettingsCommandStream.add(RegSettingsCommand.SAVE);
   }
 
   @override
   void onWrite() {
-    print("onWrite");
     if (!_formKey.currentState.validate()) {
       Scaffold.of(context).showSnackBar(SnackBar(content: Text(localizedStrings[CommonSettingsTabState.WRITING_NOT_ALLOWED])));
       return;

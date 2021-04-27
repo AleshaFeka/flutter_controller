@@ -16,10 +16,12 @@ class RegTabBloc {
   RegSettings _regSettings;
 
   StreamController _regViewModelStreamController = StreamController<RegSettings>.broadcast();
+
   Stream get regViewModelStream => _regViewModelStreamController.stream;
 
   StreamController<RegSettingsCommand> _regSettingsCommandStreamController =
       StreamController<RegSettingsCommand>.broadcast();
+
   StreamSink<RegSettingsCommand> get regSettingsCommandStream => _regSettingsCommandStreamController.sink;
 
   StreamController<Parameter> _regSettingsDataStreamController = StreamController<Parameter>.broadcast(
@@ -37,22 +39,22 @@ class RegTabBloc {
         _regSettings.currentBandwidth = int.parse(motorParameter.value);
         break;
       case "speedKp":
-        _regSettings.speedKp = int.parse(motorParameter.value);
+        _regSettings.speedKp = double.parse(motorParameter.value);
         break;
       case "speedKi":
-        _regSettings.speedKi = int.parse(motorParameter.value);
+        _regSettings.speedKi = double.parse(motorParameter.value);
         break;
       case "fieldWeakingKp":
-        _regSettings.fieldWeakingKp = int.parse(motorParameter.value);
+        _regSettings.fieldWeakingKp = double.parse(motorParameter.value);
         break;
       case "fieldWeakingKi":
-        _regSettings.fieldWeakingKi = int.parse(motorParameter.value);
+        _regSettings.fieldWeakingKi = double.parse(motorParameter.value);
         break;
       case "batteryCurrentKp":
-        _regSettings.batteryCurrentKp = int.parse(motorParameter.value);
+        _regSettings.batteryCurrentKp = double.parse(motorParameter.value);
         break;
       case "batteryCurrentKi":
-        _regSettings.batteryCurrentKi = int.parse(motorParameter.value);
+        _regSettings.batteryCurrentKi = double.parse(motorParameter.value);
         break;
       case "powerUpSpeed":
         _regSettings.powerUpSpeed = int.parse(motorParameter.value);
@@ -60,6 +62,17 @@ class RegTabBloc {
       case "motorCurrentLimitRange":
         _regSettings.motorCurrentLimitRange = int.parse(motorParameter.value);
         break;
+
+      case "speedUpSpeed":
+        _regSettings.speedUpSpeed = int.parse(motorParameter.value);
+        break;
+      case "speedDownSpeed":
+        _regSettings.speedDownSpeed = int.parse(motorParameter.value);
+        break;
+      case "fieldWeakingMaxCurrent":
+        _regSettings.fieldWeakingMaxCurrent = int.parse(motorParameter.value);
+        break;
+
     }
   }
 
@@ -81,8 +94,6 @@ class RegTabBloc {
   }
 
   void _packetHandler(Packet packet) {
-    print('RegTabBloc   _packetHandler    screenNum = ${packet.screenNum}    cmd = ${packet.cmd}');
-
     if (packet.screenNum == SCREEN_NUMBER) {
       _regSettings = Mapper.packetToRegSettings(packet) ?? _regSettings;
       _regSettingsRefresh();

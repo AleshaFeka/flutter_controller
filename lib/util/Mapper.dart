@@ -308,17 +308,22 @@ class Mapper {
 
     result.currentBandwidth = ByteData.view(buffer).getUint16(0, Endian.little);
 
-    result.speedKp = ByteData.view(buffer).getUint16(2, Endian.little) ~/ 10000;
-    result.speedKi = ByteData.view(buffer).getUint16(4, Endian.little) ~/ 10000;
+    result.speedKp = ByteData.view(buffer).getUint16(2, Endian.little) / 10000;
+    result.speedKi = ByteData.view(buffer).getUint16(4, Endian.little) / 10000;
 
-    result.fieldWeakingKp = ByteData.view(buffer).getUint16(6, Endian.little) ~/ 10000;
-    result.fieldWeakingKi = ByteData.view(buffer).getUint16(8, Endian.little) ~/ 10000;
+    result.fieldWeakingKp = ByteData.view(buffer).getUint16(6, Endian.little) / 10000;
+    result.fieldWeakingKi = ByteData.view(buffer).getUint16(8, Endian.little) / 10000;
 
-    result.batteryCurrentKp = ByteData.view(buffer).getUint16(10, Endian.little) ~/ 10000;
-    result.batteryCurrentKi = ByteData.view(buffer).getUint16(12, Endian.little) ~/ 10000;
+    result.batteryCurrentKp = ByteData.view(buffer).getUint16(10, Endian.little) / 10000;
+    result.batteryCurrentKi = ByteData.view(buffer).getUint16(12, Endian.little) / 10000;
 
     result.powerUpSpeed = ByteData.view(buffer).getUint16(14, Endian.little);
     result.motorCurrentLimitRange = ByteData.view(buffer).getUint16(16, Endian.little);
+
+
+    result.speedUpSpeed = ByteData.view(buffer).getUint16(18, Endian.little);
+    result.speedDownSpeed = ByteData.view(buffer).getUint16(20, Endian.little);
+    result.fieldWeakingMaxCurrent = ByteData.view(buffer).getUint16(22, Endian.little);
 
     return result;
   }
@@ -331,17 +336,21 @@ class Mapper {
 
     dataBuffer.setUint16(0, settings.currentBandwidth, Endian.little);
 
-    dataBuffer.setUint16(2, settings.speedKp * 10000, Endian.little);
-    dataBuffer.setUint16(4, settings.speedKi * 10000, Endian.little);
+    dataBuffer.setUint16(2, (settings.speedKp * 10000).toInt(), Endian.little);
+    dataBuffer.setUint16(4, (settings.speedKi * 10000).toInt(), Endian.little);
 
-    dataBuffer.setUint16(6, settings.fieldWeakingKp * 10000, Endian.little);
-    dataBuffer.setUint16(8, settings.fieldWeakingKi * 10000, Endian.little);
+    dataBuffer.setUint16(6, (settings.fieldWeakingKp * 10000).toInt(), Endian.little);
+    dataBuffer.setUint16(8, (settings.fieldWeakingKi * 10000).toInt(), Endian.little);
 
-    dataBuffer.setUint16(10, settings.batteryCurrentKp * 10000, Endian.little);
-    dataBuffer.setUint16(12, settings.batteryCurrentKi * 10000, Endian.little);
+    dataBuffer.setUint16(10, (settings.batteryCurrentKp * 10000).toInt(), Endian.little);
+    dataBuffer.setUint16(12, (settings.batteryCurrentKi * 10000).toInt(), Endian.little);
 
     dataBuffer.setUint16(14, settings.powerUpSpeed, Endian.little);
     dataBuffer.setUint16(16, settings.motorCurrentLimitRange, Endian.little);
+
+    dataBuffer.setUint16(18, settings.speedUpSpeed, Endian.little);
+    dataBuffer.setUint16(20, settings.speedDownSpeed, Endian.little);
+    dataBuffer.setUint16(12, settings.fieldWeakingMaxCurrent, Endian.little);
 
     return Packet(RegTabBloc.SCREEN_NUMBER, command, data);
   }

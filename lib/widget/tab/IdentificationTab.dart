@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_controller/bloc/SsTabBloc.dart';
+import 'package:flutter_controller/bloc/IdentificationTabBloc.dart';
 import 'package:flutter_controller/di/Provider.dart';
 import 'package:flutter_controller/model/Parameter.dart';
 import 'package:flutter_controller/model/SystemSettings.dart';
 import 'package:flutter_controller/widget/TitledCard.dart';
 
-class SsTab extends StatefulWidget {
+class IdentificationTab extends StatefulWidget {
   @override
-  SsTabState createState() => SsTabState();
+  IdentificationTabState createState() => IdentificationTabState();
 }
 
-class SsTabState extends State<SsTab> {
-  SsTabBloc _bloc;
+class IdentificationTabState extends State<IdentificationTab> {
+  IdentificationTabBloc _bloc;
   final _identificationCurrentEditingController = TextEditingController();
   final _writeHallsManuallyEditingController = TextEditingController();
   final _currentValueKey = GlobalKey<FormState>();
@@ -48,7 +48,7 @@ class SsTabState extends State<SsTab> {
     super.didChangeDependencies();
     _bloc = Provider.of(context).ssTabBloc;
     _bloc.init();
-    _bloc.commandSink.add(SsCommand.READ);
+    _bloc.commandSink.add(IdentificationCommand.READ);
     _localizedStrings = Provider.of(context).localizedStrings;
   }
 
@@ -145,7 +145,7 @@ class SsTabState extends State<SsTab> {
 
   Widget _buildMotorSection(
     double rS,
-    double lS,
+    int lS,
     double flux,
   ) {
     return TitledCard(
@@ -154,25 +154,25 @@ class SsTabState extends State<SsTab> {
         padding: EdgeInsets.all(8),
         child: Column(
           children: [
-            _buildMeasureSingleLine(_localizedStrings["measureRs"], rS, () {
+            _buildMeasureSingleLine(_localizedStrings["measureRs"], rS.toStringAsFixed(3), () {
               if (_currentValueKey.currentState.validate() ?? false) {
-                _bloc.commandSink.add(SsCommand.MEASURE_RS);
+                _bloc.commandSink.add(IdentificationCommand.MEASURE_RS);
               }
             }),
             Container(
               height: 8,
             ),
-            _buildMeasureSingleLine(_localizedStrings["measureLs"], lS, () {
+            _buildMeasureSingleLine(_localizedStrings["measureLs"], lS.toString(), () {
               if (_currentValueKey.currentState.validate() ?? false) {
-                _bloc.commandSink.add(SsCommand.MEASURE_LS);
+                _bloc.commandSink.add(IdentificationCommand.MEASURE_LS);
               }
             }),
             Container(
               height: 8,
             ),
-            _buildMeasureSingleLine(_localizedStrings["measureFlux"], flux, () {
+            _buildMeasureSingleLine(_localizedStrings["measureFlux"], flux.toStringAsFixed(3), () {
               if (_currentValueKey.currentState.validate() ?? false) {
-              _bloc.commandSink.add(SsCommand.MEASURE_FLUX);
+              _bloc.commandSink.add(IdentificationCommand.MEASURE_FLUX);
               }
             }),
             Container(
@@ -182,7 +182,7 @@ class SsTabState extends State<SsTab> {
               child: Text(_localizedStrings["startIdentification"]),
               onPressed: () {
                 if (_currentValueKey.currentState.validate() ?? false) {
-                  _bloc.commandSink.add(SsCommand.MEASURE_HALLS);
+                  _bloc.commandSink.add(IdentificationCommand.MEASURE_HALLS);
                 }
               },
             ),
@@ -208,7 +208,7 @@ class SsTabState extends State<SsTab> {
     return TitledCard(title: _localizedStrings["halls"], child: child);
   }
 
-  Widget _buildMeasureSingleLine(String title, double value, void Function() onPress) {
+  Widget _buildMeasureSingleLine(String title, String value, void Function() onPress) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -223,7 +223,7 @@ class SsTabState extends State<SsTab> {
             },
           ),
         ),
-        Container(width: 96, height: 36, child: _buildValueContainer(value.toStringAsFixed(3))),
+        Container(width: 96, height: 36, child: _buildValueContainer(value)),
       ],
     );
   }
@@ -257,7 +257,7 @@ class SsTabState extends State<SsTab> {
           child: Text(_localizedStrings["writeHalls"]),
           onPressed: () {
             if (_hallValuesKey.currentState.validate() ?? false) {
-              _bloc.commandSink.add(SsCommand.WRITE_HALLS_TABLE);
+              _bloc.commandSink.add(IdentificationCommand.WRITE_HALLS_TABLE);
             }
           },
         ),

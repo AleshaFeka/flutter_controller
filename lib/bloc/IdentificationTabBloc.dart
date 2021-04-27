@@ -9,16 +9,16 @@ import 'package:flutter_controller/model/SystemSettings.dart';
 import 'package:flutter_controller/util/Mapper.dart';
 import 'package:flutter_controller/util/kotlin_style_extensions.dart';
 
-enum SsCommand { DISABLE, MEASURE_RS, MEASURE_LS, MEASURE_HALLS, MEASURE_HALLS_WITH_ROTATION,  MEASURE_FLUX, WRITE_HALLS_TABLE, READ}
+enum IdentificationCommand { DISABLE, MEASURE_RS, MEASURE_LS, MEASURE_HALLS, MEASURE_HALLS_WITH_ROTATION,  MEASURE_FLUX, WRITE_HALLS_TABLE, READ}
 
-class SsTabBloc {
+class IdentificationTabBloc {
   static const SCREEN_NUMBER = 3;
 
   BluetoothInteractor _bluetoothInteractor;
   SystemSettings _settings = SystemSettings.zero();
 
-  StreamController<SsCommand> _commandController;
-  StreamSink<SsCommand> get commandSink => _commandController.sink;
+  StreamController<IdentificationCommand> _commandController;
+  StreamSink<IdentificationCommand> get commandSink => _commandController.sink;
 
   StreamController<Parameter> _dataController;
   StreamSink<Parameter> get dataSink => _dataController.sink;
@@ -30,7 +30,7 @@ class SsTabBloc {
   StreamController<int> _controllerStateStreamController ;
   StreamSubscription _controllerStateSubscription;
 
-  SsTabBloc(this._bluetoothInteractor) {
+  IdentificationTabBloc(this._bluetoothInteractor) {
 /*
     _commandController.stream.listen(_handleCommand);
     _dataController.stream.listen(_handleDataChanged);
@@ -118,31 +118,31 @@ class SsTabBloc {
     }
   }
 
-  void _handleCommand(SsCommand command) {
+  void _handleCommand(IdentificationCommand command) {
     switch (command) {
-      case SsCommand.READ :
+      case IdentificationCommand.READ :
         _readSettings();
         _refreshSettings();
         break;
-      case SsCommand.DISABLE:
+      case IdentificationCommand.DISABLE:
         // Ignore
         break;
-      case SsCommand.MEASURE_RS:
+      case IdentificationCommand.MEASURE_RS:
         _measureRs();
         break;
-      case SsCommand.MEASURE_LS:
+      case IdentificationCommand.MEASURE_LS:
         _measureLs();
         break;
-      case SsCommand.MEASURE_HALLS:
+      case IdentificationCommand.MEASURE_HALLS:
         _startIdentification();
         break;
-      case SsCommand.MEASURE_HALLS_WITH_ROTATION:
+      case IdentificationCommand.MEASURE_HALLS_WITH_ROTATION:
         // Ignore
         break;
-      case SsCommand.MEASURE_FLUX:
+      case IdentificationCommand.MEASURE_FLUX:
         _measureFlux();
         break;
-      case SsCommand.WRITE_HALLS_TABLE:
+      case IdentificationCommand.WRITE_HALLS_TABLE:
         _writeHallTable();
         break;
     }
@@ -156,31 +156,31 @@ class SsTabBloc {
     _settings = SystemSettings.zero();
   }
 
-  void _startMeasureMotorParameter(SsCommand mode) {
-    _settings.identificationMode = SsCommand.values.indexOf(mode);
+  void _startMeasureMotorParameter(IdentificationCommand mode) {
+    _settings.identificationMode = IdentificationCommand.values.indexOf(mode);
     final packet = Mapper.systemSettingsToPacket(_settings);
     _bluetoothInteractor.sendMessage(packet);
     _startMonitoringControllerState();
   }
 
   void _measureRs() {
-    _startMeasureMotorParameter(SsCommand.MEASURE_RS);
+    _startMeasureMotorParameter(IdentificationCommand.MEASURE_RS);
   }
 
   void _measureLs() {
-    _startMeasureMotorParameter(SsCommand.MEASURE_LS);
+    _startMeasureMotorParameter(IdentificationCommand.MEASURE_LS);
   }
 
   void _measureFlux() {
-    _startMeasureMotorParameter(SsCommand.MEASURE_FLUX);
+    _startMeasureMotorParameter(IdentificationCommand.MEASURE_FLUX);
   }
 
   void _startIdentification() {
-    _startMeasureMotorParameter(SsCommand.MEASURE_HALLS);
+    _startMeasureMotorParameter(IdentificationCommand.MEASURE_HALLS);
   }
 
   void _writeHallTable() {
-    _startMeasureMotorParameter(SsCommand.WRITE_HALLS_TABLE);
+    _startMeasureMotorParameter(IdentificationCommand.WRITE_HALLS_TABLE);
   }
 
   void dispose() {

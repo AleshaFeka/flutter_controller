@@ -9,8 +9,7 @@ import 'package:flutter_controller/bloc/FuncTabBloc.dart';
 import 'package:flutter_controller/bloc/MonitorTabBloc.dart';
 import 'package:flutter_controller/bloc/MotorTabBloc.dart';
 import 'package:flutter_controller/bloc/RegTabBloc.dart';
-import 'package:flutter_controller/bloc/SsTabBloc.dart';
-import 'package:flutter_controller/bloc/SystemSettingsTabBloc.dart';
+import 'package:flutter_controller/bloc/IdentificationTabBloc.dart';
 import 'package:flutter_controller/bloc/TabsPageBloc.dart';
 import 'package:flutter_controller/interactor/BluetoothInteractor.dart';
 import 'package:flutter_controller/interactor/ResourceInteractor.dart';
@@ -32,8 +31,7 @@ class Provider extends InheritedWidget {
   DriveTabBloc driveTabBloc;
   FuncTabBloc funcTabBloc;
   RegTabBloc regTabBloc;
-  SystemSettingsTabBloc systemSettingsTabBloc;
-  SsTabBloc ssTabBloc;
+  IdentificationTabBloc ssTabBloc;
 
   Map get localizedStrings => _resourceInteractor.localizedStrings;
 
@@ -48,8 +46,7 @@ class Provider extends InheritedWidget {
     driveTabBloc = DriveTabBloc(_bluetoothInteractor);
     funcTabBloc = FuncTabBloc(_bluetoothInteractor);
     regTabBloc = RegTabBloc(_bluetoothInteractor);
-    systemSettingsTabBloc = SystemSettingsTabBloc(_bluetoothInteractor);
-    ssTabBloc = SsTabBloc(_bluetoothInteractor);
+    ssTabBloc = IdentificationTabBloc(_bluetoothInteractor);
   }
 
   @override

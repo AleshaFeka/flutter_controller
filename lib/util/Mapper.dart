@@ -4,9 +4,9 @@ import 'package:flutter_controller/bloc/AnalogTabBloc.dart';
 import 'package:flutter_controller/bloc/BatteryTabBloc.dart';
 import 'package:flutter_controller/bloc/DriveTabBloc.dart';
 import 'package:flutter_controller/bloc/FuncTabBloc.dart';
+import 'package:flutter_controller/bloc/IdentificationTabBloc.dart';
 import 'package:flutter_controller/bloc/MotorTabBloc.dart';
 import 'package:flutter_controller/bloc/RegTabBloc.dart';
-import 'package:flutter_controller/bloc/SystemSettingsTabBloc.dart';
 import 'package:flutter_controller/core/Packet.dart';
 import 'package:flutter_controller/model/AnalogSettings.dart';
 import 'package:flutter_controller/model/BatterySettings.dart';
@@ -360,7 +360,7 @@ class Mapper {
     result.hall6 = ByteData.view(buffer).getUint16(10, Endian.little);
 
     result.motorResistance = ByteData.view(buffer).getUint16(12, Endian.little) / 1000;
-    result.motorInduction = ByteData.view(buffer).getUint16(14, Endian.little) / 1000000;
+    result.motorInduction = ByteData.view(buffer).getUint16(14, Endian.little);
     result.motorMagnetStream = ByteData.view(buffer).getUint16(16, Endian.little) / 10000;
     result.identificationMode = ByteData.view(buffer).getUint16(18, Endian.little);
     result.identificationCurrent = ByteData.view(buffer).getUint16(20, Endian.little);
@@ -387,6 +387,6 @@ class Mapper {
     dataBuffer.setUint16(16, settings.hall5, Endian.little);
     dataBuffer.setUint16(18, settings.hall6, Endian.little);
 
-    return Packet(SystemSettingsTabBloc.SCREEN_NUMBER, command, data);
+    return Packet(IdentificationTabBloc.SCREEN_NUMBER, command, data);
   }
 }

@@ -71,13 +71,13 @@ class Mapper {
     ByteData dataBuffer = data.buffer.asByteData();
     int command = 1;
 
-    final saveWord = "RESET";
+    final restartWord = "RESET";
 
-    dataBuffer.setInt16(0, saveWord.codeUnitAt(0), Endian.little);
-    dataBuffer.setInt16(2, saveWord.codeUnitAt(1), Endian.little);
-    dataBuffer.setInt16(4, saveWord.codeUnitAt(2), Endian.little);
-    dataBuffer.setInt16(6, saveWord.codeUnitAt(3), Endian.little);
-    dataBuffer.setInt16(8, saveWord.codeUnitAt(4), Endian.little);
+    dataBuffer.setInt16(0, restartWord.codeUnitAt(0), Endian.little);
+    dataBuffer.setInt16(2, restartWord.codeUnitAt(1), Endian.little);
+    dataBuffer.setInt16(4, restartWord.codeUnitAt(2), Endian.little);
+    dataBuffer.setInt16(6, restartWord.codeUnitAt(3), Endian.little);
+    dataBuffer.setInt16(8, restartWord.codeUnitAt(4), Endian.little);
 
     return Packet(_COMMAND_SCREEN_NUMBER, command, data);
   }
@@ -87,12 +87,12 @@ class Mapper {
     ByteData dataBuffer = data.buffer.asByteData();
     int command = 1;
 
-    final saveWord = "LOAD";
+    final resetWord = "LOAD";
 
-    dataBuffer.setInt16(0, saveWord.codeUnitAt(0), Endian.little);
-    dataBuffer.setInt16(2, saveWord.codeUnitAt(1), Endian.little);
-    dataBuffer.setInt16(4, saveWord.codeUnitAt(2), Endian.little);
-    dataBuffer.setInt16(6, saveWord.codeUnitAt(3), Endian.little);
+    dataBuffer.setInt16(0, resetWord.codeUnitAt(0), Endian.little);
+    dataBuffer.setInt16(2, resetWord.codeUnitAt(1), Endian.little);
+    dataBuffer.setInt16(4, resetWord.codeUnitAt(2), Endian.little);
+    dataBuffer.setInt16(6, resetWord.codeUnitAt(3), Endian.little);
 
     return Packet(_COMMAND_SCREEN_NUMBER, command, data);
   }

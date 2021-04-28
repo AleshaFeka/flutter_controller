@@ -215,6 +215,12 @@
   "restartController": "Перезагрузить контроллер",
   "bootloaderMode": "Режим BootLoader",
 
+  "appDescription": "Программа для настройки и мониторинга параметров контроллера имени Булычева и Ермакова",
+  "firmwareVersion": "Прошивка контроллера:",
+  "maxVoltage": "Макс. напряжение:",
+  "maxPhaseCurrent": "Макс. фазный ток:",
+  "processor": "Процессор:",
+
   "yes": "Да",
   "no": "Нет",
   "unknownTemperatureSensor": "Неверный тип"

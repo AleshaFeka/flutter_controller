@@ -214,6 +214,12 @@
   "restartController": "Restart controller",
   "bootloaderMode": "BootLoader mode",
 
+  "appDescription": "App for configuring and monitoring the parameters of SinTech controller",
+  "firmwareVersion": "Firmware version:",
+  "maxVoltage": "Max voltage:",
+  "maxPhaseCurrent": "Max phase current:",
+  "processor": "Processor",
+
 
   "yes": "Yes",
   "no": "No",

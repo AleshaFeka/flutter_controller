@@ -16,13 +16,15 @@ void showAbout(BuildContext context) {
         size: 64,
       ),
       applicationVersion: appVersion,
-      applicationLegalese: "Sergey Averin <s@averin.ru>",
+      applicationLegalese: "B&E llc.",
 
       children: <Widget>[_buildAboutContent(context)]
   );
 }
 
-Widget _buildAboutContent(BuildContext context) => FutureBuilder<ControllerInfo>(
+Widget _buildAboutContent(BuildContext context) {
+  final localizedStrings = Provider.of(context).localizedStrings;
+  return FutureBuilder<ControllerInfo>(
     future: _getControllerInfoFuture(Provider.of(context).bluetoothInteractor),
     builder: (ctx, snapshot) {
       if (snapshot.hasData) {
@@ -30,23 +32,24 @@ Widget _buildAboutContent(BuildContext context) => FutureBuilder<ControllerInfo>
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(height: 12),
-            const Text(
-              "Программа для настройки и мониторинга параметров контроллера имени Булычева и Ермакова",
+            Text(
+              localizedStrings['appDescription'],
               textAlign: TextAlign.justify,),
             Container(height: 12),
             Container(height: 12),
-            Text("Прошивка контроллера: ${snapshot.data.firmwareDateBig}.${snapshot.data.firmwareDateLittle}"),
+            Text("${localizedStrings['firmwareVersion']} ${snapshot.data.firmwareDateBig}.${snapshot.data.firmwareDateLittle}", textAlign: TextAlign.center),
             Container(height: 12),
-            Text("Макс. напряжение: ${snapshot.data.controllerMaxVoltage}V"),
-            Text("Макс. фазный ток: ${snapshot.data.controllerMaxCurrent}А"),
+            Text("${localizedStrings['maxVoltage']} ${snapshot.data.controllerMaxVoltage}V"),
+            Text("${localizedStrings['maxPhaseCurrent']} ${snapshot.data.controllerMaxCurrent}А"),
             Container(height: 12),
-            Text("Процессор: ${snapshot.data.processorIdBig}.${snapshot.data.processorIdLittle}"),
+            Text("${localizedStrings['processor']} ${snapshot.data.processorIdBig}.${snapshot.data.processorIdLittle}"),
           ],
         );
       } else {
         return Center(child: CircularProgressIndicator());
       }
     });
+}
 
 Future<ControllerInfo> _getControllerInfoFuture(BluetoothInteractor interactor) {
   Completer<ControllerInfo> completer = Completer();
@@ -55,7 +58,6 @@ Future<ControllerInfo> _getControllerInfoFuture(BluetoothInteractor interactor) 
   interactor.startListenSerial((packet) {
     if (packet.screenNum == Mapper.INFO_SCREEN_NUMBER) {
       ControllerInfo controllerInfo = Mapper.packetToControllerInfo(packet);
-      print(controllerInfo.controllerMaxVoltage);
       completer.complete(controllerInfo);
     }
   });

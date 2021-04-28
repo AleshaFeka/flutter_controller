@@ -4,6 +4,7 @@ import 'package:flutter_controller/di/Provider.dart';
 import 'package:flutter_controller/screen/ConnectPage.dart';
 import 'package:flutter_controller/screen/SettingsPage.dart';
 import 'package:flutter_controller/screen/TabsPage.dart';
+import 'package:flutter_controller/util/Util.dart';
 import 'package:flutter_controller/widget/Voltmeter.dart';
 import 'package:flutter_controller/widget/tab/AnalogTab.dart';
 import 'package:flutter_controller/widget/tab/BatteryTab.dart';
@@ -20,8 +21,9 @@ class MainPage extends StatefulWidget {
 class _MainPage extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
-//    return ConnectPage();
-    return SettingsPage();//debugScreen(SsTab());
+    return ConnectPage();
+
+//    return debugScreen(Center(child: ElevatedButton(onPressed: () {showAbout(context);}, child: Text("asfdg"))));
   }
 
   Widget debugScreen(Widget child) {

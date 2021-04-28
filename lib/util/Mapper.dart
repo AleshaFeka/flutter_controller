@@ -10,6 +10,7 @@ import 'package:flutter_controller/bloc/RegTabBloc.dart';
 import 'package:flutter_controller/core/Packet.dart';
 import 'package:flutter_controller/model/AnalogSettings.dart';
 import 'package:flutter_controller/model/BatterySettings.dart';
+import 'package:flutter_controller/model/ControllerInfo.dart';
 import 'package:flutter_controller/model/DriveSettings.dart';
 import 'package:flutter_controller/model/FuncSettings.dart';
 import 'package:flutter_controller/model/MotorSettings.dart';
@@ -21,7 +22,7 @@ class Mapper {
   static const SCREEN_NUM_AND_COMMAND_NUM_OFFSET = 2;
 
   static const _COMMAND_SCREEN_NUMBER = 127;
-  static const _INFO_SCREEN_NUMBER = 126;
+  static const INFO_SCREEN_NUMBER = 126;
 
   static String mapPwmFrequency(String input) {
     String value;
@@ -50,6 +51,8 @@ class Mapper {
     }
     return value;
   }
+
+  static Packet buildControllerInfoPacket() => Packet(INFO_SCREEN_NUMBER, 0, Uint8List(28));
 
   static buildSavePacket() {
     Uint8List data = Uint8List(PACKET_LENGTH);
@@ -95,6 +98,20 @@ class Mapper {
     dataBuffer.setInt16(6, resetWord.codeUnitAt(3), Endian.little);
 
     return Packet(_COMMAND_SCREEN_NUMBER, command, data);
+  }
+
+  static ControllerInfo packetToControllerInfo(Packet packet) {
+    ControllerInfo result = ControllerInfo.zero();
+    ByteBuffer buffer = packet.toBytes.sublist(SCREEN_NUM_AND_COMMAND_NUM_OFFSET).buffer;
+
+    result.firmwareDateLittle = ByteData.view(buffer).getUint16(0, Endian.little);
+    result.firmwareDateBig = ByteData.view(buffer).getUint16(2, Endian.little);
+    result.controllerMaxCurrent = ByteData.view(buffer).getUint16(4, Endian.little);
+    result.controllerMaxVoltage = ByteData.view(buffer).getUint16(6, Endian.little);
+    result.processorIdLittle = ByteData.view(buffer).getUint16(8, Endian.little);
+    result.processorIdBig = ByteData.view(buffer).getUint16(10, Endian.little);
+
+    return result;
   }
 
   static Packet funcSettingsToPacket(FuncSettings settings) {

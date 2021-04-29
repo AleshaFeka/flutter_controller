@@ -152,7 +152,7 @@ class IdentificationTabState extends State<IdentificationTab> {
   }
 
   Widget _buildMotorSection(
-    double rS,
+    int rS,
     int lS,
     double flux,
   ) {
@@ -162,7 +162,7 @@ class IdentificationTabState extends State<IdentificationTab> {
         padding: EdgeInsets.all(8),
         child: Column(
           children: [
-            _buildMeasureSingleLine(_localizedStrings["measureRs"], rS.toStringAsFixed(3), () {
+            _buildMeasureSingleLine(_localizedStrings["measureRs"], rS.toString(), () {
               if (_currentValueKey.currentState.validate() ?? false) {
                 _bloc.commandSink.add(IdentificationCommand.MEASURE_RS);
               }

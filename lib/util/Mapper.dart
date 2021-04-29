@@ -69,7 +69,7 @@ class Mapper {
     return Packet(_COMMAND_SCREEN_NUMBER, command, data);
   }
 
-  static buildRestartPacket() {
+  static buildBootloaderPacket() {
     Uint8List data = Uint8List(PACKET_LENGTH);
     ByteData dataBuffer = data.buffer.asByteData();
     int command = 1;
@@ -81,6 +81,27 @@ class Mapper {
     dataBuffer.setInt16(4, restartWord.codeUnitAt(2), Endian.little);
     dataBuffer.setInt16(6, restartWord.codeUnitAt(3), Endian.little);
     dataBuffer.setInt16(8, restartWord.codeUnitAt(4), Endian.little);
+
+    return Packet(_COMMAND_SCREEN_NUMBER, command, data);
+  }
+
+  static buildRestartPacket() {
+    Uint8List data = Uint8List(PACKET_LENGTH);
+    ByteData dataBuffer = data.buffer.asByteData();
+    int command = 1;
+
+    final restartWord = "RESETCONN";
+
+    dataBuffer.setInt16(0, restartWord.codeUnitAt(0), Endian.little);
+    dataBuffer.setInt16(2, restartWord.codeUnitAt(1), Endian.little);
+    dataBuffer.setInt16(4, restartWord.codeUnitAt(2), Endian.little);
+    dataBuffer.setInt16(6, restartWord.codeUnitAt(3), Endian.little);
+    dataBuffer.setInt16(8, restartWord.codeUnitAt(4), Endian.little);
+
+    dataBuffer.setInt16(10, restartWord.codeUnitAt(4), Endian.little);
+    dataBuffer.setInt16(12, restartWord.codeUnitAt(4), Endian.little);
+    dataBuffer.setInt16(14, restartWord.codeUnitAt(4), Endian.little);
+    dataBuffer.setInt16(16, restartWord.codeUnitAt(4), Endian.little);
 
     return Packet(_COMMAND_SCREEN_NUMBER, command, data);
   }
@@ -162,7 +183,7 @@ class Mapper {
     result.in3 = (inWord>>8) & 0xf;
     result.in4 = (inWord>>12) & 0xf;
 
-    int inInversionWord = ByteData.view(buffer).getUint16(2, Endian.little) ~/ 1000; // todo remove division after firmware update.
+    int inInversionWord = ByteData.view(buffer).getUint16(2, Endian.little);
     result.invertIn1 = ((inInversionWord>>0) & 0x1 == 1);
     result.invertIn2 = ((inInversionWord>>1) & 0x1 == 1);
     result.invertIn3 = ((inInversionWord>>2) & 0x1 == 1);
@@ -417,7 +438,7 @@ class Mapper {
     result.hall5 = ByteData.view(buffer).getUint16(8, Endian.little);
     result.hall6 = ByteData.view(buffer).getUint16(10, Endian.little);
 
-    result.motorResistance = ByteData.view(buffer).getUint16(12, Endian.little) / 1000;
+    result.motorResistance = ByteData.view(buffer).getUint16(12, Endian.little);
     result.motorInduction = ByteData.view(buffer).getUint16(14, Endian.little);
     result.motorMagnetStream = ByteData.view(buffer).getUint16(16, Endian.little) / 10000;
     result.identificationMode = ByteData.view(buffer).getUint16(18, Endian.little);

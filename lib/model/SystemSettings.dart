@@ -7,7 +7,7 @@ class SystemSettings {
   int hall4 = 0;
   int hall5 = 0;
   int hall6 = 0;
-  double motorResistance = 0;
+  int motorResistance = 0;
   int motorInduction = 0;
   double motorMagnetStream = 0;
   int identificationMode = 0;
@@ -24,7 +24,7 @@ class SystemSettings {
     hall4 = r.nextInt(max);
     hall5 = r.nextInt(max);
     hall6 = r.nextInt(max);
-    motorResistance = r.nextDouble() * max;
+    motorResistance = r.nextInt(max);
     motorInduction = r.nextInt(max);
     motorMagnetStream = r.nextDouble() * max;
     identificationMode = r.nextInt(max);

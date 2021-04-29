@@ -99,6 +99,9 @@ class _SettingsPage extends State<SettingsPage> {
               ),
               ElevatedButton(
                 child: Text(_localizedStrings['bootloaderMode']),
+                onPressed: () {
+                  _bluetoothInteractor.turnToBootloaderMode();
+                },
               ),
             ]),
           ],

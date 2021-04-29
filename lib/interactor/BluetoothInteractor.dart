@@ -46,6 +46,10 @@ class BluetoothInteractor {
     sendMessage(Mapper.buildRestartPacket());
   }
 
+  void turnToBootloaderMode() {
+    sendMessage(Mapper.buildRestartPacket());
+  }
+
   Future<bool> connect(String address) async {
     print('Connected to the device...');
     await BluetoothConnection.toAddress(address).then((value) {

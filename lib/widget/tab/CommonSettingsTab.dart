@@ -3,7 +3,7 @@ import 'package:flutter_controller/di/Provider.dart';
 
 
 abstract class CommonSettingsTabState <TWidget extends StatefulWidget, TData> extends State<TWidget> {
-  static const _parameterValueAccuracy = 2;
+  static const _parameterValueAccuracy = 3;
   static const _read = "read";
   static const _write = "write";
   static const _save = "save";

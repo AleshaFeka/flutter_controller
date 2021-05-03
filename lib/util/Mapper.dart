@@ -90,7 +90,7 @@ class Mapper {
     ByteData dataBuffer = data.buffer.asByteData();
     int command = 1;
 
-    final restartWord = "RESETCONN";
+    final restartWord = "RESETCON";
 
     dataBuffer.setInt16(0, restartWord.codeUnitAt(0), Endian.little);
     dataBuffer.setInt16(2, restartWord.codeUnitAt(1), Endian.little);
@@ -101,7 +101,6 @@ class Mapper {
     dataBuffer.setInt16(10, restartWord.codeUnitAt(4), Endian.little);
     dataBuffer.setInt16(12, restartWord.codeUnitAt(4), Endian.little);
     dataBuffer.setInt16(14, restartWord.codeUnitAt(4), Endian.little);
-    dataBuffer.setInt16(16, restartWord.codeUnitAt(4), Endian.little);
 
     return Packet(_COMMAND_SCREEN_NUMBER, command, data);
   }
@@ -125,12 +124,11 @@ class Mapper {
     ControllerInfo result = ControllerInfo.zero();
     ByteBuffer buffer = packet.toBytes.sublist(SCREEN_NUM_AND_COMMAND_NUM_OFFSET).buffer;
 
-    result.firmwareDateLittle = ByteData.view(buffer).getUint16(0, Endian.little);
-    result.firmwareDateBig = ByteData.view(buffer).getUint16(2, Endian.little);
+
+    result.firmwareDateBig = ByteData.view(buffer).getUint32(0, Endian.little);
     result.controllerMaxCurrent = ByteData.view(buffer).getUint16(4, Endian.little);
     result.controllerMaxVoltage = ByteData.view(buffer).getUint16(6, Endian.little);
-    result.processorIdLittle = ByteData.view(buffer).getUint16(8, Endian.little);
-    result.processorIdBig = ByteData.view(buffer).getUint16(10, Endian.little);
+    result.processorIdBig = ByteData.view(buffer).getUint32(8, Endian.little);
 
     return result;
   }

@@ -21,13 +21,12 @@ class _AnalogTabState extends CommonSettingsTabState<AnalogTab, AnalogSettings> 
     "brakeCurveCoefficient2",
     "brakeCurveCoefficient3"
   ];
-  static const _onlyIntegerValues = [  ];
+  static const _onlyIntegerValues = [];
 
   final _formKey = GlobalKey<FormState>();
   AnalogTabBloc _analogTabBloc;
   Map _parameterNames;
   Map<String, String Function(String, String)> _validators;
-
 
   @override
   void didChangeDependencies() {
@@ -54,7 +53,10 @@ class _AnalogTabState extends CommonSettingsTabState<AnalogTab, AnalogSettings> 
   }
 
   @override
-  Map getParameterNames() => Map()..putIfAbsent("voltmeter", () => "Voltmeter")..addAll(_parameterNames);
+  Map getParameterNames() => Map()
+    ..putIfAbsent("throttleVoltmeter", () => "Voltmeter")
+    ..putIfAbsent("brakeVoltmeter", () => "Voltmeter")
+    ..addAll(_parameterNames);
 
   @override
   Map getParameterValues(AsyncSnapshot<AnalogSettings> snapshot) {
@@ -70,8 +72,12 @@ class _AnalogTabState extends CommonSettingsTabState<AnalogTab, AnalogSettings> 
 
   @override
   Widget buildRow(String parameterName, String value, String variableName) {
-    if (variableName == "voltmeter") {
-      return _buildVoltmeter();
+    if (variableName == "throttleVoltmeter") {
+      return _buildThrottleVoltmeter();
+    }
+
+    if (variableName == "brakeVoltmeter") {
+      return _buildBrakeVoltmeter();
     }
 
     String Function(String) validator = (String value) {
@@ -116,52 +122,66 @@ class _AnalogTabState extends CommonSettingsTabState<AnalogTab, AnalogSettings> 
     );
   }
 
-
   @override
   void dispose() {
     super.dispose();
     _analogTabBloc.analogSettingsCommandStream.add(AnalogSettingsCommand.STOP_MONITORING);
   }
 
-  StreamBuilder<int> _buildVoltmeter() {
+  StreamBuilder<int> _buildThrottleVoltmeter() =>
+      _buildVoltmeter(_analogTabBloc.throttleValueStream, localizedStrings['monitorSettingsParameters']['12']);
+
+  StreamBuilder<int> _buildBrakeVoltmeter() =>
+      _buildVoltmeter(_analogTabBloc.brakeValueStream, localizedStrings['monitorSettingsParameters']['8']);
+
+  StreamBuilder<int> _buildVoltmeter(Stream<int> stream, String title) {
     return StreamBuilder<int>(
-      stream: _analogTabBloc.throttleValueStream,
-      builder: (context, snapshot) {
-        Voltmeter voltmeter;
-        if (snapshot.hasData) {
-          voltmeter = Voltmeter(milliVolts: snapshot.data,);
-        } else {
-          voltmeter =  Voltmeter(milliVolts: 0,);
-        }
-        return FittedBox(
-          child: Row(
-            children: [
-              voltmeter,
-              SizedBox(
-                height: 200,
-                width: 200,
-                child: Center(child: Text(
-                  voltmeter.volts,
-                  style: TextStyle(fontSize: 48),
-                )))
-            ],
-          ),
-        );
-      }
-    );
+        stream: stream,
+        builder: (context, snapshot) {
+          Voltmeter voltmeter;
+          if (snapshot.hasData) {
+            voltmeter = Voltmeter(
+              milliVolts: snapshot.data,
+            );
+          } else {
+            voltmeter = Voltmeter(
+              milliVolts: 0,
+            );
+          }
+          return FittedBox(
+            child: Column(
+              children: [
+                Text(title, style: TextStyle(fontSize: 24),),
+                Row(
+                  children: [
+                    voltmeter,
+                    SizedBox(
+                        height: 200,
+                        width: 200,
+                        child: Center(
+                            child: Text(
+                          voltmeter.volts,
+                          style: TextStyle(fontSize: 48),
+                        )))
+                  ],
+                ),
+              ],
+            ),
+          );
+        });
   }
 
   TextFormField _buildTextInput(validator, String variableName, String value) {
     return TextFormField(
-      validator: validator,
-      onSaved: (value) {
-        _analogTabBloc.analogSettingsDataStream.add(Parameter(variableName, value));
-      },
-      controller: TextEditingController()..text = value,
-      keyboardType: TextInputType.number,
-      decoration: InputDecoration(
-        errorStyle: TextStyle(height: 0), // Use just red border without text
-        border: OutlineInputBorder()));
+        validator: validator,
+        onSaved: (value) {
+          _analogTabBloc.analogSettingsDataStream.add(Parameter(variableName, value));
+        },
+        controller: TextEditingController()..text = value,
+        keyboardType: TextInputType.number,
+        decoration: InputDecoration(
+            errorStyle: TextStyle(height: 0), // Use just red border without text
+            border: OutlineInputBorder()));
   }
 
   @override
@@ -177,7 +197,8 @@ class _AnalogTabState extends CommonSettingsTabState<AnalogTab, AnalogSettings> 
   @override
   void onWrite() {
     if (!_formKey.currentState.validate()) {
-      Scaffold.of(context).showSnackBar(SnackBar(content: Text(localizedStrings[CommonSettingsTabState.WRITING_NOT_ALLOWED])));
+      Scaffold.of(context)
+          .showSnackBar(SnackBar(content: Text(localizedStrings[CommonSettingsTabState.WRITING_NOT_ALLOWED])));
       return;
     } else {
       _formKey.currentState.save();

@@ -27,6 +27,9 @@ class AnalogTabBloc {
   StreamController<int> _throttleValueStreamController ;
   Stream<int> get throttleValueStream => _throttleValueStreamController.stream;
 
+  StreamController<int> _brakeValueStreamController ;
+  Stream<int> get brakeValueStream => _brakeValueStreamController.stream;
+
   StreamSubscription _monitoringSubscription;
 
   BluetoothInteractor _bluetoothInteractor;
@@ -37,51 +40,53 @@ class AnalogTabBloc {
     _analogSettingsDataStreamController.stream.listen(_handleSettingsData);
 
     _throttleValueStreamController = StreamController<int>.broadcast(
-      onListen: _startThrottleMonitoring,
-      onCancel: _stopThrottleMonitoring
+      onListen: _startMonitoring,
+      onCancel: _stopMonitoring
     );
+    _brakeValueStreamController = StreamController<int>.broadcast();
   }
 
-  void _startThrottleMonitoring() async {
-    _monitoringSubscription = Stream.periodic(Duration(milliseconds: _MONITORING_INTERVAL), receiveThrottleValue).listen((_) { });
+  void _startMonitoring() async {
+    _monitoringSubscription = Stream.periodic(Duration(milliseconds: _MONITORING_INTERVAL), receiveValues).listen((_) { });
   }
 
-  void _stopThrottleMonitoring() async {
+  void _stopMonitoring() async {
     _bluetoothInteractor.stopListenSerial();
     _monitoringSubscription?.cancel();
   }
 
-  void receiveThrottleValue (count) {
+  void receiveValues (count) {
     _bluetoothInteractor.sendMessage(Packet(MONITOR_SCREEN_NUMBER, 0, Uint8List(28)));
-    _bluetoothInteractor.startListenSerial(_throttlePacketHandler);
+    _bluetoothInteractor.startListenSerial(_valuesPacketHandler);
   }
 
-  void _throttlePacketHandler(Packet packet) {
+  void _valuesPacketHandler(Packet packet) {
     if (packet.screenNum == MONITOR_SCREEN_NUMBER) {
-      double throttleActualValue = LiveData.fromBytes(packet.dataBuffer).throttleAct;
-      _throttleValueStreamController.sink.add((throttleActualValue * 100).toInt());
+      final data = LiveData.fromBytes(packet.dataBuffer);
+      _throttleValueStreamController.sink.add((data.throttleAct * 100).toInt());
+      _brakeValueStreamController.sink.add((data.brake * 100).toInt());
     }
   }
 
   void _handleCommand(AnalogSettingsCommand event) {
     switch (event) {
       case AnalogSettingsCommand.READ:
-        _stopThrottleMonitoring();
+        _stopMonitoring();
         _analogSettingsRead();
         break;
       case AnalogSettingsCommand.WRITE:
-        _stopThrottleMonitoring();
+        _stopMonitoring();
         _analogSettingsWrite();
         break;
       case AnalogSettingsCommand.SAVE:
-        _stopThrottleMonitoring();
+        _stopMonitoring();
         _analogSettingsSave();
         break;
       case AnalogSettingsCommand.REFRESH:
         _analogSettingsRefresh();
         break;
       case AnalogSettingsCommand.STOP_MONITORING:
-        _stopThrottleMonitoring();
+        _stopMonitoring();
         break;
     }
   }
@@ -131,7 +136,7 @@ class AnalogTabBloc {
     if (packet.screenNum == SCREEN_NUMBER) {
       _analogSettings = Mapper.packetToAnalogSettings(packet);
       _analogSettingsRefresh();
-      _startThrottleMonitoring();
+      _startMonitoring();
     }
   }
 
@@ -153,5 +158,6 @@ class AnalogTabBloc {
     _analogViewModelStreamController.close();
     _analogSettingsCommandStreamController.close();
     _throttleValueStreamController.close();
+    _brakeValueStreamController.close();
   }
 }

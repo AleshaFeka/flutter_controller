@@ -53,10 +53,9 @@ class _AnalogTabState extends CommonSettingsTabState<AnalogTab, AnalogSettings> 
   }
 
   @override
-  Map getParameterNames() => Map()
-    ..putIfAbsent("throttleVoltmeter", () => "Voltmeter")
-    ..putIfAbsent("brakeVoltmeter", () => "Voltmeter")
-    ..addAll(_parameterNames);
+  Map getParameterNames() {
+    return _parameterNames;
+  }
 
   @override
   Map getParameterValues(AsyncSnapshot<AnalogSettings> snapshot) {
@@ -128,13 +127,16 @@ class _AnalogTabState extends CommonSettingsTabState<AnalogTab, AnalogSettings> 
     _analogTabBloc.analogSettingsCommandStream.add(AnalogSettingsCommand.STOP_MONITORING);
   }
 
-  StreamBuilder<int> _buildThrottleVoltmeter() =>
+  Widget _buildThrottleVoltmeter() =>
       _buildVoltmeter(_analogTabBloc.throttleValueStream, localizedStrings['monitorSettingsParameters']['12']);
 
-  StreamBuilder<int> _buildBrakeVoltmeter() =>
-      _buildVoltmeter(_analogTabBloc.brakeValueStream, localizedStrings['monitorSettingsParameters']['8']);
+  Widget _buildBrakeVoltmeter() =>
+      Padding(
+        padding: const EdgeInsets.only(top: 20.0),
+        child: _buildVoltmeter(_analogTabBloc.brakeValueStream, localizedStrings['monitorSettingsParameters']['8']),
+      );
 
-  StreamBuilder<int> _buildVoltmeter(Stream<int> stream, String title) {
+  StreamBuilder<int> _buildVoltmeter(Stream<int> stream, String title,) {
     return StreamBuilder<int>(
         stream: stream,
         builder: (context, snapshot) {

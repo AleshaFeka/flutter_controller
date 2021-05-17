@@ -23,7 +23,7 @@ class _MainPage extends State<MainPage> {
   Widget build(BuildContext context) {
     return ConnectPage();
 
-//    return debugScreen(Center(child: ElevatedButton(onPressed: () {showAbout(context);}, child: Text("asfdg"))));
+//    return debugScreen(AnalogTab());
   }
 
   Widget debugScreen(Widget child) {

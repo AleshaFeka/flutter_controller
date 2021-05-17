@@ -46,11 +46,13 @@
     "regenCurrent": "Max Charge current"
   },
   "analogParameterNames": {
+    "throttleVoltmeter": "Voltmeter",
     "throttleMin": "Min. Throttle voltage",
     "throttleMax": "Max. Throttle voltage",
     "throttleCurveCoefficient1": "Throttle transfer K1 coef.",
     "throttleCurveCoefficient2": "Throttle transfer K2 coef.",
     "throttleCurveCoefficient3": "Throttle transfer K3 coef.",
+    "brakeVoltmeter": "Voltmeter",
     "brakeMin": "Min. Brake voltage",
     "brakeMax": "Max. Brake voltage",
     "brakeCurveCoefficient1": "Brake transfer K1 coef.",

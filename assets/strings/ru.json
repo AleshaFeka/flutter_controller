@@ -40,10 +40,10 @@
   "batteryParameterNames": {
     "fullVoltage": "Максимальное напряжение",
     "lowVoltage": "Минимальное напряжение",
+    "powerReductionVoltage": "Напряжение снижения мощности",
     "maxPower": "Максимальная мощность",
     "driveCurrent": "Ток езды",
-    "regenCurrent": "Ток рекуперации",
-    "powerReductionVoltage": "Напряжение снижения мощности"
+    "regenCurrent": "Ток рекуперации"
   },
   "analogParameterNames": {
     "throttleMin": "Мин. значение ручки газа в вольтах",
@@ -69,9 +69,7 @@
     "discreetBrakeCurrentMax": "Максимальный ток дискретный тормоз",
     "controlMode": "Режим управления",
     "phaseWeakingCurrent": "Ток ослабления потока",
-    "pwmFrequency": "Частота ШИМ",
-    "processorIdHigh": "Идентификатор процессора High",
-    "processorIdLow": "Идентификатор процессора Low"
+    "pwmFrequency": "Частота ШИМ"
   },
   "functionParameterNames": {
     "fullVoltage": "Максимальное напряжение",

@@ -40,10 +40,10 @@
   "batteryParameterNames": {
     "fullVoltage": "Battery Max voltage",
     "lowVoltage": "Battery Min voltage",
+    "powerReductionVoltage": "Power Fade voltage",
     "maxPower": "Power Battery power",
     "driveCurrent": "Max Discharge current",
-    "regenCurrent": "Max Charge current",
-    "powerReductionVoltage": "Power Fade voltage"
+    "regenCurrent": "Max Charge current"
   },
   "analogParameterNames": {
     "throttleMin": "Min. Throttle voltage",
@@ -69,9 +69,7 @@
     "discreetBrakeCurrentMax": "SwitchBrake Max current",
     "controlMode": "Control Mode",
     "phaseWeakingCurrent": "Field Weaking current",
-    "pwmFrequency": "PWM Frequency",
-    "processorIdHigh": "ProcessorId High",
-    "processorIdLow": "ProcessorId Low"
+    "pwmFrequency": "PWM Frequency"
   },
   "functionParameterNames": {
     "fullVoltage": "Max voltage",

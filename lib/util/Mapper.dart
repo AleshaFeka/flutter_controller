@@ -98,9 +98,9 @@ class Mapper {
     dataBuffer.setInt16(6, restartWord.codeUnitAt(3), Endian.little);
     dataBuffer.setInt16(8, restartWord.codeUnitAt(4), Endian.little);
 
-    dataBuffer.setInt16(10, restartWord.codeUnitAt(4), Endian.little);
-    dataBuffer.setInt16(12, restartWord.codeUnitAt(4), Endian.little);
-    dataBuffer.setInt16(14, restartWord.codeUnitAt(4), Endian.little);
+    dataBuffer.setInt16(10, restartWord.codeUnitAt(5), Endian.little);
+    dataBuffer.setInt16(12, restartWord.codeUnitAt(6), Endian.little);
+    dataBuffer.setInt16(14, restartWord.codeUnitAt(7), Endian.little);
 
     return Packet(_COMMAND_SCREEN_NUMBER, command, data);
   }

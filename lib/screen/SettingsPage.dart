@@ -88,23 +88,65 @@ class _SettingsPage extends State<SettingsPage> {
               ElevatedButton(
                 child: Text(_localizedStrings['restartController']),
                 onPressed: () {
-                  _bluetoothInteractor.restartController();
+                  _showConfirmationDialog(context, _localizedStrings['askRestartController'], () {
+                    _bluetoothInteractor.restartController();
+                  });
                 },
               ),
               ElevatedButton(
                 child: Text(_localizedStrings['resetToDefaults']),
                 onPressed: () {
-                  _bluetoothInteractor.resetController();
+                  _showConfirmationDialog(context, _localizedStrings['askResetToDefaults'], () {
+                    _bluetoothInteractor.resetController();
+                  });
                 },
               ),
               ElevatedButton(
                 child: Text(_localizedStrings['bootloaderMode']),
                 onPressed: () {
-                  _bluetoothInteractor.turnToBootloaderMode();
+                  _showConfirmationDialog(context, _localizedStrings['askBootloaderMode'], () {
+                    _bluetoothInteractor.turnToBootloaderMode();
+                  });
                 },
               ),
             ]),
           ],
         ));
   }
+
+  Future<void> _showConfirmationDialog(BuildContext context, String confirmationText, Function onApprove) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(_localizedStrings['confirmation']),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(confirmationText),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            ElevatedButton(
+              child: const Text('OK'),
+              onPressed: () {
+                onApprove();
+                Navigator.of(context).pop();
+              },
+            ),
+            Container(width: 8,),
+            ElevatedButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 }

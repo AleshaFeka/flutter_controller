@@ -220,6 +220,10 @@
   "maxPhaseCurrent": "Max phase current:",
   "processor": "Processor",
 
+  "confirmation": "Confirmation:",
+  "askResetToDefaults": "Reset To Defaults?",
+  "askRestartController": "Restart Controller?",
+  "askBootloaderMode": "Go to Bootloader Mode?",
 
   "yes": "Yes",
   "no": "No",

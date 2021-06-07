@@ -221,6 +221,11 @@
   "maxPhaseCurrent": "Макс. фазный ток:",
   "processor": "Процессор:",
 
+  "confirmation": "Подтверждение:",
+  "askResetToDefaults": "Сбросить настройки?",
+  "askRestartController": "Перезагрузить контроллер?",
+  "askBootloaderMode": "Перейти в режим BootLoader?",
+
   "yes": "Да",
   "no": "Нет",
   "unknownTemperatureSensor": "Неверный тип"

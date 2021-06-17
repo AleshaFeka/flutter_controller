@@ -3,6 +3,7 @@ import 'package:flutter_controller/bloc/MonitorTabBloc.dart';
 import 'package:flutter_controller/di/Provider.dart';
 import 'package:flutter_controller/model/MonitorSettings.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_screen_wake/flutter_screen_wake.dart';
 
 class MonitorTab extends StatefulWidget {
   @override
@@ -17,16 +18,18 @@ class _MonitorTab extends State<MonitorTab> {
   MonitorTabBloc _monitorTabBloc;
   Map _localizedStrings;
 
-
   @override
   void dispose() {
     _monitorTabBloc.monitorSettingsCommandStream.add(MonitorTabCommand.STOP_MONITORING);
     super.dispose();
+    FlutterScreenWake.keepOn(false);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    FlutterScreenWake.keepOn(true);
+
     _localizedStrings = Provider.of(context).localizedStrings;
     _monitorTabBloc = Provider.of(context).monitorTabBloc;
     _monitorTabBloc.monitorSettingsCommandStream.add(MonitorTabCommand.READ);

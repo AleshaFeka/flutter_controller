@@ -2,16 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_controller/di/Provider.dart';
 import 'package:flutter_controller/screen/ConnectPage.dart';
-import 'package:flutter_controller/screen/SettingsPage.dart';
-import 'package:flutter_controller/screen/TabsPage.dart';
-import 'package:flutter_controller/util/Util.dart';
-import 'package:flutter_controller/widget/Voltmeter.dart';
-import 'package:flutter_controller/widget/tab/AnalogTab.dart';
-import 'package:flutter_controller/widget/tab/BatteryTab.dart';
-import 'package:flutter_controller/widget/tab/DriveTab.dart';
-import 'package:flutter_controller/widget/tab/FuncTab.dart';
-import 'package:flutter_controller/widget/tab/MotorTab.dart';
-import 'package:flutter_controller/widget/tab/IdentificationTab.dart';
 
 class MainPage extends StatefulWidget {
   @override
